@@ -1,21 +1,59 @@
-/* ... manter o anterior e adicionar/ajustar ... */
-
-.action-price {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+:root {
+    --black: #000000;
+    --card: #1c1c1e;
+    --blue: #0A84FF;
+    --text: #ffffff;
 }
 
-.btn-del {
-    background: rgba(255, 69, 58, 0.1);
-    color: var(--red);
-    border: none;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    font-size: 12px;
-    cursor: pointer;
+body {
+    background-color: var(--black) !important; /* Força o fundo preto */
+    color: var(--text);
+    font-family: sans-serif;
+    margin: 0;
+    padding-bottom: 90px;
 }
 
-.info { flex: 1; }
-/* ... restante do CSS anterior ... */
+header { padding: 30px 20px; display: flex; justify-content: space-between; align-items: center; }
+header h1 span { color: var(--blue); }
+
+.badge-status { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; }
+
+.container { padding: 0 15px; }
+
+.card-balanco, .card-chart, .card-form {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.main-balance { text-align: center; margin: 15px 0; }
+.main-balance h2 { font-size: 32px; margin: 5px 0; }
+
+.sub-balanco { display: flex; justify-content: space-around; border-top: 1px solid #333; padding-top: 15px; }
+
+.aba-content { display: none; }
+.aba-content.active { display: block; }
+
+.nav-bottom {
+    position: fixed; bottom: 0; width: 100%;
+    background: #1c1c1e; display: flex; padding: 15px 0;
+    border-top: 1px solid #333;
+}
+
+.nav-item { flex: 1; background: none; border: none; color: #666; text-align: center; }
+.nav-item.active { color: var(--blue); font-weight: bold; }
+
+input, select, .btn-save {
+    width: 100%; background: #2c2c2e; border: 1px solid #444;
+    padding: 15px; border-radius: 12px; color: #fff; margin-bottom: 10px; box-sizing: border-box;
+}
+
+.btn-save { background: var(--blue); font-weight: bold; border: none; }
+.text-green { color: #32D74B; }
+.text-red { color: #FF453A; }
+
+.list-item {
+    background: var(--card); padding: 15px; border-radius: 12px;
+    display: flex; justify-content: space-between; margin-bottom: 8px;
+}
