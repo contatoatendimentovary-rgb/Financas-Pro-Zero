@@ -4,41 +4,34 @@ function abrirAba(event, nomeAba) {
     document.querySelectorAll('.aba-content').forEach(a => a.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(nomeAba).classList.add('active');
-    if(event && event.currentTarget) event.currentTarget.classList.add('active');
+    if(event) event.currentTarget.classList.add('active');
     if (nomeAba === 'extrato') carregarDados();
 }
 
-async function enviarGasto() {
-    const input = document.getElementById("inputGasto");
-    const status = document.getElementById("iaStatus");
-    if (!input.value) return;
+function salvarManual() {
+    const desc = document.getElementById("desc").value;
+    const valor = document.getElementById("valor").value;
+    const tipo = document.getElementById("tipo").value;
+    const cat = document.getElementById("cat").value;
 
-    status.innerText = "🤖 Analisando...";
-    try {
-        const resIA = await fetch("/api/server", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mensagem: input.value })
-        });
-        
-        const dado = await resIA.json();
+    if (!desc || !valor) return alert("Preencha todos os campos!");
 
-        if (dado.erro) {
-            status.innerText = "❌ " + dado.erro;
-            return;
-        }
-        
-        let storage = JSON.parse(localStorage.getItem("transacoes") || "[]");
-        storage.push({ ...dado, data: new Date() });
-        localStorage.setItem("transacoes", JSON.stringify(storage));
+    const novoGasto = {
+        descricao: desc,
+        valor: parseFloat(valor),
+        tipo: tipo,
+        categoria: cat
+    };
 
-        status.innerText = "✅ Salvo!";
-        input.value = "";
-        setTimeout(() => { abrirAba(null, 'extrato'); }, 1500);
+    let historico = JSON.parse(localStorage.getItem("transacoes") || "[]");
+    historico.push(novoGasto);
+    localStorage.setItem("transacoes", JSON.stringify(historico));
 
-    } catch (e) { 
-        status.innerText = "❌ Erro de rede ou servidor."; 
-    }
+    // Limpar campos e voltar para o extrato
+    document.getElementById("desc").value = "";
+    document.getElementById("valor").value = "";
+    alert("✅ Lançamento realizado!");
+    abrirAba(null, 'extrato');
 }
 
 function carregarDados() {
@@ -50,8 +43,9 @@ function carregarDados() {
 
     dados.forEach(d => {
         const v = parseFloat(d.valor) || 0;
-        if (d.tipo === "receita") { rec += v; } 
-        else { 
+        if (d.tipo === "receita") { 
+            rec += v; 
+        } else { 
             des += v; 
             if(cats[d.categoria] !== undefined) cats[d.categoria] += v;
         }
