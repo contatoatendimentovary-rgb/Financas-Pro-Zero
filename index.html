@@ -11,62 +11,90 @@
 <body>
 
 <header>
-    <h1>Finanças<span>PRO</span></h1>
-    <div id="statusOrcamento" class="badge-status">Analisando...</div>
+    <div class="header-content">
+        <h1>Finanças<span>PRO</span></h1>
+        <div id="statusOrcamento" class="badge-status">Carregando...</div>
+    </div>
 </header>
 
 <div class="container">
     <section id="extrato" class="aba-content active">
         <div class="card-balanco">
-            <div class="seletor-mes">
+            <div class="seletor-container">
                 <select id="filtroMes" onchange="carregarDados()"></select>
             </div>
             <div class="main-balance">
-                <small>Saldo Atual</small>
+                <small>Saldo Disponível</small>
                 <h2 id="saldo">R$ 0,00</h2>
             </div>
             <div class="sub-balanco">
                 <div class="item-balanco">
-                    <small>Receitas</small>
+                    <small>Entradas</small>
                     <span id="receita" class="text-green">R$ 0,00</span>
                 </div>
                 <div class="item-balanco">
-                    <small>Despesas</small>
+                    <small>Saídas</small>
                     <span id="despesa" class="text-red">R$ 0,00</span>
                 </div>
             </div>
         </div>
 
         <div class="card-chart">
-            <canvas id="graficoPizza"></canvas>
+            <div class="chart-container">
+                <canvas id="graficoPizza"></canvas>
+            </div>
         </div>
 
+        <div class="lista-header">
+            <h3>Atividades Recentes</h3>
+        </div>
         <div id="lista" class="historico-lista"></div>
     </section>
 
     <section id="lancamento" class="aba-content">
         <div class="card-form">
-            <h2>Novo Lançamento</h2>
-            <input type="text" id="desc" placeholder="Descrição">
-            <input type="number" id="valor" step="0.01" placeholder="Valor R$">
-            <input type="date" id="data">
-            <select id="tipo">
-                <option value="receita">Receita (Entrada)</option>
-                <option value="despesa" selected>Despesa (Saída)</option>
-            </select>
-            <select id="cat">
-                <option value="Essencial">Essencial (50%)</option>
-                <option value="Lazer">Lazer (30%)</option>
-                <option value="Investimento">Investimento (20%)</option>
-            </select>
-            <button onclick="salvarNovoDado()" class="btn-save">Salvar Registro</button>
+            <h2>Novo Registro</h2>
+            <div class="group">
+                <label>Descrição</label>
+                <input type="text" id="desc" placeholder="Ex: Mercado, Venda...">
+            </div>
+            <div class="group">
+                <label>Valor</label>
+                <input type="number" id="valor" step="0.01" placeholder="R$ 0,00">
+            </div>
+            <div class="group">
+                <label>Data</label>
+                <input type="date" id="data">
+            </div>
+            <div class="row">
+                <div class="group">
+                    <label>Tipo</label>
+                    <select id="tipo">
+                        <option value="receita">Receita</option>
+                        <option value="despesa" selected>Despesa</option>
+                    </select>
+                </div>
+                <div class="group">
+                    <label>Categoria</label>
+                    <select id="cat">
+                        <option value="Essencial">Essencial</option>
+                        <option value="Lazer">Lazer</option>
+                        <option value="Investimento">Investir</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="salvarNovoDado()" class="btn-save">Confirmar</button>
         </div>
     </section>
 </div>
 
 <nav class="nav-bottom">
-    <button class="nav-item active" onclick="abrirAba(event, 'extrato')">📊 Dashboard</button>
-    <button class="nav-item" onclick="abrirAba(event, 'lancamento')">➕ Lançar</button>
+    <button class="nav-item active" onclick="abrirAba(event, 'extrato')">
+        <span class="icon">📊</span><br>Dashboard
+    </button>
+    <button class="nav-item" onclick="abrirAba(event, 'lancamento')">
+        <span class="icon">➕</span><br>Lançar
+    </button>
 </nav>
 
 <script src="script.js"></script>
