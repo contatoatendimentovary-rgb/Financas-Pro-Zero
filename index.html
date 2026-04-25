@@ -3,17 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finanças PRO 50/30/20</title>
+    <title>Finanças PRO Black</title>
+    <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
     <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
 
 <header>
     <div class="header-content">
         <h1>Finanças<span>PRO</span></h1>
-        <div id="statusOrcamento" class="badge-status">Carregando...</div>
+        <div id="statusOrcamento" class="badge-status">Analisando...</div>
     </div>
 </header>
 
@@ -46,7 +49,7 @@
         </div>
 
         <div class="lista-header">
-            <h3>Atividades Recentes</h3>
+            <h3>Detalhamento / Extrato</h3>
         </div>
         <div id="lista" class="historico-lista"></div>
     </section>
@@ -77,20 +80,20 @@
                 <div class="group">
                     <label>Categoria</label>
                     <select id="cat">
-                        <option value="Essencial">Essencial</option>
-                        <option value="Lazer">Lazer</option>
-                        <option value="Investimento">Investir</option>
+                        <option value="Essencial">Essencial (50%)</option>
+                        <option value="Lazer">Lazer (30%)</option>
+                        <option value="Investimento">Investir (20%)</option>
                     </select>
                 </div>
             </div>
-            <button onclick="salvarNovoDado()" class="btn-save">Confirmar</button>
+            <button onclick="salvarNovoDado()" class="btn-save">Confirmar Registro</button>
         </div>
     </section>
 </div>
 
 <nav class="nav-bottom">
     <button class="nav-item active" onclick="abrirAba(event, 'extrato')">
-        <span class="icon">📊</span><br>Dashboard
+        <span class="icon">📊</span><br>Extrato
     </button>
     <button class="nav-item" onclick="abrirAba(event, 'lancamento')">
         <span class="icon">➕</span><br>Lançar
