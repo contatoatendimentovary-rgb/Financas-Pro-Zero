@@ -20,11 +20,24 @@
 <div class="container">
     <section id="extrato" class="aba-content active">
         <div class="card resumo-topo">
-            <div><small>Receitas</small><div id="receita" class="receita">R$ 0,00</div></div>
-            <div><small>Despesas</small><div id="despesa" class="despesa">R$ 0,00</div></div>
-            <div><small>Saldo</small><div id="saldo">R$ 0,00</div></div>
+            <div>
+                <small>Receitas</small>
+                <div id="receita" class="receita">R$ 0,00</div>
+            </div>
+            <div>
+                <small>Despesas</small>
+                <div id="despesa" class="despesa">R$ 0,00</div>
+            </div>
+            <div>
+                <small>Saldo</small>
+                <div id="saldo">R$ 0,00</div>
+            </div>
         </div>
-        <div class="card"><canvas id="grafico"></canvas></div>
+
+        <div class="card">
+            <canvas id="grafico" style="max-height: 250px;"></canvas>
+        </div>
+
         <div id="lista" class="historico-lista"></div>
     </section>
 
@@ -34,13 +47,13 @@
             <p>Fale naturalmente: "Gastei 50 reais no BK"</p>
             <input id="inputGasto" placeholder="O que aconteceu hoje?">
             <button onclick="enviarGasto()">Analisar com Gemini</button>
-            <div id="iaStatus"></div>
+            <div id="iaStatus" style="margin-top: 10px; font-weight: bold;"></div>
         </div>
     </section>
 
     <section id="saude" class="aba-content">
         <div class="card">
-            <h2>Metas 50/30/20</h2>
+            <h2>Saúde Financeira</h2>
             <div class="pote">
                 <div class="pote-label"><span>Essencial (50%)</span><span id="txt-fixo">R$ 0 / R$ 0</span></div>
                 <div class="barra-bg"><div id="bar-fixo" class="barra-fill blue"></div></div>
@@ -54,7 +67,6 @@
                 <div class="barra-bg"><div id="bar-invest" class="barra-fill green"></div></div>
             </div>
         </div>
-        <div class="ia-box" id="iaResumo">Aguardando dados...</div>
     </section>
 </div>
 
