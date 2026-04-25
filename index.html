@@ -1,82 +1,126 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FinançasPRO - Cloud</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinançasPRO - 2026</title>
     <link rel="stylesheet" href="style.css">
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0A84FF">
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+      }
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+
     <header>
-        <div class="header-top">
-            <h1>Finanças<span>PRO</span></h1>
-            <button onclick="window.loginGoogle()" id="btnAuth" class="btn-google">Login Google</button>
-        </div>
+        <h1>FinançasPRO</h1>
+        <button id="btnAuth" class="btn-auth">Login Google</button>
     </header>
 
-    <div class="container">
-        <div class="card-balanco">
-            <div class="seletor-mes">
-                <select id="filtroMes" onchange="carregarDadosDoFirebase()"></select>
+    <main>
+        <section class="resumo">
+            <div class="card">
+                <h3>Saldo Atual</h3>
+                <p id="saldo">R$ 0,00</p>
             </div>
-            <small>Saldo em Conta</small>
-            <h2 id="saldo">R$ 0,00</h2>
             <div class="chart-container">
-                <canvas id="graficoPizza"></canvas>
+                <canvas id="meuGrafico"></canvas>
             </div>
-        </div>
+        </section>
 
-        <div class="card-form">
-            <h3>Novo Registro</h3>
-            <input type="text" id="desc" placeholder="Descrição">
-            <div class="row">
-                <input type="number" id="valor" placeholder="R$ 0,00" style="flex:2">
-                <input type="date" id="data" style="flex:1.5">
-            </div>
-            <select id="cat">
-                <option value="Receita">Receita / Salário</option>
-                <option value="Essencial">Essencial (50%)</option>
-                <option value="Lazer">Lazer (30%)</option>
-                <option value="Investimento">Investimento (20%)</option>
+        <section class="controles">
+            <select id="filtroMes">
+                <option value="janeiro">Janeiro</option>
+                <option value="fevereiro">Fevereiro</option>
+                <option value="março">Março</option>
+                <option value="abril">Abril</option>
+                <option value="maio">Maio</option>
+                <option value="junho">Junho</option>
+                <option value="julho">Julho</option>
+                <option value="agosto">Agosto</option>
+                <option value="setembro">Setembro</option>
+                <option value="outubro">Outubro</option>
+                <option value="novembro">Novembro</option>
+                <option value="dezembro">Dezembro</option>
             </select>
-            <button onclick="salvarNoFirebase()" class="btn-save">Confirmar Registro</button>
-        </div>
+            <button id="abrirModal" class="btn-add">+</button>
+        </section>
 
-        <div id="lista" class="historico-lista"></div>
+        <section class="lista-transacoes">
+            <ul id="lista">
+                </ul>
+        </section>
+    </main>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h2>Novo Registro</h2>
+            <input type="text" id="desc" placeholder="Ex: Salário, Aluguel...">
+            <input type="number" id="valor" placeholder="R$ 0,00">
+            <select id="tipo">
+                <option value="entrada">Entrada (+)</option>
+                <option value="saida">Saída (-)</option>
+            </select>
+            <div class="modal-actions">
+                <button id="btnSalvar">Confirmar</button>
+                <button id="btnFechar">Cancelar</button>
+            </div>
+        </div>
     </div>
 
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-      import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-      import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-      const firebaseConfig = {
-        apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE",
-        authDomain: "financaspro-1e0e8.firebaseapp.com",
-        projectId: "financaspro-1e0e8",
-        storageBucket: "financaspro-1e0e8.firebasestorage.app",
-        messagingSenderId: "659521706556",
-        appId: "1:659521706556:web:86f2174c4c8a89335ac139"
-      };
-
-      const app = initializeApp(firebaseConfig);
-      window.auth = getAuth(app);
-      window.db = getFirestore(app);
-      const provider = new GoogleAuthProvider();
-
-      window.loginGoogle = () => {
-        signInWithPopup(window.auth, provider).then(() => location.reload());
-      };
-
-      onAuthStateChanged(window.auth, (user) => {
-          if (user) {
-              document.getElementById('btnAuth').innerText = "Sair";
-              document.getElementById('btnAuth').onclick = () => window.auth.signOut().then(() => location.reload());
-              window.carregarDadosDoFirebase();
-          }
-      });
-    </script>
     <script src="script.js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE",
+            authDomain: "financaspro-1e0e8.firebaseapp.com",
+            projectId: "financaspro-1e0e8",
+            storageBucket: "financaspro-1e0e8.firebasestorage.app",
+            messagingSenderId: "659521706556",
+            appId: "1:659521706556:web:86f2174c4c8a89335ac139"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        
+        // Exportando para o script.js conseguir usar
+        window.auth = getAuth(app);
+        window.db = getFirestore(app);
+        window.doc = doc;
+        window.setDoc = setDoc;
+        window.getDoc = getDoc;
+        
+        const provider = new GoogleAuthProvider();
+
+        window.loginGoogle = () => {
+            signInWithPopup(window.auth, provider)
+                .then(() => location.reload())
+                .catch((error) => console.error("Erro no login:", error));
+        };
+
+        onAuthStateChanged(window.auth, (user) => {
+            const btn = document.getElementById('btnAuth');
+            if (user) {
+                btn.innerText = "Sair";
+                btn.onclick = () => window.auth.signOut().then(() => location.reload());
+                // Carrega os dados do Firebase se a função existir no script.js
+                if (typeof window.carregarDadosDoFirebase === "function") {
+                    window.carregarDadosDoFirebase();
+                }
+            } else {
+                btn.innerText = "Login Google";
+                btn.onclick = window.loginGoogle;
+            }
+        });
+    </script>
 </body>
-</html> 
+</html>
