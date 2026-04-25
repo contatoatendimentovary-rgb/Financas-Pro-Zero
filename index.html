@@ -3,38 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinançasPRO - 2026</title>
+    <title>FinançasPRO</title>
     <link rel="stylesheet" href="style.css">
-    
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0A84FF">
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
-      }
-    </script>
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-
     <header>
-        <h1>FinançasPRO</h1>
-        <button id="btnAuth" class="btn-auth">Login Google</button>
+        <div class="header-content">
+            <h1>FinançasPRO</h1>
+            <button id="btnAuth">Login Google</button>
+        </div>
     </header>
 
     <main>
-        <section class="resumo">
-            <div class="card">
-                <h3>Saldo Atual</h3>
-                <p id="saldo">R$ 0,00</p>
+        <section class="resumo-cards">
+            <div class="card-saldo">
+                <span>Saldo Atual</span>
+                <h2 id="saldo">R$ 0,00</h2>
             </div>
-            <div class="chart-container">
+            <div class="grafico-box">
                 <canvas id="meuGrafico"></canvas>
             </div>
         </section>
 
-        <section class="controles">
+        <section class="acoes">
             <select id="filtroMes">
                 <option value="janeiro">Janeiro</option>
                 <option value="fevereiro">Fevereiro</option>
@@ -49,33 +42,29 @@
                 <option value="novembro">Novembro</option>
                 <option value="dezembro">Dezembro</option>
             </select>
-            <button id="abrirModal" class="btn-add">+</button>
+            <button id="abrirModal" class="btn-floating">+</button>
         </section>
 
-        <section class="lista-transacoes">
-            <ul id="lista">
-                </ul>
-        </section>
+        <ul id="lista" class="transacoes-lista"></ul>
     </main>
 
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <h2>Novo Registro</h2>
-            <input type="text" id="desc" placeholder="Ex: Salário, Aluguel...">
-            <input type="number" id="valor" placeholder="R$ 0,00">
+    <div id="modal" class="modal-overlay">
+        <div class="modal-container">
+            <h3>Novo Lançamento</h3>
+            <input type="text" id="desc" placeholder="Descrição">
+            <input type="number" id="valor" placeholder="Valor R$">
             <select id="tipo">
                 <option value="entrada">Entrada (+)</option>
                 <option value="saida">Saída (-)</option>
             </select>
-            <div class="modal-actions">
-                <button id="btnSalvar">Confirmar</button>
-                <button id="btnFechar">Cancelar</button>
+            <div class="modal-btns">
+                <button id="btnSalvar" class="confirmar">Salvar</button>
+                <button id="btnFechar" class="cancelar">Fechar</button>
             </div>
         </div>
     </div>
 
     <script src="script.js"></script>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -91,8 +80,6 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        
-        // Exportando para o script.js conseguir usar
         window.auth = getAuth(app);
         window.db = getFirestore(app);
         window.doc = doc;
@@ -102,9 +89,7 @@
         const provider = new GoogleAuthProvider();
 
         window.loginGoogle = () => {
-            signInWithPopup(window.auth, provider)
-                .then(() => location.reload())
-                .catch((error) => console.error("Erro no login:", error));
+            signInWithPopup(window.auth, provider).then(() => location.reload());
         };
 
         onAuthStateChanged(window.auth, (user) => {
@@ -112,10 +97,7 @@
             if (user) {
                 btn.innerText = "Sair";
                 btn.onclick = () => window.auth.signOut().then(() => location.reload());
-                // Carrega os dados do Firebase se a função existir no script.js
-                if (typeof window.carregarDadosDoFirebase === "function") {
-                    window.carregarDadosDoFirebase();
-                }
+                if (window.carregarDadosDoFirebase) window.carregarDadosDoFirebase();
             } else {
                 btn.innerText = "Login Google";
                 btn.onclick = window.loginGoogle;
