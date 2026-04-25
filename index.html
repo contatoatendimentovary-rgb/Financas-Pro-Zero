@@ -8,40 +8,68 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>Finanças PRO - Gestão Comercial</header>
-    <nav class="tabs-mobile">
-        <button class="tab-btn active" onclick="abrirAba(event, 'extrato')">📊 Extrato</button>
-        <button class="tab-btn" onclick="abrirAba(event, 'lancamento')">➕ Novo</button>
-    </nav>
-    <div class="container">
-        <section id="extrato" class="aba-content active">
-            <div class="card resumo-topo">
-                <div><small>Receitas</small><div id="receita" class="receita">R$ 0,00</div></div>
-                <div><small>Despesas</small><div id="despesa" class="despesa">R$ 0,00</div></div>
-                <div><small>Saldo</small><div id="saldo">R$ 0,00</div></div>
-            </div>
-            <div class="card"><canvas id="grafico" style="max-height: 250px;"></canvas></div>
-            <div id="lista" class="historico-lista"></div>
-        </section>
 
-        <section id="lancamento" class="aba-content">
-            <div class="card">
-                <h2>Novo Lançamento</h2>
-                <input type="text" id="desc" placeholder="Descrição (ex: Venda de Produto)">
-                <input type="number" id="valor" placeholder="Valor (R$)">
-                <select id="tipo">
-                    <option value="despesa">Despesa</option>
-                    <option value="receita">Receita</option>
-                </select>
-                <select id="cat">
-                    <option value="Essencial">Essencial / Operacional</option>
-                    <option value="Lazer">Lazer / Marketing</option>
-                    <option value="Investimento">Investimento</option>
-                </select>
-                <button onclick="salvarManual()">Salvar Lançamento</button>
+<header>Finanças PRO - Gestão Comercial</header>
+
+<nav class="tabs-mobile">
+    <button class="tab-btn active" onclick="abrirAba(event, 'extrato')">📊 Extrato</button>
+    <button class="tab-btn" onclick="abrirAba(event, 'lancamento')">➕ Novo</button>
+</nav>
+
+<div class="container">
+    <section id="extrato" class="aba-content active">
+        <div class="card resumo-topo">
+            <div>
+                <small>Receitas</small>
+                <div id="receita" class="receita" style="color: #22c55e;">R$ 0,00</div>
             </div>
-        </section>
-    </div>
-    <script src="script.js"></script>
+            <div>
+                <small>Despesas</small>
+                <div id="despesa" class="despesa" style="color: #ef4444;">R$ 0,00</div>
+            </div>
+            <div>
+                <small>Saldo</small>
+                <div id="saldo" style="font-weight: bold;">R$ 0,00</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <canvas id="grafico" style="max-height: 250px;"></canvas>
+        </div>
+
+        <div id="lista" class="historico-lista"></div>
+    </section>
+
+    <section id="lancamento" class="aba-content">
+        <div class="card">
+            <h2>Novo Lançamento</h2>
+            
+            <label>O que comprou/vendeu?</label>
+            <input type="text" id="desc" placeholder="Ex: Venda de Marmita">
+            
+            <label>Qual o valor?</label>
+            <input type="number" id="valor" placeholder="0.00">
+            
+            <label>Tipo:</label>
+            <select id="tipo">
+                <option value="receita">Receita (Dinheiro entrando)</option>
+                <option value="despesa">Despesa (Dinheiro saindo)</option>
+            </select>
+            
+            <label>Categoria:</label>
+            <select id="cat">
+                <option value="Essencial">Essencial / Operação</option>
+                <option value="Lazer">Lazer / Marketing</option>
+                <option value="Investimento">Investimento</option>
+            </select>
+            
+            <button onclick="salvarManual()" style="margin-top: 15px; background-color: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer;">
+                Salvar Lançamento
+            </button>
+        </div>
+    </section>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
