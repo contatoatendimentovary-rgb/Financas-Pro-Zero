@@ -16,21 +16,21 @@ function salvarNovoDado() {
     const tipo = document.getElementById("tipo").value;
     const cat = document.getElementById("cat").value;
 
-    if (!desc || !valorInput || !data) return alert("Preencha tudo!");
+    if (!desc || !valorInput || !data) return alert("Preencha todos os campos!");
 
     const item = { desc, valor: parseFloat(valorInput), data, tipo, cat, id: Date.now() };
-    const banco = JSON.parse(localStorage.getItem("db_v4") || "[]");
+    const banco = JSON.parse(localStorage.getItem("db_final") || "[]");
     banco.push(item);
-    localStorage.setItem("db_v4", JSON.stringify(banco));
+    localStorage.setItem("db_final", JSON.stringify(banco));
 
-    alert("Salvo!");
+    alert("Registrado com sucesso!");
     document.getElementById("desc").value = "";
     document.getElementById("valor").value = "";
     abrirAba(null, 'extrato');
 }
 
 function carregarDados() {
-    const banco = JSON.parse(localStorage.getItem("db_v4") || "[]");
+    const banco = JSON.parse(localStorage.getItem("db_final") || "[]");
     const filtro = document.getElementById("filtroMes").value;
     const lista = document.getElementById("lista");
     lista.innerHTML = "";
@@ -39,7 +39,10 @@ function carregarDados() {
 
     banco.filter(t => t.data.startsWith(filtro)).reverse().forEach(t => {
         if (t.tipo === 'receita') r += t.valor;
-        else { d += t.valor; c[t.cat] += t.valor; }
+        else { 
+            d += t.valor; 
+            c[t.cat] += t.valor; 
+        }
 
         lista.innerHTML += `
             <div class="list-item">
@@ -60,25 +63,25 @@ function carregarDados() {
     document.getElementById("despesa").innerText = `R$ ${d.toFixed(2)}`;
     document.getElementById("saldo").innerText = `R$ ${(r - d).toFixed(2)}`;
     
-    analisar(r, c);
+    analisarOrcamento(r, c);
     gerarGrafico(c);
 }
 
 function excluirItem(id) {
     if(confirm("Deseja apagar este lançamento?")) {
-        let banco = JSON.parse(localStorage.getItem("db_v4") || "[]");
+        let banco = JSON.parse(localStorage.getItem("db_final") || "[]");
         banco = banco.filter(t => t.id !== id);
-        localStorage.setItem("db_v4", JSON.stringify(banco));
+        localStorage.setItem("db_final", JSON.stringify(banco));
         carregarDados();
     }
 }
 
-function analisar(receita, gastos) {
+function analisarOrcamento(receita, gastos) {
     const st = document.getElementById("statusOrcamento");
     if (receita === 0) { st.innerText = "S/ RECEITA"; st.style.background = "#444"; return; }
     
     const estourou = (gastos.Essencial > receita * 0.5) || (gastos.Lazer > receita * 0.3);
-    st.innerText = estourou ? "🔴 RUIM" : "🟢 BOM";
+    st.innerText = estourou ? "🔴 ALERTA" : "🟢 EM DIA";
     st.style.background = estourou ? "#FF453A" : "#32D74B";
 }
 
@@ -109,7 +112,7 @@ function init() {
     for(let i=0; i<12; i++) {
         let m = new Date(agora.getFullYear(), agora.getMonth() - i, 1);
         let v = m.toISOString().substring(0, 7);
-        s.innerHTML += `<option value="${v}">${m.toLocaleDateString('pt-BR', {month:'short', year:'numeric'})}</option>`;
+        s.innerHTML += `<option value="${v}">${m.toLocaleDateString('pt-BR', {month:'long', year:'numeric'})}</option>`;
     }
     carregarDados();
 }
