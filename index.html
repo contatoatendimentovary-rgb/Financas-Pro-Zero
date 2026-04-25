@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Finanças PRO AI</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>Finanças PRO AI</header>
+
+<nav class="tabs-mobile">
+    <button class="tab-btn active" onclick="abrirAba(event, 'extrato')">📊 Extrato</button>
+    <button class="tab-btn" onclick="abrirAba(event, 'lancamento')">➕ Novo</button>
+    <button class="tab-btn" onclick="abrirAba(event, 'saude')">🏥 Saúde</button>
+</nav>
+
+<div class="container">
+    <section id="extrato" class="aba-content active">
+        <div class="card resumo-topo">
+            <div><small>Receitas</small><div id="receita" class="receita">R$ 0,00</div></div>
+            <div><small>Despesas</small><div id="despesa" class="despesa">R$ 0,00</div></div>
+            <div><small>Saldo</small><div id="saldo">R$ 0,00</div></div>
+        </div>
+        <div class="card"><canvas id="grafico"></canvas></div>
+        <div id="lista" class="historico-lista"></div>
+    </section>
+
+    <section id="lancamento" class="aba-content">
+        <div class="card">
+            <h2>Lançamento via IA</h2>
+            <p>Fale naturalmente: "Gastei 50 reais no BK"</p>
+            <input id="inputGasto" placeholder="O que aconteceu hoje?">
+            <button onclick="enviarGasto()">Analisar com Gemini</button>
+            <div id="iaStatus"></div>
+        </div>
+    </section>
+
+    <section id="saude" class="aba-content">
+        <div class="card">
+            <h2>Metas 50/30/20</h2>
+            <div class="pote">
+                <div class="pote-label"><span>Essencial (50%)</span><span id="txt-fixo">R$ 0 / R$ 0</span></div>
+                <div class="barra-bg"><div id="bar-fixo" class="barra-fill blue"></div></div>
+            </div>
+            <div class="pote">
+                <div class="pote-label"><span>Lazer (30%)</span><span id="txt-lazer">R$ 0 / R$ 0</span></div>
+                <div class="barra-bg"><div id="bar-lazer" class="barra-fill purple"></div></div>
+            </div>
+            <div class="pote">
+                <div class="pote-label"><span>Investir (20%)</span><span id="txt-invest">R$ 0 / R$ 0</span></div>
+                <div class="barra-bg"><div id="bar-invest" class="barra-fill green"></div></div>
+            </div>
+        </div>
+        <div class="ia-box" id="iaResumo">Aguardando dados...</div>
+    </section>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
