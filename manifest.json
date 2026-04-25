@@ -1,13 +1,13 @@
 {
-  "name": "Finanças PRO AI",
-  "short_name": "FinançasAI",
-  "start_url": "/",
+  "name": "Finanças PRO Black",
+  "short_name": "FinPRO",
+  "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#3b82f6",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2845/2845812.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/2454/2454282.png",
       "sizes": "512x512",
       "type": "image/png"
     }
