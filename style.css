@@ -1,43 +1,36 @@
-:root {
-    --black: #000000;
-    --card: #1c1c1e;
-    --blue: #0A84FF;
-    --text: #ffffff;
+/* Container que centraliza o seletor */
+.seletor-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
 }
 
-body { background: var(--black); color: var(--text); font-family: sans-serif; margin: 0; padding-bottom: 100px; }
-header { padding: 30px 20px; }
-header h1 span { color: var(--blue); }
-
-.container { padding: 0 15px; }
-
-.card-balanco, .card-chart, .card-form {
-    background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 15px; border: 1px solid #2c2c2e;
+/* Estilo do botão de Meses */
+#filtroMes {
+    background: #2c2c2e; /* Fundo cinza escuro Apple style */
+    color: var(--blue);
+    border: 1px solid #3a3a3c;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    appearance: none; /* Remove a setinha padrão feia */
+    -webkit-appearance: none;
+    cursor: pointer;
+    min-width: 150px;
+    transition: all 0.3s ease;
 }
 
-.main-balance { text-align: center; margin: 20px 0; }
-.main-balance h2 { font-size: 38px; margin: 0; }
-
-.sub-balanco { display: flex; justify-content: space-between; border-top: 1px solid #333; padding-top: 15px; }
-.item-balanco { text-align: center; flex: 1; }
-
-.aba-content { display: none; }
-.aba-content.active { display: block; }
-
-.nav-bottom {
-    position: fixed; bottom: 0; width: 100%; background: rgba(28,28,30,0.95);
-    display: flex; padding: 15px 0 30px; border-top: 1px solid #333;
+#filtroMes:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 8px rgba(10, 132, 255, 0.3);
 }
-.nav-item { flex: 1; background: none; border: none; color: #666; font-size: 11px; }
-.nav-item.active { color: var(--blue); }
 
-input, select, .btn-save {
-    width: 100%; background: #2c2c2e; border: 1px solid #444; padding: 15px;
-    border-radius: 12px; color: #fff; margin-bottom: 10px; box-sizing: border-box;
+/* Ajuste para que o texto dentro do select fique centralizado no mobile */
+#filtroMes option {
+    background: #1c1c1e;
+    color: #fff;
+    text-align: center;
 }
-.btn-save { background: var(--blue); font-weight: bold; }
-
-.list-item { background: var(--card); padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; margin-bottom: 10px; }
-.text-green { color: #32D74B; }
-.text-red { color: #FF453A; }
-.btn-del { border: none; background: none; color: #666; }
