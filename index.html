@@ -3,76 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finanças PRO</title>
+    <title>Finanças PRO Black</title>
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#000000">
 </head>
 <body>
 
-<header>Minha Gestão Financeira</header>
-
-<nav class="tabs-mobile">
-    <button class="tab-btn active" onclick="abrirAba(event, 'extrato')">📊 Resumo</button>
-    <button class="tab-btn" onclick="abrirAba(event, 'lancamento')">➕ Novo</button>
-    <button class="tab-btn" onclick="abrirAba(event, 'config')">⚙️ Ajustes</button>
-</nav>
+<header>
+    <h1>Finanças<span>PRO</span></h1>
+</header>
 
 <div class="container">
     <section id="extrato" class="aba-content active">
-        <div class="card">
-            <select id="filtroMes" onchange="carregarDados()" style="width: 100%; padding: 10px; border-radius: 8px; background: #1e293b; color: white;">
-                </select>
+        <div class="card-balanco">
+            <div class="seletor-mes">
+                <select id="filtroMes" onchange="carregarDados()"></select>
+            </div>
+            <div class="main-balance">
+                <small>Saldo Disponível</small>
+                <h2 id="saldo">R$ 0,00</h2>
+            </div>
+            <div class="sub-balanco">
+                <div class="item-balanco">
+                    <small>Receitas</small>
+                    <span id="receita" class="text-green">R$ 0,00</span>
+                </div>
+                <div class="item-balanco">
+                    <small>Despesas</small>
+                    <span id="despesa" class="text-red">R$ 0,00</span>
+                </div>
+            </div>
         </div>
 
-        <div class="card resumo-topo">
-            <div><small>Ganhos</small><div id="receita" style="color: #22c55e;">R$ 0,00</div></div>
-            <div><small>Gastos</small><div id="despesa" style="color: #ef4444;">R$ 0,00</div></div>
-            <div><small>Saldo</small><div id="saldo" style="font-weight: bold;">R$ 0,00</div></div>
+        <div class="card-chart">
+            <canvas id="grafico"></canvas>
         </div>
 
-        <div class="card"><canvas id="grafico" style="max-height: 220px;"></canvas></div>
-        <div id="lista" class="historico-lista"></div>
+        <div id="lista" class="historico-lista">
+            </div>
     </section>
 
     <section id="lancamento" class="aba-content">
-        <div class="card">
-            <h2>Novo Lançamento</h2>
-            <label>Descrição</label>
-            <input type="text" id="desc" placeholder="Ex: Salário, Aluguel...">
-            
-            <label>Valor (R$)</label>
-            <input type="number" id="valor" step="0.01" placeholder="0.00">
-            
-            <label>Data</label>
-            <input type="date" id="dataLancamento">
-
-            <label>Tipo</label>
-            <select id="tipo">
-                <option value="receita">Dinheiro Entrando</option>
-                <option value="despesa">Dinheiro Saindo</option>
-            </select>
-            
-            <label>Categoria</label>
-            <select id="cat">
-                <option value="Essencial">Essencial</option>
-                <option value="Lazer">Lazer / Variáveis</option>
-                <option value="Investimento">Investimentos</option>
-            </select>
-            
-            <button onclick="salvarManual()" class="btn-principal">Salvar</button>
+        <div class="card-form">
+            <h2>Novo Registro</h2>
+            <div class="input-group">
+                <input type="text" id="desc" placeholder="Descrição (ex: Venda de Produto)">
+                <input type="number" id="valor" step="0.01" placeholder="Valor R$">
+                <input type="date" id="data">
+                <select id="tipo">
+                    <option value="receita">Entrada (+)</option>
+                    <option value="despesa" selected>Saída (-)</option>
+                </select>
+                <select id="cat">
+                    <option value="Essencial">Essencial</option>
+                    <option value="Lazer">Lazer / Marketing</option>
+                    <option value="Investimento">Investimento</option>
+                </select>
+                <button onclick="salvarDado()" class="btn-save">Confirmar Lançamento</button>
+            </div>
         </div>
     </section>
 
     <section id="config" class="aba-content">
-        <div class="card">
+        <div class="card-form">
             <h2>Ferramentas</h2>
-            <button onclick="exportarCSV()" style="background: #22c55e; margin-bottom: 10px;">Exportar para Excel</button>
-            <button onclick="limparTudo()" style="background: #ef4444;">Apagar Todos os Dados</button>
+            <button onclick="exportarCSV()" class="btn-tool">Exportar para Excel (CSV)</button>
+            <button onclick="limparBanco()" class="btn-danger">Limpar Todos os Dados</button>
         </div>
     </section>
 </div>
+
+<nav class="nav-bottom">
+    <button class="nav-item active" onclick="abrirAba(event, 'extrato')">📊<br>Início</button>
+    <button class="nav-item" onclick="abrirAba(event, 'lancamento')">➕<br>Lançar</button>
+    <button class="nav-item" onclick="abrirAba(event, 'config')">⚙️<br>Menu</button>
+</nav>
 
 <script src="script.js"></script>
 </body>
