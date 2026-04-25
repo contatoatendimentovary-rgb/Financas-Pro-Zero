@@ -1,0 +1,15 @@
+{
+  "name": "Finanças PRO AI",
+  "short_name": "FinançasAI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2845/2845812.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
