@@ -1,60 +1,56 @@
 let myChart;
 
-// Inicia com a data atual
 document.getElementById('data').valueAsDate = new Date();
 
 function abrirAba(e, aba) {
     document.querySelectorAll('.aba-content').forEach(a => a.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
     document.getElementById(aba).classList.add('active');
-    e.currentTarget.classList.add('active');
+    if(e) e.currentTarget.classList.add('active');
     if (aba === 'extrato') carregarDados();
 }
 
-function salvarDado() {
+function salvarNovoDado() {
     const desc = document.getElementById("desc").value;
     const valor = parseFloat(document.getElementById("valor").value);
     const data = document.getElementById("data").value;
     const tipo = document.getElementById("tipo").value;
     const cat = document.getElementById("cat").value;
 
-    if (!desc || isNaN(valor)) return alert("Dados inválidos!");
+    if (!desc || isNaN(valor)) return alert("Preencha os campos corretamente!");
 
-    const transacao = { desc, valor, data, tipo, cat, id: Date.now() };
-    const banco = JSON.parse(localStorage.getItem("financas_black") || "[]");
-    banco.push(transacao);
-    localStorage.setItem("financas_black", JSON.stringify(banco));
+    const item = { desc, valor, data, tipo, cat, id: Date.now() };
+    const banco = JSON.parse(localStorage.getItem("db_financas") || "[]");
+    banco.push(item);
+    localStorage.setItem("db_financas", JSON.stringify(banco));
 
-    alert("Lançado!");
+    // Limpa campos
     document.getElementById("desc").value = "";
     document.getElementById("valor").value = "";
-    abrirAba({ currentTarget: document.querySelector('.nav-item') }, 'extrato');
+    alert("Registrado!");
+    abrirAba(null, 'extrato');
 }
 
 function carregarDados() {
-    const banco = JSON.parse(localStorage.getItem("financas_black") || "[]");
-    const mesFiltro = document.getElementById("filtroMes").value;
+    const banco = JSON.parse(localStorage.getItem("db_financas") || "[]");
+    const filtro = document.getElementById("filtroMes").value;
     const lista = document.getElementById("lista");
     lista.innerHTML = "";
 
-    let r = 0, d = 0, cats = { Essencial: 0, Lazer: 0, Investimento: 0 };
+    let r = 0, d = 0, c = { Essencial: 0, Lazer: 0, Investimento: 0 };
 
-    banco.filter(t => t.data.startsWith(mesFiltro)).reverse().forEach(t => {
-        if (t.tipo === 'receita') {
-            r += t.valor;
-        } else {
+    banco.filter(t => t.data.startsWith(filtro)).reverse().forEach(t => {
+        if (t.tipo === 'receita') r += t.valor;
+        else {
             d += t.valor;
-            cats[t.cat] += t.valor;
+            c[t.cat] += t.valor;
         }
 
         lista.innerHTML += `
             <div class="list-item">
-                <div class="info">
-                    <strong>${t.desc}</strong>
-                    <small>${t.data.split('-').reverse().join('/')} • ${t.cat}</small>
-                </div>
+                <div><strong>${t.desc}</strong><br><small>${t.cat}</small></div>
                 <span class="${t.tipo === 'receita' ? 'text-green' : 'text-red'}">
-                    ${t.tipo === 'receita' ? '+' : '-'} R$ ${t.valor.toFixed(2)}
+                    R$ ${t.valor.toFixed(2)}
                 </span>
             </div>`;
     });
@@ -63,40 +59,62 @@ function carregarDados() {
     document.getElementById("despesa").innerText = `R$ ${d.toFixed(2)}`;
     document.getElementById("saldo").innerText = `R$ ${(r - d).toFixed(2)}`;
     
-    atualizarGrafico(cats);
+    analisarOrcamento(r, c);
+    gerarGrafico(c);
 }
 
-function atualizarGrafico(c) {
-    const ctx = document.getElementById('grafico').getContext('2d');
+function analisarOrcamento(receitaTotal, gastos) {
+    const status = document.getElementById("statusOrcamento");
+    if (receitaTotal === 0) {
+        status.innerText = "Aguardando Receitas";
+        status.style.background = "#666";
+        return;
+    }
+
+    // Regra 50/30/20
+    const limiteEssencial = receitaTotal * 0.5;
+    const limiteLazer = receitaTotal * 0.3;
+    
+    let mensagem = "✅ Orçamento Saudável";
+    status.style.background = "#10b981";
+
+    if (gastos.Essencial > limiteEssencial || gastos.Lazer > limiteLazer) {
+        mensagem = "⚠️ Alerta: Gastos Excessivos!";
+        status.style.background = "#ef4444";
+    }
+
+    status.innerText = mensagem;
+}
+
+function gerarGrafico(dados) {
+    const ctx = document.getElementById('graficoPizza').getContext('2d');
     if (myChart) myChart.destroy();
     myChart = new Chart(ctx, {
-        type: 'doughnut',
+        type: 'pie',
         data: {
-            labels: ['Essencial', 'Lazer', 'Investimento'],
+            labels: ['Essencial', 'Lazer', 'Investir'],
             datasets: [{
-                data: [c.Essencial, c.Lazer, c.Investimento],
+                data: [dados.Essencial, dados.Lazer, dados.Investimento],
                 backgroundColor: ['#3b82f6', '#a855f7', '#10b981'],
                 borderWidth: 0
             }]
         },
         options: {
-            plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } },
-            cutout: '70%'
+            responsive: true,
+            plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } }
         }
     });
 }
 
-function montarMeses() {
+function init() {
     const s = document.getElementById("filtroMes");
     const agora = new Date();
     for(let i=0; i<6; i++) {
-        let mes = new Date(agora.getFullYear(), agora.getMonth() - i, 1);
-        let val = mes.toISOString().substring(0, 7);
-        let label = mes.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-        s.innerHTML += `<option value="${val}">${label}</option>`;
+        let m = new Date(agora.getFullYear(), agora.getMonth() - i, 1);
+        let v = m.toISOString().substring(0, 7);
+        s.innerHTML += `<option value="${v}">${m.toLocaleDateString('pt-BR', {month:'long', year:'numeric'})}</option>`;
     }
+    carregarDados();
 }
 
-function limparBanco() { if(confirm("Apagar tudo?")) { localStorage.clear(); location.reload(); } }
-
-window.onload = () => { montarMeses(); carregarDados(); };
+window.onload = init;
