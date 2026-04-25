@@ -2,74 +2,46 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finanças PRO AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finanças PRO - Gestão Comercial</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<header>Finanças PRO AI</header>
-
-<nav class="tabs-mobile">
-    <button class="tab-btn active" onclick="abrirAba(event, 'extrato')">📊 Extrato</button>
-    <button class="tab-btn" onclick="abrirAba(event, 'lancamento')">➕ Novo</button>
-    <button class="tab-btn" onclick="abrirAba(event, 'saude')">🏥 Saúde</button>
-</nav>
-
-<div class="container">
-    <section id="extrato" class="aba-content active">
-        <div class="card resumo-topo">
-            <div>
-                <small>Receitas</small>
-                <div id="receita" class="receita">R$ 0,00</div>
+    <header>Finanças PRO - Gestão Comercial</header>
+    <nav class="tabs-mobile">
+        <button class="tab-btn active" onclick="abrirAba(event, 'extrato')">📊 Extrato</button>
+        <button class="tab-btn" onclick="abrirAba(event, 'lancamento')">➕ Novo</button>
+    </nav>
+    <div class="container">
+        <section id="extrato" class="aba-content active">
+            <div class="card resumo-topo">
+                <div><small>Receitas</small><div id="receita" class="receita">R$ 0,00</div></div>
+                <div><small>Despesas</small><div id="despesa" class="despesa">R$ 0,00</div></div>
+                <div><small>Saldo</small><div id="saldo">R$ 0,00</div></div>
             </div>
-            <div>
-                <small>Despesas</small>
-                <div id="despesa" class="despesa">R$ 0,00</div>
-            </div>
-            <div>
-                <small>Saldo</small>
-                <div id="saldo">R$ 0,00</div>
-            </div>
-        </div>
+            <div class="card"><canvas id="grafico" style="max-height: 250px;"></canvas></div>
+            <div id="lista" class="historico-lista"></div>
+        </section>
 
-        <div class="card">
-            <canvas id="grafico" style="max-height: 250px;"></canvas>
-        </div>
-
-        <div id="lista" class="historico-lista"></div>
-    </section>
-
-    <section id="lancamento" class="aba-content">
-        <div class="card">
-            <h2>Lançamento via IA</h2>
-            <p>Fale naturalmente: "Gastei 50 reais no BK"</p>
-            <input id="inputGasto" placeholder="O que aconteceu hoje?">
-            <button onclick="enviarGasto()">Analisar com Gemini</button>
-            <div id="iaStatus" style="margin-top: 10px; font-weight: bold;"></div>
-        </div>
-    </section>
-
-    <section id="saude" class="aba-content">
-        <div class="card">
-            <h2>Saúde Financeira</h2>
-            <div class="pote">
-                <div class="pote-label"><span>Essencial (50%)</span><span id="txt-fixo">R$ 0 / R$ 0</span></div>
-                <div class="barra-bg"><div id="bar-fixo" class="barra-fill blue"></div></div>
+        <section id="lancamento" class="aba-content">
+            <div class="card">
+                <h2>Novo Lançamento</h2>
+                <input type="text" id="desc" placeholder="Descrição (ex: Venda de Produto)">
+                <input type="number" id="valor" placeholder="Valor (R$)">
+                <select id="tipo">
+                    <option value="despesa">Despesa</option>
+                    <option value="receita">Receita</option>
+                </select>
+                <select id="cat">
+                    <option value="Essencial">Essencial / Operacional</option>
+                    <option value="Lazer">Lazer / Marketing</option>
+                    <option value="Investimento">Investimento</option>
+                </select>
+                <button onclick="salvarManual()">Salvar Lançamento</button>
             </div>
-            <div class="pote">
-                <div class="pote-label"><span>Lazer (30%)</span><span id="txt-lazer">R$ 0 / R$ 0</span></div>
-                <div class="barra-bg"><div id="bar-lazer" class="barra-fill purple"></div></div>
-            </div>
-            <div class="pote">
-                <div class="pote-label"><span>Investir (20%)</span><span id="txt-invest">R$ 0 / R$ 0</span></div>
-                <div class="barra-bg"><div id="bar-invest" class="barra-fill green"></div></div>
-            </div>
-        </div>
-    </section>
-</div>
-
-<script src="script.js"></script>
+        </section>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>
