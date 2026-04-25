@@ -1,83 +1,95 @@
 :root {
-    --bg: #0f172a;
-    --card: #1e293b;
-    --text: #f8fafc;
+    --black: #000000;
+    --dark: #121212;
+    --card: #1c1c1e;
+    --blue: #0A84FF;
+    --green: #32D74B;
+    --red: #FF453A;
+    --text: #ffffff;
 }
 
 body {
-    background: var(--bg);
+    background: var(--black);
     color: var(--text);
-    font-family: sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     margin: 0;
-    padding-bottom: 80px;
+    padding-bottom: 90px;
 }
 
-header {
-    background: var(--card);
+header { padding: 30px 20px 10px; text-align: left; }
+header h1 { font-size: 28px; margin: 0; font-weight: 800; }
+header span { color: var(--blue); }
+
+.container { padding: 15px; }
+
+/* CARTÃO DE BALANÇO */
+.card-balanco {
+    background: linear-gradient(145deg, #1c1c1e, #121212);
+    border-radius: 20px;
     padding: 20px;
-    text-align: center;
-    font-weight: bold;
-    font-size: 1.2rem;
-    border-bottom: 1px solid #334155;
+    margin-bottom: 20px;
+    border: 1px solid #333;
 }
 
-.container { padding: 10px; }
+.main-balance { text-align: center; margin: 20px 0; }
+.main-balance h2 { font-size: 36px; margin: 5px 0; }
+.main-balance small { color: #888; text-transform: uppercase; letter-spacing: 1px; }
 
-.card {
+.sub-balanco { display: flex; justify-content: space-around; border-top: 1px solid #333; padding-top: 15px; }
+.item-balanco { text-align: center; }
+.item-balanco small { display: block; color: #888; }
+.item-balanco span { font-weight: bold; font-size: 18px; }
+
+.text-green { color: var(--green); }
+.text-red { color: var(--red); }
+
+/* LISTA */
+.list-item {
     background: var(--card);
-    border-radius: 12px;
+    margin-bottom: 10px;
     padding: 15px;
-    margin-bottom: 15px;
-}
-
-.resumo-topo {
+    border-radius: 12px;
     display: flex;
     justify-content: space-between;
-    text-align: center;
+    align-items: center;
 }
 
-.tabs-mobile {
+.info strong { display: block; font-size: 16px; }
+.info small { color: #888; }
+
+/* NAVEGAÇÃO */
+.nav-bottom {
     position: fixed;
     bottom: 0;
     width: 100%;
-    background: var(--card);
+    background: rgba(28, 28, 30, 0.95);
+    backdrop-filter: blur(10px);
     display: flex;
-    border-top: 1px solid #334155;
+    padding: 10px 0;
+    border-top: 1px solid #333;
 }
 
-.tab-btn {
+.nav-item {
     flex: 1;
-    padding: 15px;
     background: none;
     border: none;
-    color: #94a3b8;
-    cursor: pointer;
+    color: #666;
+    font-size: 12px;
+    text-align: center;
 }
 
-.tab-btn.active { color: #3b82f6; border-top: 2px solid #3b82f6; }
+.nav-item.active { color: var(--blue); font-weight: bold; }
 
-.aba-content { display: none; }
-.aba-content.active { display: block; }
-
-input, select, .btn-principal {
+/* FORMULÁRIO */
+input, select, .btn-save {
     width: 100%;
-    padding: 12px;
-    margin: 8px 0;
-    border-radius: 8px;
-    border: 1px solid #334155;
-    background: #0f172a;
-    color: white;
+    background: var(--card);
+    border: 1px solid #333;
+    padding: 15px;
+    border-radius: 10px;
+    color: #fff;
+    margin-bottom: 10px;
     box-sizing: border-box;
 }
 
-.btn-principal { background: #3b82f6; font-weight: bold; }
-
-.item {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px;
-    border-bottom: 1px solid #334155;
-}
-
-.receita { color: #22c55e; }
-.despesa { color: #ef4444; }
+.btn-save { background: var(--blue); font-weight: bold; border: none; }
