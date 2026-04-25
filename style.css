@@ -1,36 +1,88 @@
-/* Container que centraliza o seletor */
+:root {
+    --black: #000000;
+    --dark: #121212;
+    --card: #1c1c1e;
+    --blue: #0A84FF;
+    --green: #32D74B;
+    --red: #FF453A;
+    --text: #ffffff;
+    --gray: #8e8e93;
+}
+
+body {
+    background-color: var(--black) !important;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    margin: 0;
+    padding-bottom: 110px;
+}
+
+header { padding: 40px 20px 10px; }
+header h1 { font-size: 24px; margin: 0; }
+header h1 span { color: var(--blue); }
+
+.badge-status { font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: bold; background: #2c2c2e; }
+
+.container { padding: 0 15px; }
+
+.card-balanco, .card-chart, .card-form {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 20px;
+    border: 1px solid #2c2c2e;
+    margin-bottom: 15px;
+}
+
+/* SELETOR DE MESES ORGANIZADO */
 .seletor-container {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
 }
 
-/* Estilo do botão de Meses */
 #filtroMes {
-    background: #2c2c2e; /* Fundo cinza escuro Apple style */
+    background: #2c2c2e;
     color: var(--blue);
     border: 1px solid #3a3a3c;
-    padding: 8px 16px;
+    padding: 8px 20px;
     border-radius: 12px;
     font-size: 14px;
     font-weight: 600;
     text-align: center;
-    appearance: none; /* Remove a setinha padrão feia */
+    appearance: none;
     -webkit-appearance: none;
     cursor: pointer;
-    min-width: 150px;
-    transition: all 0.3s ease;
+    min-width: 160px;
 }
 
-#filtroMes:focus {
-    outline: none;
-    border-color: var(--blue);
-    box-shadow: 0 0 8px rgba(10, 132, 255, 0.3);
+.main-balance { text-align: center; margin-bottom: 20px; }
+.main-balance h2 { font-size: 38px; margin: 5px 0; }
+.sub-balanco { display: flex; justify-content: space-between; border-top: 1px solid #2c2c2e; padding-top: 15px; }
+.item-balanco { text-align: center; flex: 1; }
+
+.card-chart { height: 250px; }
+.chart-container { position: relative; height: 100%; width: 100%; }
+
+.list-item {
+    background: var(--card); padding: 16px; border-radius: 16px;
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
 }
 
-/* Ajuste para que o texto dentro do select fique centralizado no mobile */
-#filtroMes option {
-    background: #1c1c1e;
-    color: #fff;
-    text-align: center;
+.nav-bottom {
+    position: fixed; bottom: 0; width: 100%; background: rgba(28, 28, 30, 0.95);
+    backdrop-filter: blur(20px); display: flex; padding: 15px 0 30px; border-top: 1px solid #2c2c2e;
 }
+.nav-item { flex: 1; background: none; border: none; color: #636366; font-size: 11px; }
+.nav-item.active { color: var(--blue); font-weight: bold; }
+
+.aba-content { display: none; }
+.aba-content.active { display: block; }
+
+input, select, .btn-save {
+    width: 100%; background: #2c2c2e; border: 1px solid #333; padding: 15px; border-radius: 12px; color: white; margin-bottom: 12px; box-sizing: border-box; font-size: 16px;
+}
+.btn-save { background: var(--blue); border: none; font-weight: bold; margin-top: 10px; }
+
+.text-green { color: var(--green); }
+.text-red { color: var(--red); }
+.btn-del { background: none; border: none; color: #444; font-size: 16px; padding-left: 10px; }
