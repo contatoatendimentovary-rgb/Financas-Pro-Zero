@@ -3,97 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FinançasPRO Black</title>
-    <link rel="stylesheet" href="./style.css">
+    <title>FinançasPRO - Cloud</title>
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <meta name="theme-color" content="#000000">
-    <meta name="apple-mobile-web-app-capable" content="yes">
 </head>
 <body>
-
-<header>
-    <div class="header-content">
-        <h1>Finanças<span>PRO</span></h1>
-        <div id="statusOrcamento" class="badge-status">Dashboard</div>
-    </div>
-</header>
-
-<div class="container">
-    <section id="extrato" class="aba-content active">
-        <div class="card-balanco">
-            <div class="seletor-container">
-                <select id="filtroMes" onchange="carregarDados()"></select>
-            </div>
-            <div class="main-balance">
-                <small>Saldo Disponível</small>
-                <h2 id="saldo">R$ 0,00</h2>
-            </div>
-            <div class="sub-balanco">
-                <div class="item-balanco">
-                    <small>Entradas</small>
-                    <span id="receita" class="text-green">+ R$ 0,00</span>
-                </div>
-                <div class="item-balanco">
-                    <small>Saídas</small>
-                    <span id="despesa" class="text-red">- R$ 0,00</span>
-                </div>
-            </div>
+    <header>
+        <div class="header-top">
+            <h1>Finanças<span>PRO</span></h1>
+            <button onclick="window.loginGoogle()" id="btnAuth" class="btn-google">Login Google</button>
         </div>
+    </header>
 
-        <div class="card-chart">
+    <div class="container">
+        <div class="card-balanco">
+            <div class="seletor-mes">
+                <select id="filtroMes" onchange="carregarDadosDoFirebase()"></select>
+            </div>
+            <small>Saldo em Conta</small>
+            <h2 id="saldo">R$ 0,00</h2>
             <div class="chart-container">
                 <canvas id="graficoPizza"></canvas>
             </div>
         </div>
 
-        <div class="lista-header"><h3>Histórico</h3></div>
-        <div id="lista" class="historico-lista"></div>
-    </section>
-
-    <section id="lancamento" class="aba-content">
         <div class="card-form">
-            <h2>Novo Registro</h2>
-            <div class="group">
-                <label>Descrição</label>
-                <input type="text" id="desc" placeholder="Ex: Salário, Mercado...">
+            <h3>Novo Registro</h3>
+            <input type="text" id="desc" placeholder="Descrição">
+            <div class="row">
+                <input type="number" id="valor" placeholder="R$ 0,00" style="flex:2">
+                <input type="date" id="data" style="flex:1.5">
             </div>
-            <div class="row" style="display: flex; gap: 10px;">
-                <div class="group" style="flex: 2;">
-                    <label>Valor</label>
-                    <input type="number" id="valor" step="0.01" placeholder="R$ 0,00">
-                </div>
-                <div class="group" style="flex: 1.5;">
-                    <label>Data</label>
-                    <input type="date" id="data">
-                </div>
-            </div>
-            <div class="group">
-                <label>Categoria</label>
-                <select id="cat">
-                    <option value="Essencial">Essencial (50%)</option>
-                    <option value="Lazer">Lazer (30%)</option>
-                    <option value="Investimento">Investir (20%)</option>
-                    <option value="Receita">Entrada / Salário</option>
-                </select>
-            </div>
-            <button onclick="salvarInteligente()" class="btn-save">Confirmar Registro</button>
+            <select id="cat">
+                <option value="Receita">Receita / Salário</option>
+                <option value="Essencial">Essencial (50%)</option>
+                <option value="Lazer">Lazer (30%)</option>
+                <option value="Investimento">Investimento (20%)</option>
+            </select>
+            <button onclick="salvarNoFirebase()" class="btn-save">Confirmar Registro</button>
         </div>
-    </section>
 
-    <section id="metas" class="aba-content">
-        <div class="card-balanco">
-            <h3 style="margin:0 0 20px 0">Metas Financeiras</h3>
-            <div id="painelMetas"></div>
-        </div>
-    </section>
-</div>
+        <div id="lista" class="historico-lista"></div>
+    </div>
 
-<nav class="nav-bottom">
-    <button class="nav-item active" onclick="abrirAba(event, 'extrato')">📊<br>Início</button>
-    <button class="nav-item" onclick="abrirAba(event, 'lancamento')">➕<br>Lançar</button>
-    <button class="nav-item" onclick="abrirAba(event, 'metas')">🎯<br>Metas</button>
-</nav>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+      import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-<script src="./script.js"></script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE",
+        authDomain: "financaspro-1e0e8.firebaseapp.com",
+        projectId: "financaspro-1e0e8",
+        storageBucket: "financaspro-1e0e8.firebasestorage.app",
+        messagingSenderId: "659521706556",
+        appId: "1:659521706556:web:86f2174c4c8a89335ac139"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      window.auth = getAuth(app);
+      window.db = getFirestore(app);
+      const provider = new GoogleAuthProvider();
+
+      window.loginGoogle = () => {
+        signInWithPopup(window.auth, provider).then(() => location.reload());
+      };
+
+      onAuthStateChanged(window.auth, (user) => {
+          if (user) {
+              document.getElementById('btnAuth').innerText = "Sair";
+              document.getElementById('btnAuth').onclick = () => window.auth.signOut().then(() => location.reload());
+              window.carregarDadosDoFirebase();
+          }
+      });
+    </script>
+    <script src="script.js"></script>
 </body>
 </html>
