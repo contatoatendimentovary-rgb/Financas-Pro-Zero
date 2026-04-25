@@ -1,104 +1,145 @@
 let myChart;
 
-// Função para garantir que os dados carreguem ao trocar de aba
+// Função para navegar entre as abas
 function abrirAba(event, nomeAba) {
     document.querySelectorAll('.aba-content').forEach(a => a.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(nomeAba).classList.add('active');
-    if(event) event.currentTarget.classList.add('active');
+    if(event && event.currentTarget) event.currentTarget.classList.add('active');
     
-    // SEMPRE recarrega os dados ao abrir Extrato ou Saúde
+    // Recarrega os dados visualmente ao abrir as abas de resumo
     if (nomeAba === 'extrato' || nomeAba === 'saude') {
-        setTimeout(carregarDados, 100); 
+        carregarDados();
     }
 }
 
+// Função que envia a frase para a IA no Gemini
 async function enviarGasto() {
     const input = document.getElementById("inputGasto");
     const status = document.getElementById("iaStatus");
-    if (!input.value) return;
+    
+    if (!input || !input.value) return;
 
-    status.innerText = "🤖 Analisando...";
+    status.innerText = "🤖 Analisando com IA...";
+    
     try {
         const resIA = await fetch("/api/server", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ mensagem: input.value })
         });
-        const dado = await resIA.json();
         
-        let storage = JSON.parse(localStorage.getItem("transacoes") || "[]");
-        storage.push({ ...dado, data: new Date() });
-        localStorage.setItem("transacoes", JSON.stringify(storage));
+        const dadoIA = await resIA.json();
+        
+        // Se a IA retornar erro, avisa na tela
+        if (dadoIA.erro) throw new Error(dadoIA.erro);
 
-        status.innerHTML = "✅ Salvo!";
+        // Salva no banco de dados local do navegador
+        let historico = JSON.parse(localStorage.getItem("transacoes") || "[]");
+        historico.push({
+            valor: parseFloat(dadoIA.valor) || 0,
+            descricao: dadoIA.descricao || "Gasto sem nome",
+            tipo: dadoIA.tipo || "despesa",
+            categoria: dadoIA.categoria || "Lazer",
+            data: new Date().toISOString()
+        });
+        
+        localStorage.setItem("transacoes", JSON.stringify(historico));
+
+        status.innerText = "✅ Salvo com sucesso!";
         input.value = "";
         
-        // Força a atualização e volta para o extrato após 1 segundo
+        // Após 1.5 segundos, volta para o extrato para ver o gráfico atualizado
         setTimeout(() => {
+            status.innerText = "";
             abrirAba(null, 'extrato');
-            document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        }, 1000);
+            // Ativa o primeiro botão da navegação visualmente
+            const btnExtrato = document.querySelector('.tab-btn');
+            if(btnExtrato) btnExtrato.classList.add('active');
+        }, 1500);
 
-    } catch (e) { 
-        status.innerText = "❌ Erro na IA"; 
-        console.error(e);
+    } catch (e) {
+        console.error("Erro no app:", e);
+        status.innerText = "❌ Erro na IA. Verifique sua chave API.";
     }
 }
 
+// Função que lê os dados salvos e monta o gráfico e a lista
 function carregarDados() {
-    const dados = JSON.parse(localStorage.getItem("transacoes") || "[]");
-    let rec = 0, des = 0, cats = { Essencial: 0, Lazer: 0, Investimento: 0 };
-    const lista = document.getElementById("lista");
+    const dadosRaw = localStorage.getItem("transacoes");
+    const transacoes = JSON.parse(dadosRaw || "[]");
     
-    if(!lista) return; // Segurança caso o elemento não exista
-    lista.innerHTML = "";
+    let totalReceitas = 0;
+    let totalDespesas = 0;
+    let categoriasSoma = { Essencial: 0, Lazer: 0, Investimento: 0 };
+    
+    const listaHTML = document.getElementById("lista");
+    if(!listaHTML) return;
+    listaHTML.innerHTML = "";
 
-    dados.forEach(d => {
-        if (d.tipo === "receita") {
-            rec += Number(d.valor);
+    transacoes.forEach(t => {
+        const v = parseFloat(t.valor) || 0;
+        
+        if (t.tipo === "receita") {
+            totalReceitas += v;
         } else {
-            des += Number(d.valor);
-            if(cats[d.categoria] !== undefined) {
-                cats[d.categoria] += Number(d.valor);
+            totalDespesas += v;
+            // Soma na categoria correta (se a categoria não existir, joga no Lazer)
+            if (categoriasSoma.hasOwnProperty(t.categoria)) {
+                categoriasSoma[t.categoria] += v;
+            } else {
+                categoriasSoma["Lazer"] += v;
             }
         }
-        lista.innerHTML += `<div class="item"><span>${d.descricao}</span><span class="${d.tipo}">R$ ${Number(d.valor).toFixed(2)}</span></div>`;
+
+        // Adiciona o item na lista visual
+        listaHTML.innerHTML += `
+            <div class="item">
+                <span>${t.descricao}</span>
+                <span class="${t.tipo}">R$ ${v.toFixed(2)}</span>
+            </div>`;
     });
 
-    document.getElementById("receita").innerText = `R$ ${rec.toFixed(2)}`;
-    document.getElementById("despesa").innerText = `R$ ${des.toFixed(2)}`;
-    document.getElementById("saldo").innerText = `R$ ${(rec - des).toFixed(2)}`;
+    // Atualiza os valores nos cards do topo
+    document.getElementById("receita").innerText = `R$ ${totalReceitas.toFixed(2)}`;
+    document.getElementById("despesa").innerText = `R$ ${totalDespesas.toFixed(2)}`;
+    document.getElementById("saldo").innerText = `R$ ${(totalReceitas - totalDespesas).toFixed(2)}`;
 
-    atualizarGrafico(cats);
-    if(typeof renderizarSaude === "function") renderizarSaude(rec, cats);
+    desenharGrafico(categoriasSoma);
 }
 
-function atualizarGrafico(cats) {
+// Função técnica para criar o gráfico de rosca (Chart.js)
+function desenharGrafico(dadosCategorias) {
     const canvas = document.getElementById('grafico');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     
+    // Se já existir um gráfico, apaga para criar um novo por cima
     if (myChart) myChart.destroy();
     
     myChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: Object.keys(cats),
-            datasets: [{ 
-                data: Object.values(cats), 
+            labels: ['Essencial', 'Lazer', 'Investimento'],
+            datasets: [{
+                data: [dadosCategorias.Essencial, dadosCategorias.Lazer, dadosCategorias.Investimento],
                 backgroundColor: ['#3b82f6', '#a855f7', '#22c55e'],
-                borderWidth: 0 
+                hoverOffset: 4,
+                borderWidth: 0
             }]
         },
-        options: { 
+        options: {
             responsive: true,
-            plugins: { legend: { labels: { color: 'white' } } } 
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: 'white', font: { size: 12 } }
+                }
+            }
         }
     });
 }
 
-// Inicialização
-window.onload = () => {
-    carregarDados();
-};
+// Quando a página abre, carrega os dados automaticamente
+window.onload = carregarDados;
