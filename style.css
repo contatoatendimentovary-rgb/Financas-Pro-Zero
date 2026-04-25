@@ -1,26 +1,14 @@
-:root { --black: #000000; --card: #1c1c1e; --blue: #0A84FF; }
-body { background: var(--black); color: white; font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 100px; }
-.container { padding: 15px; }
-.card-balanco, .card-chart, .card-form { background: var(--card); border-radius: 24px; padding: 20px; margin-bottom: 15px; border: 1px solid #2c2c2e; }
-.seletor-container { display: flex; justify-content: center; margin-bottom: 20px; }
-#filtroMes { background: #2c2c2e; color: var(--blue); border: none; padding: 10px 20px; border-radius: 14px; font-weight: bold; appearance: none; }
-.main-balance { text-align: center; margin-bottom: 20px; }
-.main-balance h2 { font-size: 38px; margin: 5px 0; font-weight: bold; }
-.sub-balanco { display: flex; justify-content: space-between; border-top: 1px solid #2c2c2e; padding-top: 15px; }
-.item-balanco { text-align: center; flex: 1; }
-.card-chart { height: 250px; }
-.chart-container { height: 100%; width: 100%; }
-.list-item { background: var(--card); padding: 16px; border-radius: 18px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.item-actions { display: flex; align-items: center; gap: 12px; }
-.btn-delete { background: rgba(255,255,255,0.05); border: none; color: #555; width: 28px; height: 28px; border-radius: 50%; font-size: 12px; cursor: pointer; }
-.info strong { display: block; font-size: 15px; }
-.info small { color: #8e8e93; font-size: 11px; }
-.text-green { color: #32D74B; font-weight: bold; }
-.text-red { color: #FF453A; font-weight: bold; }
-.aba-content { display: none; }
-.aba-content.active { display: block; }
-.nav-bottom { position: fixed; bottom: 0; width: 100%; background: #121212; display: flex; padding: 15px 0 35px; border-top: 1px solid #2c2c2e; }
-.nav-item { flex: 1; background: none; border: none; color: #444; font-size: 11px; }
-.nav-item.active { color: var(--blue); font-weight: bold; }
-input, select, .btn-save { width: 100%; background: #2c2c2e; border: none; padding: 16px; border-radius: 14px; color: white; margin-bottom: 12px; box-sizing: border-box; }
-.btn-save { background: var(--blue); font-weight: bold; font-size: 16px; }
+:root { --bg: #000000; --card: #1c1c1e; --accent: #0A84FF; }
+body { background: var(--bg); color: #fff; font-family: -apple-system, sans-serif; margin: 0; padding: 15px; }
+header { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
+h1 span { color: var(--accent); }
+.btn-google { background: #fff; color: #000; border: none; padding: 8px 16px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+.card-balanco, .card-form { background: var(--card); padding: 20px; border-radius: 24px; margin-bottom: 15px; border: 1px solid #2c2c2e; }
+#saldo { font-size: 36px; margin: 10px 0; font-weight: bold; }
+.chart-container { height: 220px; margin: 20px 0; }
+input, select, .btn-save { width: 100%; padding: 15px; margin: 8px 0; border-radius: 12px; border: none; box-sizing: border-box; background: #2c2c2e; color: #fff; }
+.btn-save { background: var(--accent); font-weight: bold; cursor: pointer; font-size: 16px; }
+.list-item { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+.text-green { color: #32D74B; }
+.text-red { color: #FF453A; }
+.row { display: flex; gap: 10px; }
