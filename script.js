@@ -1,36 +1,46 @@
 let myChart;
-document.getElementById('data').valueAsDate = new Date();
 
 function abrirAba(e, aba) {
     document.querySelectorAll('.aba-content').forEach(a => a.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
     document.getElementById(aba).classList.add('active');
     if(e && e.currentTarget) e.currentTarget.classList.add('active');
+    
     if (aba === 'extrato') carregarDados();
+    if (aba === 'metas') calcularMetas();
 }
 
-function salvarNovoDado() {
-    const desc = document.getElementById("desc").value;
-    const valorInput = document.getElementById("valor").value;
-    const data = document.getElementById("data").value;
-    const tipo = document.getElementById("tipo").value;
-    const cat = document.getElementById("cat").value;
+function salvarInteligente() {
+    const descOriginal = document.getElementById("desc").value;
+    const desc = descOriginal.toLowerCase();
+    const valor = parseFloat(document.getElementById("valor").value);
+    const catSelecionada = document.getElementById("cat").value;
+    const data = new Date().toISOString().substring(0, 10);
 
-    if (!desc || !valorInput || !data) return alert("Preencha todos os campos!");
+    if (!desc || isNaN(valor)) return alert("Preencha descrição e valor!");
 
-    const item = { desc, valor: parseFloat(valorInput), data, tipo, cat, id: Date.now() };
-    const banco = JSON.parse(localStorage.getItem("db_final") || "[]");
+    let tipo = "despesa";
+    let categoria = catSelecionada;
+
+    // Automação: Se detectar palavras de entrada ou categoria Receita
+    if (desc.includes("salario") || desc.includes("pix") || desc.includes("recebi") || catSelecionada === "Receita") {
+        tipo = "receita";
+        categoria = "Entrada";
+    }
+
+    const item = { desc: descOriginal, valor, data, tipo, categoria, id: Date.now() };
+    const banco = JSON.parse(localStorage.getItem("db_v5") || "[]");
     banco.push(item);
-    localStorage.setItem("db_final", JSON.stringify(banco));
+    localStorage.setItem("db_v5", JSON.stringify(banco));
 
-    alert("Registrado com sucesso!");
+    alert("Registrado como: " + tipo.toUpperCase());
     document.getElementById("desc").value = "";
     document.getElementById("valor").value = "";
     abrirAba(null, 'extrato');
 }
 
 function carregarDados() {
-    const banco = JSON.parse(localStorage.getItem("db_final") || "[]");
+    const banco = JSON.parse(localStorage.getItem("db_v5") || "[]");
     const filtro = document.getElementById("filtroMes").value;
     const lista = document.getElementById("lista");
     lista.innerHTML = "";
@@ -41,14 +51,14 @@ function carregarDados() {
         if (t.tipo === 'receita') r += t.valor;
         else { 
             d += t.valor; 
-            c[t.cat] += t.valor; 
+            if(c.hasOwnProperty(t.categoria)) c[t.categoria] += t.valor;
         }
 
         lista.innerHTML += `
             <div class="list-item">
                 <div class="info">
                     <strong>${t.desc}</strong>
-                    <small>${t.cat} • ${t.data.split('-').reverse().join('/')}</small>
+                    <small>${t.categoria} • ${t.data.split('-').reverse().join('/')}</small>
                 </div>
                 <div class="action-price">
                     <span class="${t.tipo === 'receita' ? 'text-green' : 'text-red'}">
@@ -63,26 +73,50 @@ function carregarDados() {
     document.getElementById("despesa").innerText = `R$ ${d.toFixed(2)}`;
     document.getElementById("saldo").innerText = `R$ ${(r - d).toFixed(2)}`;
     
-    analisarOrcamento(r, c);
     gerarGrafico(c);
 }
 
-function excluirItem(id) {
-    if(confirm("Deseja apagar este lançamento?")) {
-        let banco = JSON.parse(localStorage.getItem("db_final") || "[]");
-        banco = banco.filter(t => t.id !== id);
-        localStorage.setItem("db_final", JSON.stringify(banco));
-        carregarDados();
-    }
+function calcularMetas() {
+    const banco = JSON.parse(localStorage.getItem("db_v5") || "[]");
+    let receita = 0;
+    let gastos = { Essencial: 0, Lazer: 0, Investimento: 0 };
+
+    banco.forEach(t => {
+        if (t.tipo === 'receita') receita += t.valor;
+        else if (gastos.hasOwnProperty(t.categoria)) gastos[t.categoria] += t.valor;
+    });
+
+    const painel = document.getElementById("painelMetas");
+    const criarBarra = (nome, atual, meta, cor) => {
+        const perc = meta > 0 ? Math.min((atual/meta)*100, 100) : 0;
+        const status = atual > meta && meta > 0 ? "🔴 Estourou" : "🟢 OK";
+        return `
+            <div style="margin-bottom:20px">
+                <div style="display:flex; justify-content:space-between; font-size:12px">
+                    <span>${nome} (Meta: R$ ${meta.toFixed(0)})</span>
+                    <span>${status}</span>
+                </div>
+                <div style="background:#333; height:10px; border-radius:5px; margin-top:5px">
+                    <div style="background:${cor}; width:${perc}%; height:100%; border-radius:5px"></div>
+                </div>
+                <small>Gasto: R$ ${atual.toFixed(2)}</small>
+            </div>`;
+    };
+
+    painel.innerHTML = receita > 0 ? 
+        criarBarra("Essencial (50%)", gastos.Essencial, receita * 0.5, "#0A84FF") +
+        criarBarra("Lazer (30%)", gastos.Lazer, receita * 0.3, "#BF5AF2") +
+        criarBarra("Investimento (20%)", gastos.Investimento, receita * 0.2, "#32D74B")
+        : "<p>Adicione uma receita para ver as metas.</p>";
 }
 
-function analisarOrcamento(receita, gastos) {
-    const st = document.getElementById("statusOrcamento");
-    if (receita === 0) { st.innerText = "S/ RECEITA"; st.style.background = "#444"; return; }
-    
-    const estourou = (gastos.Essencial > receita * 0.5) || (gastos.Lazer > receita * 0.3);
-    st.innerText = estourou ? "🔴 ALERTA" : "🟢 EM DIA";
-    st.style.background = estourou ? "#FF453A" : "#32D74B";
+function excluirItem(id) {
+    if(confirm("Apagar registro?")) {
+        let banco = JSON.parse(localStorage.getItem("db_v5") || "[]");
+        banco = banco.filter(t => t.id !== id);
+        localStorage.setItem("db_v5", JSON.stringify(banco));
+        carregarDados();
+    }
 }
 
 function gerarGrafico(dados) {
@@ -112,7 +146,7 @@ function init() {
     for(let i=0; i<12; i++) {
         let m = new Date(agora.getFullYear(), agora.getMonth() - i, 1);
         let v = m.toISOString().substring(0, 7);
-        s.innerHTML += `<option value="${v}">${m.toLocaleDateString('pt-BR', {month:'long', year:'numeric'})}</option>`;
+        s.innerHTML += `<option value="${v}">${m.toLocaleDateString('pt-BR', {month:'short', year:'numeric'})}</option>`;
     }
     carregarDados();
 }
