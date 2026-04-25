@@ -15,7 +15,7 @@ function salvarInteligente() {
     const desc = descOriginal.toLowerCase();
     const valor = parseFloat(document.getElementById("valor").value);
     const catSelecionada = document.getElementById("cat").value;
-    const data = new Date().toISOString().substring(0, 10);
+    let dataSelecionada = document.getElementById("data").value;
 
     if (!desc || isNaN(valor)) return alert("Preencha descrição e valor!");
 
@@ -27,19 +27,20 @@ function salvarInteligente() {
         categoria = "Entrada";
     }
 
-    const item = { desc: descOriginal, valor, data, tipo, categoria, id: Date.now() };
-    const banco = JSON.parse(localStorage.getItem("db_final_v6") || "[]");
+    const item = { desc: descOriginal, valor, data: dataSelecionada, tipo, categoria, id: Date.now() };
+    const banco = JSON.parse(localStorage.getItem("db_final_v7") || "[]");
     banco.push(item);
-    localStorage.setItem("db_final_v6", JSON.stringify(banco));
+    localStorage.setItem("db_final_v7", JSON.stringify(banco));
 
-    alert("Registrado como: " + tipo.toUpperCase());
+    alert("Salvo com sucesso!");
     document.getElementById("desc").value = "";
     document.getElementById("valor").value = "";
+    document.getElementById('data').value = new Date().toISOString().substring(0, 10);
     abrirAba(null, 'extrato');
 }
 
 function carregarDados() {
-    const banco = JSON.parse(localStorage.getItem("db_final_v6") || "[]");
+    const banco = JSON.parse(localStorage.getItem("db_final_v7") || "[]");
     const filtro = document.getElementById("filtroMes").value;
     const lista = document.getElementById("lista");
     lista.innerHTML = "";
@@ -61,22 +62,22 @@ function carregarDados() {
                 </div>
                 <div class="action-price">
                     <span class="${t.tipo === 'receita' ? 'text-green' : 'text-red'}">
-                        R$ ${t.valor.toFixed(2)}
+                        ${t.tipo === 'receita' ? '+' : '-'} R$ ${t.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
                     </span>
                     <button onclick="excluirItem(${t.id})" class="btn-del">✕</button>
                 </div>
             </div>`;
     });
 
-    document.getElementById("receita").innerText = `R$ ${r.toFixed(2)}`;
-    document.getElementById("despesa").innerText = `R$ ${d.toFixed(2)}`;
-    document.getElementById("saldo").innerText = `R$ ${(r - d).toFixed(2)}`;
+    document.getElementById("receita").innerText = `+ R$ ${r.toFixed(2)}`;
+    document.getElementById("despesa").innerText = `- R$ ${d.toFixed(2)}`;
+    document.getElementById("saldo").innerText = `R$ ${(r - d).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
     
     gerarGrafico(c);
 }
 
 function calcularMetas() {
-    const banco = JSON.parse(localStorage.getItem("db_final_v6") || "[]");
+    const banco = JSON.parse(localStorage.getItem("db_final_v7") || "[]");
     let receita = 0;
     let gastos = { Essencial: 0, Lazer: 0, Investimento: 0 };
 
@@ -88,17 +89,20 @@ function calcularMetas() {
     const painel = document.getElementById("painelMetas");
     const criarBarra = (nome, atual, meta, cor) => {
         const perc = meta > 0 ? Math.min((atual/meta)*100, 100) : 0;
-        const status = atual > meta && meta > 0 ? "🔴 Estourou" : "🟢 OK";
+        const corBarra = atual > meta ? "#FF453A" : cor;
         return `
-            <div style="margin-bottom:20px">
-                <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px">
-                    <span>${nome} (Limite: R$ ${meta.toFixed(0)})</span>
-                    <span>${status}</span>
+            <div class="meta-row">
+                <div class="meta-info">
+                    <span>${nome}</span>
+                    <span>${perc.toFixed(0)}%</span>
                 </div>
-                <div style="background:#333; height:8px; border-radius:10px">
-                    <div style="background:${cor}; width:${perc}%; height:100%; border-radius:10px; transition:0.5s"></div>
+                <div class="progress-bg">
+                    <div class="progress-fill" style="width:${perc}%; background:${corBarra}; box-shadow: 0 0 10px ${corBarra}55"></div>
                 </div>
-                <small style="color:#8e8e93">Gasto: R$ ${atual.toFixed(2)}</small>
+                <div class="meta-footer">
+                    <span>Gasto: R$ ${atual.toFixed(0)}</span>
+                    <span>Limite: R$ ${meta.toFixed(0)}</span>
+                </div>
             </div>`;
     };
 
@@ -106,45 +110,53 @@ function calcularMetas() {
         criarBarra("Essencial (50%)", gastos.Essencial, receita * 0.5, "#0A84FF") +
         criarBarra("Lazer (30%)", gastos.Lazer, receita * 0.3, "#BF5AF2") +
         criarBarra("Investimento (20%)", gastos.Investimento, receita * 0.2, "#32D74B")
-        : "<p style='color:#8e8e93; text-align:center'>Adicione uma receita para ver as metas.</p>";
+        : "<p style='text-align:center; color:#666; padding:20px'>Lance uma receita para calcular.</p>";
 }
 
 function excluirItem(id) {
-    if(confirm("Apagar registro?")) {
-        let banco = JSON.parse(localStorage.getItem("db_final_v6") || "[]");
+    if(confirm("Deseja apagar este registro?")) {
+        let banco = JSON.parse(localStorage.getItem("db_final_v7") || "[]");
         banco = banco.filter(t => t.id !== id);
-        localStorage.setItem("db_final_v6", JSON.stringify(banco));
+        localStorage.setItem("db_final_v7", JSON.stringify(banco));
         carregarDados();
     }
 }
 
 function gerarGrafico(dados) {
-    const canvas = document.getElementById('graficoPizza');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = document.getElementById('graficoPizza').getContext('2d');
     if (myChart) myChart.destroy();
+    
+    // Se não houver dados, exibe gráfico cinza vazio
+    const semDados = dados.Essencial === 0 && dados.Lazer === 0 && dados.Investimento === 0;
+    const finalData = semDados ? [1, 0, 0] : [dados.Essencial, dados.Lazer, dados.Investimento];
+    const finalColors = semDados ? ['#2c2c2e'] : ['#0A84FF', '#BF5AF2', '#32D74B'];
+
     myChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: ['Essencial', 'Lazer', 'Investir'],
             datasets: [{
-                data: [dados.Essencial, dados.Lazer, dados.Investimento],
-                backgroundColor: ['#0A84FF', '#BF5AF2', '#32D74B'],
-                borderWidth: 0
+                data: finalData,
+                backgroundColor: finalColors,
+                hoverOffset: 4,
+                borderWidth: 0,
+                borderRadius: 5
             }]
         },
         options: {
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom', labels: { color: '#fff', boxWidth: 12, padding: 15 } } },
-            cutout: '75%'
+            plugins: { 
+                legend: { position: 'bottom', labels: { color: '#8e8e93', font: { size: 12 }, padding: 20 } } 
+            },
+            cutout: '80%'
         }
     });
 }
 
 function init() {
+    document.getElementById('data').value = new Date().toISOString().substring(0, 10);
     const s = document.getElementById("filtroMes");
     const agora = new Date();
-    s.innerHTML = "";
     for(let i=0; i<12; i++) {
         let m = new Date(agora.getFullYear(), agora.getMonth() - i, 1);
         let v = m.toISOString().substring(0, 7);
