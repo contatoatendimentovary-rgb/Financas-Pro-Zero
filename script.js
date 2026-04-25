@@ -28,6 +28,7 @@ async function enviarGasto() {
         localStorage.setItem("transacoes", JSON.stringify(storage));
 
         status.innerText = "✅ Salvo!";
+        setTimeout(() => { abrirAba({currentTarget: document.querySelector('.tab-btn')}, 'extrato'); }, 1000);
         input.value = "";
         setTimeout(() => carregarDados(), 1000);
     } catch (e) { status.innerText = "❌ Erro na IA"; }
