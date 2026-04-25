@@ -1,5 +1,5 @@
 let myChart;
-const DB_NAME = "FinancasPro_Dados_Oficiais"; // Nome único para não perder dados
+const DB_NAME = "FinancasPro_Definitivo";
 
 function abrirAba(e, aba) {
     document.querySelectorAll('.aba-content').forEach(a => a.classList.remove('active'));
@@ -16,13 +16,12 @@ function salvarInteligente() {
     const catSelecionada = document.getElementById("cat").value;
     const data = document.getElementById("data").value;
 
-    if (!descOriginal || isNaN(valor) || !data) return alert("Preencha todos os campos!");
+    if (!descOriginal || isNaN(valor) || !data) return alert("Preencha tudo!");
 
     let tipo = "despesa";
     let categoria = catSelecionada;
 
-    // Automação de Receita baseada em texto ou categoria
-    if (descOriginal.toLowerCase().includes("salario") || descOriginal.toLowerCase().includes("pix") || catSelecionada === "Receita") {
+    if (descOriginal.toLowerCase().includes("salario") || catSelecionada === "Receita") {
         tipo = "receita";
         categoria = "Entrada";
     }
@@ -32,7 +31,6 @@ function salvarInteligente() {
     banco.push(item);
     localStorage.setItem(DB_NAME, JSON.stringify(banco));
 
-    alert("Registro salvo!");
     document.getElementById("desc").value = "";
     document.getElementById("valor").value = "";
     abrirAba(null, 'extrato');
@@ -46,7 +44,6 @@ function carregarDados() {
 
     let r = 0, d = 0, c = { Essencial: 0, Lazer: 0, Investimento: 0 };
 
-    // Filtra pelo mês selecionado (ex: 2026-05)
     banco.filter(t => t.data.startsWith(filtro)).reverse().forEach(t => {
         if (t.tipo === 'receita') r += t.valor;
         else { 
@@ -60,9 +57,12 @@ function carregarDados() {
                     <strong>${t.desc}</strong>
                     <small>${t.categoria} • ${t.data.split('-').reverse().join('/')}</small>
                 </div>
-                <span class="${t.tipo === 'receita' ? 'text-green' : 'text-red'}">
-                    R$ ${t.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
-                </span>
+                <div class="item-actions">
+                    <span class="${t.tipo === 'receita' ? 'text-green' : 'text-red'}">
+                        R$ ${t.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                    </span>
+                    <button class="btn-delete" onclick="apagarItem(${t.id})">✕</button>
+                </div>
             </div>`;
     });
 
@@ -73,10 +73,18 @@ function carregarDados() {
     gerarGrafico(c);
 }
 
+function apagarItem(id) {
+    if (confirm("Deseja realmente apagar este lançamento?")) {
+        let banco = JSON.parse(localStorage.getItem(DB_NAME) || "[]");
+        banco = banco.filter(item => item.id !== id);
+        localStorage.setItem(DB_NAME, JSON.stringify(banco));
+        carregarDados(); // Atualiza a tela
+    }
+}
+
 function gerarGrafico(dados) {
     const ctx = document.getElementById('graficoPizza').getContext('2d');
     if (myChart) myChart.destroy();
-    
     myChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -96,25 +104,20 @@ function gerarGrafico(dados) {
 }
 
 function init() {
-    // Configura data de hoje no campo de lançamento
     document.getElementById('data').value = new Date().toISOString().substring(0, 10);
-    
     const s = document.getElementById("filtroMes");
     const anoAtual = new Date().getFullYear();
-    const mesAtual = new Date().getMonth(); // 0 a 11
-
+    const mesAtual = new Date().getMonth();
     s.innerHTML = "";
-    // Gera Janeiro a Dezembro do ano atual
     for(let i = 0; i < 12; i++) {
         let m = new Date(anoAtual, i, 1);
-        let v = m.toISOString().substring(0, 7); // Formato YYYY-MM
+        let v = m.toISOString().substring(0, 7);
         let nomeMes = m.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
         nomeMes = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1).replace(" de ", " ");
-        
         let opt = document.createElement("option");
         opt.value = v;
         opt.innerText = nomeMes;
-        if(i === mesAtual) opt.selected = true; // Auto-seleciona o mês vigente
+        if(i === mesAtual) opt.selected = true;
         s.appendChild(opt);
     }
     carregarDados();
@@ -131,20 +134,23 @@ function calcularMetas() {
     });
 
     const painel = document.getElementById("painelMetas");
-    const barra = (n, v, m, c) => `
-        <div style="margin-bottom:15px">
-            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px">
-                <span>${n}</span><span>R$ ${v.toFixed(0)} / ${m.toFixed(0)}</span>
-            </div>
-            <div style="background:#2c2c2e; height:8px; border-radius:10px; overflow:hidden">
-                <div style="background:${c}; width:${Math.min((v/m)*100, 100)}%; height:100%"></div>
-            </div>
-        </div>`;
+    const barra = (n, v, m, c) => {
+        const perc = m > 0 ? Math.min((v/m)*100, 100) : 0;
+        return `
+            <div style="margin-bottom:20px">
+                <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px">
+                    <span>${n}</span><span>R$ ${v.toFixed(0)} / ${m.toFixed(0)}</span>
+                </div>
+                <div style="background:#2c2c2e; height:10px; border-radius:10px; overflow:hidden">
+                    <div style="background:${c}; width:${perc}%; height:100%"></div>
+                </div>
+            </div>`;
+    }
 
     painel.innerHTML = receita > 0 ? 
         barra("Essencial (50%)", gastos.Essencial, receita * 0.5, "#0A84FF") +
         barra("Lazer (30%)", gastos.Lazer, receita * 0.3, "#BF5AF2") +
-        barra("Investimento (20%)", gastos.Investimento, receita * 0.2, "#32D74B") : "Sem receita no mês.";
+        barra("Investimento (20%)", gastos.Investimento, receita * 0.2, "#32D74B") : "Sem receita.";
 }
 
 window.onload = init;
