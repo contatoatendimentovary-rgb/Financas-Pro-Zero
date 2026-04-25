@@ -1,31 +1,83 @@
 :root {
-    --bg: #0f172a; --card: #1e293b; --text: #f8fafc;
-    --primary: #3b82f6; --success: #22c55e; --danger: #ef4444;
+    --bg: #0f172a;
+    --card: #1e293b;
+    --text: #f8fafc;
 }
 
-body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
-header { text-align: center; padding: 20px; font-size: 22px; font-weight: bold; color: var(--primary); }
-.container { padding: 15px; max-width: 500px; margin: auto; }
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: sans-serif;
+    margin: 0;
+    padding-bottom: 80px;
+}
 
-.tabs-mobile { display: flex; justify-content: space-around; background: var(--card); position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #334155; }
-.tab-btn { background: none; border: none; color: #94a3b8; padding: 15px; font-weight: bold; cursor: pointer; }
-.tab-btn.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
+header {
+    background: var(--card);
+    padding: 20px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    border-bottom: 1px solid #334155;
+}
+
+.container { padding: 10px; }
+
+.card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.resumo-topo {
+    display: flex;
+    justify-content: space-between;
+    text-align: center;
+}
+
+.tabs-mobile {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: var(--card);
+    display: flex;
+    border-top: 1px solid #334155;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 15px;
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+}
+
+.tab-btn.active { color: #3b82f6; border-top: 2px solid #3b82f6; }
 
 .aba-content { display: none; }
-.aba-content.active { display: block; animation: fadeIn 0.3s; }
+.aba-content.active { display: block; }
 
-.card { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 15px; }
-.resumo-topo { display: flex; justify-content: space-between; text-align: center; }
-.receita { color: var(--success); font-weight: bold; }
-.despesa { color: var(--danger); font-weight: bold; }
+input, select, .btn-principal {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    background: #0f172a;
+    color: white;
+    box-sizing: border-box;
+}
 
-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; margin-bottom: 10px; box-sizing: border-box; }
-button { width: 100%; padding: 12px; border-radius: 8px; border: none; background: var(--primary); color: white; font-weight: bold; }
+.btn-principal { background: #3b82f6; font-weight: bold; }
 
-.item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #334155; }
-.barra-bg { background: #334155; height: 8px; border-radius: 10px; margin: 10px 0; overflow: hidden; }
-.barra-fill { height: 100%; transition: width 0.5s; }
-.blue { background: var(--primary); } .purple { background: #a855f7; } .green { background: var(--success); }
-.ia-box { border-left: 4px solid var(--primary); background: var(--card); padding: 15px; border-radius: 8px; }
+.item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    border-bottom: 1px solid #334155;
+}
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.receita { color: #22c55e; }
+.despesa { color: #ef4444; }
