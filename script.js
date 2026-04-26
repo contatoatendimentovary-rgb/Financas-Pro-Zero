@@ -1,85 +1,149 @@
-// Alternador de Tema
-document.getElementById('toggleTheme').onclick = () => {
-    document.body.classList.toggle('dark-mode');
-};
-
-window.carregarDados = async () => {
+// Ativação do Bloco de Dados Cyber
+window.carregarDadosCyber = async () => {
     const user = window.auth.currentUser;
-    const mes = document.getElementById('filtroMes').value;
+    // Pega o mês atual do seletor
+    const mesFeed = document.getElementById('filtroMes').value;
     if (!user) return;
 
-    const dadosRef = window.doc(window.db, "usuarios", user.uid, "meses", mes);
-    const docSnap = await window.getDoc(dadosRef);
+    const feedRef = window.doc(window.db, "usuarios", user.uid, "meses", mesFeed);
+    
+    try {
+        const snap = await window.getDoc(feedRef);
+        let rec = 0, fix = 0, laz = 0, inv = 0, trans = [];
+        
+        if (snap.exists()) trans = snap.data().transacoes || [];
 
-    let rec = 0, fixo = 0, lazer = 0, inv = 0, trans = [];
-    if (docSnap.exists()) trans = docSnap.data().transacoes || [];
+        const feedList = document.getElementById('lista');
+        feedList.innerHTML = ""; // Limpa feeds antigos
 
-    const lista = document.getElementById('lista');
-    lista.innerHTML = "";
+        trans.forEach(t => {
+            const v = parseFloat(t.valor);
+            if (t.tipo === 'entrada') rec += v;
+            else if (t.tipo === 'fixo') fix += v;
+            else if (t.tipo === 'lazer') laz += v;
+            else if (t.tipo === 'investimento') inv += v;
 
-    trans.forEach(t => {
-        const v = parseFloat(t.valor);
-        if (t.tipo === 'entrada') rec += v;
-        else if (t.tipo === 'fixo') fixo += v;
-        else if (t.tipo === 'lazer') lazer += v;
-        else if (t.tipo === 'investimento') inv += v;
+            // Determina a cor do feed-right baseado no tipo
+            let feedColor = var(--border);
+            if (t.tipo === 'entrada') feedColor = var(--green-neon);
+            if (t.tipo === 'fixo') feedColor = var(--green-neon);
+            if (t.tipo === 'lazer') feedColor = var(--orange-neon);
+            if (t.tipo === 'investimento') feedColor = var(--blue-neon);
 
-        lista.innerHTML += `
-            <li class="item" style="border-left: 5px solid ${t.tipo === 'entrada' ? '#00D166' : '#FF7A00'}">
-                <div><b>${t.descricao}</b><br><small style="color: #999; text-transform: capitalize;">${t.tipo}</small></div>
-                <span style="color: ${t.tipo === 'entrada' ? '#00D166' : '#FF7A00'}; font-weight: bold;">R$ ${v.toFixed(2)}</span>
-            </li>`;
-    });
+            feedList.innerHTML += `
+                <li class="cyber-item" style="border-right-color: ${feedColor}">
+                    <div class="feed-data">
+                        <b>> ${t.descricao}</b><br>
+                        <small>// type::${t.tipo}</small>
+                    </div>
+                    <span class="${t.tipo === 'entrada' ? 'neon-text_green' : 'neon-text_orange'}" style="font-weight: 700;">
+                        ${t.tipo === 'entrada' ? '+' : '-'} R$ ${v.toFixed(2)}
+                    </span>
+                </li>`;
+        });
 
-    // Cálculos 50-30-20
-    const pFixo = rec * 0.5;
-    const pLazer = rec * 0.3;
-    const pInv = rec * 0.2;
+        // Cálculos do Protocolo 50-30-20
+        const projFixo = rec * 0.5;
+        const projLazer = rec * 0.3;
+        const projInv = rec * 0.2;
 
-    document.getElementById('saldo').innerText = `R$ ${(rec - (fixo + lazer + inv)).toFixed(2)}`;
+        const totalGasto = fix + laz + inv;
+        document.getElementById('saldo').innerText = `$$ ${(rec - totalGasto).toFixed(2)}`;
 
-    updateBar('fixo', fixo, pFixo);
-    updateBar('lazer', lazer, pLazer);
-    updateBar('invest', inv, pInv);
+        // Atualiza Barras de Energia
+        atualizaPainel('fixo', fix, projFixo);
+        atualizaPainel('lazer', laz, projLazer);
+        atualizaPainel('invest', inv, projInv);
+
+    } catch (e) {
+        console.error("FEED_READ_ERROR ::", e);
+    }
 };
 
-function updateBar(id, atual, proj) {
-    const perc = proj > 0 ? Math.min((atual / proj) * 100, 100) : 0;
-    const bar = document.getElementById(`bar-${id}`);
-    bar.style.width = perc + '%';
-    document.getElementById(`txt-${id}`).innerText = `R$ ${atual.toFixed(0)} / R$ ${proj.toFixed(0)}`;
+// Controla as barras de progresso estilo energia
+function atualizaPainel(podId, atual, proj) {
+    // Evita divisão por zero e formata o texto
+    const projLabel = proj > 0 ? proj.toFixed(0) : "0";
+    document.getElementById(`txt-${podId}`).innerText = `${atual.toFixed(0)} / ${projLabel}`;
+
+    const perc = proj > 0 ? (atual / proj) * 100 : 0;
+    const barFill = document.getElementById(`bar-${podId}`);
     
-    // Se estourar o orçamento projetado, a barra fica vermelha
-    if (atual > proj && proj > 0) {
-        bar.style.background = '#FF453A';
+    // Limita o preenchimento em 100% visivelmente
+    barFill.style.width = Math.min(perc, 100) + '%';
+
+    // Alerta de sobrecarga (orçamento estourado)
+    if (perc > 100) {
+        barFill.style.background = 'var(--red-alert)';
+        barFill.style.boxShadow = '0 0 15px var(--red-alert)';
     } else {
-        // Volta para a cor original caso não esteja estourado
-        if(id === 'fixo') bar.style.background = '#00D166';
-        if(id === 'lazer') bar.style.background = '#FF7A00';
-        if(id === 'invest') bar.style.background = '#00A3FF';
+        // Reseta cores originais
+        if (podId === 'fixo') { barFill.style.background = 'var(--green-neon)'; barFill.style.boxShadow = '0 0 15px var(--green-neon)'; }
+        if (podId === 'lazer') { barFill.style.background = 'var(--orange-neon)'; barFill.style.boxShadow = '0 0 15px var(--orange-neon)'; }
+        if (podId === 'invest') { barFill.style.background = 'var(--blue-neon)'; barFill.style.boxShadow = '0 0 15px var(--blue-neon)'; }
     }
 }
 
+// === EXECUÇÃO DE LANÇAMENTO (CORRIGIDO) ===
 document.getElementById('btnSalvar').onclick = async () => {
-    const d = document.getElementById('desc').value, v = document.getElementById('valor').value;
-    const t = document.getElementById('tipo').value, m = document.getElementById('filtroMes').value;
+    // 1. Captura os dados de entrada
+    const descField = document.getElementById('desc').value;
+    const valorField = document.getElementById('valor').value;
+    const tipoField = document.getElementById('tipo').value;
+    const mesField = document.getElementById('filtroMes').value;
     const user = window.auth.currentUser;
 
-    if (!user || !d || !v) return alert("Preencha descrição e valor!");
-
-    const ref = window.doc(window.db, "usuarios", user.uid, "meses", m);
-    const snap = await window.getDoc(ref);
-    let list = snap.exists() ? snap.data().transacoes : [];
-
-    list.push({ descricao: d, valor: parseFloat(v), tipo: t, data: new Date().getTime() });
-    await window.setDoc(ref, { transacoes: list });
+    // 2. Validação rigorosa para evitar erro de dados incompletos
+    if (!user) return alert("ERROR :: Faça login primeiro!");
     
-    document.getElementById('modal').style.display = 'none';
-    document.getElementById('desc').value = "";
-    document.getElementById('valor').value = "";
-    window.carregarDados();
+    // Verifica se os campos visiveis estão preenchidos
+    if (!descField || !valorField || !mesField) {
+        // Isso resolve seu erro "Dados incompletos!"
+        return alert("EXEC_ERROR :: Preencha descrição e valor antes de confirmar.");
+    }
+
+    // 3. Converte valor para número para o Firebase aceitar
+    const valorNum = parseFloat(valorField);
+    if (isNaN(valorNum) || valorNum <= 0) {
+        return alert("EXEC_ERROR :: Valor numérico inválido.");
+    }
+
+    // Referência do banco
+    const dadosRef = window.doc(window.db, "usuarios", user.uid, "meses", mesField);
+
+    try {
+        const docSnap = await window.getDoc(dadosRef);
+        let transacoes = docSnap.exists() ? docSnap.data().transacoes : [];
+
+        // Adiciona o novo registro na lista existente
+        transacoes.push({
+            descricao: descField,
+            valor: valorNum, // Número real, não texto
+            tipo: tipoField, // fixo, lazer, investimento, entrada
+            timestamp: new Date().getTime()
+        });
+
+        // Salva de volta no banco
+        await window.setDoc(dadosRef, { transacoes });
+        
+        // Fecha o modal e limpa campos
+        document.getElementById('modal').style.display = 'none';
+        document.getElementById('desc').value = "";
+        document.getElementById('valor').value = "";
+        
+        // Recarrega o feed sem dar reload na página
+        window.carregarDadosCyber();
+        
+    } catch (e) {
+        console.error("DATA_EXEC_ERROR ::", e);
+        alert("CRITICAL_ERROR :: Falha ao salvar no banco.");
+    }
 };
 
+// Controles de Interface Futurista
 document.getElementById('abrirModal').onclick = () => document.getElementById('modal').style.display = 'flex';
 document.getElementById('btnFechar').onclick = () => document.getElementById('modal').style.display = 'none';
-document.getElementById('filtroMes').onchange = () => window.carregarDados();
+document.getElementById('filtroMes').onchange = () => window.carregarDadosCyber();
+
+// Vincula a função de carga ao Firebase (Mantenha isso no index.html módulo de script)
+// window.carregarDados = window.carregarDadosCyber; 
