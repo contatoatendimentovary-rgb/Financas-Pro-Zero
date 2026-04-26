@@ -11,61 +11,72 @@ window.carregarDados = async () => {
     const dadosRef = window.doc(window.db, "usuarios", user.uid, "meses", mes);
     const docSnap = await window.getDoc(dadosRef);
 
-    let totalReceita = 0, gastoFixo = 0, gastoLazer = 0, gastoInvest = 0;
-    let transacoes = docSnap.exists() ? docSnap.data().transacoes : [];
+    let rec = 0, fixo = 0, lazer = 0, inv = 0, trans = [];
+    if (docSnap.exists()) trans = docSnap.data().transacoes || [];
 
-    const listaUl = document.getElementById('lista');
-    listaUl.innerHTML = "";
+    const lista = document.getElementById('lista');
+    lista.innerHTML = "";
 
-    transacoes.forEach(t => {
+    trans.forEach(t => {
         const v = parseFloat(t.valor);
-        if (t.tipo === 'entrada') totalReceita += v;
-        else if (t.tipo === 'fixo') gastoFixo += v;
-        else if (t.tipo === 'lazer') gastoLazer += v;
-        else if (t.tipo === 'investimento') gastoInvest += v;
+        if (t.tipo === 'entrada') rec += v;
+        else if (t.tipo === 'fixo') fixo += v;
+        else if (t.tipo === 'lazer') lazer += v;
+        else if (t.tipo === 'investimento') inv += v;
 
-        listaUl.innerHTML += `
-            <li class="item">
-                <span>${t.descricao}</span>
-                <span class="${t.tipo === 'entrada' ? 'valor-entrada' : 'valor-saida'}">R$ ${v.toFixed(2)}</span>
+        lista.innerHTML += `
+            <li class="item" style="border-left: 5px solid ${t.tipo === 'entrada' ? '#00D166' : '#FF7A00'}">
+                <div><b>${t.descricao}</b><br><small style="color: #999; text-transform: capitalize;">${t.tipo}</small></div>
+                <span style="color: ${t.tipo === 'entrada' ? '#00D166' : '#FF7A00'}; font-weight: bold;">R$ ${v.toFixed(2)}</span>
             </li>`;
     });
 
     // Cálculos 50-30-20
-    const projFixo = totalReceita * 0.5;
-    const projLazer = totalReceita * 0.3;
-    const projInvest = totalReceita * 0.2;
+    const pFixo = rec * 0.5;
+    const pLazer = rec * 0.3;
+    const pInv = rec * 0.2;
 
-    document.getElementById('saldo').innerText = `R$ ${(totalReceita - (gastoFixo + gastoLazer + gastoInvest)).toFixed(2)}`;
+    document.getElementById('saldo').innerText = `R$ ${(rec - (fixo + lazer + inv)).toFixed(2)}`;
 
-    // Atualiza Barras
-    atualizarBarra('fixo', gastoFixo, projFixo);
-    atualizarBarra('lazer', gastoLazer, projLazer);
-    atualizarBarra('invest', gastoInvest, projInvest);
+    updateBar('fixo', fixo, pFixo);
+    updateBar('lazer', lazer, pLazer);
+    updateBar('invest', inv, pInv);
 };
 
-function atualizarBarra(id, atual, proj) {
-    const porcentagem = proj > 0 ? (atual / proj) * 100 : 0;
-    document.getElementById(`bar-${id}`).style.width = Math.min(porcentagem, 100) + '%';
-    document.getElementById(`bar-${id}`).style.background = porcentagem > 100 ? '#ff4757' : '#00B894';
+function updateBar(id, atual, proj) {
+    const perc = proj > 0 ? Math.min((atual / proj) * 100, 100) : 0;
+    const bar = document.getElementById(`bar-${id}`);
+    bar.style.width = perc + '%';
     document.getElementById(`txt-${id}`).innerText = `R$ ${atual.toFixed(0)} / R$ ${proj.toFixed(0)}`;
+    
+    // Se estourar o orçamento projetado, a barra fica vermelha
+    if (atual > proj && proj > 0) {
+        bar.style.background = '#FF453A';
+    } else {
+        // Volta para a cor original caso não esteja estourado
+        if(id === 'fixo') bar.style.background = '#00D166';
+        if(id === 'lazer') bar.style.background = '#FF7A00';
+        if(id === 'invest') bar.style.background = '#00A3FF';
+    }
 }
 
 document.getElementById('btnSalvar').onclick = async () => {
-    const desc = document.getElementById('desc').value, val = document.getElementById('valor').value;
-    const tipo = document.getElementById('tipo').value, mes = document.getElementById('filtroMes').value;
+    const d = document.getElementById('desc').value, v = document.getElementById('valor').value;
+    const t = document.getElementById('tipo').value, m = document.getElementById('filtroMes').value;
     const user = window.auth.currentUser;
 
-    if (!user || !desc || !val) return alert("Dados incompletos!");
+    if (!user || !d || !v) return alert("Preencha descrição e valor!");
 
-    const dadosRef = window.doc(window.db, "usuarios", user.uid, "meses", mes);
-    const docSnap = await window.getDoc(dadosRef);
-    let lista = docSnap.exists() ? docSnap.data().transacoes : [];
+    const ref = window.doc(window.db, "usuarios", user.uid, "meses", m);
+    const snap = await window.getDoc(ref);
+    let list = snap.exists() ? snap.data().transacoes : [];
 
-    lista.push({ descricao: desc, valor: parseFloat(val), tipo, data: new Date().getTime() });
-    await window.setDoc(dadosRef, { transacoes: lista });
+    list.push({ descricao: d, valor: parseFloat(v), tipo: t, data: new Date().getTime() });
+    await window.setDoc(ref, { transacoes: list });
     
     document.getElementById('modal').style.display = 'none';
+    document.getElementById('desc').value = "";
+    document.getElementById('valor').value = "";
     window.carregarDados();
 };
 
