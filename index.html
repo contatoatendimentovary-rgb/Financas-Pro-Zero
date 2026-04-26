@@ -13,7 +13,7 @@
             --text-sub: #64748B; --border: #E2E8F0; --accent: #FDE047;
             --green: #22C55E; --orange: #F97316; --red: #EF4444;
         }
-        /* MODO ESCURO: PRETO TOTAL E CORES VIBRANTES */
+        /* MODO ESCURO: PRETO TOTAL E CORES NEON */
         body.dark-mode {
             --bg: #000000;
             --header-bg: #000000;
@@ -27,13 +27,13 @@
             --red: #EF4444;    /* Vermelho */
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: 0.3s; }
-        body { background: var(--bg); color: var(--text-main); padding-bottom: 100px; }
+        body { background: var(--bg); color: var(--text-main); padding-bottom: 120px; min-height: 100vh; }
         
         .glass-header { background: var(--header-bg); padding: 40px 20px 30px; border-radius: 0 0 35px 35px; border-bottom: 1px solid var(--border); }
         .header-content { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .brand { font-weight: 800; font-size: 1.2rem; } .brand span { color: var(--accent); }
-        .theme-switch { background: none; border: 1px solid var(--border); padding: 8px 12px; border-radius: 12px; cursor: pointer; }
-        .user-pill { background: var(--accent); color: #000; border: none; padding: 8px 18px; border-radius: 20px; font-weight: 800; }
+        .theme-switch { background: none; border: 1px solid var(--border); padding: 8px 12px; border-radius: 12px; cursor: pointer; color: var(--text-main); }
+        .user-pill { background: var(--accent); color: #000; border: none; padding: 8px 18px; border-radius: 20px; font-weight: 800; text-transform: uppercase; }
         
         .main-balance { text-align: center; }
         .main-balance small { text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; font-weight: 700; font-size: 0.7rem; }
@@ -41,36 +41,40 @@
 
         .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px; margin-top: -30px; }
         .stat-card { background: var(--card); padding: 18px; border-radius: 24px; border: 1px solid var(--border); display: flex; align-items: center; gap: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .stat-card b { font-size: 1.1rem; }
         .stat-card.incoming .icon { color: var(--green); }
         .stat-card.outgoing .icon { color: var(--red); }
         
-        .viz-card { background: var(--card); margin: 25px 20px; padding: 25px; border-radius: 30px; border: 1px solid var(--border); }
-        .chart-box { height: 260px; }
+        .viz-card { background: var(--card); margin: 25px 20px; padding: 25px; border-radius: 30px; border: 1px solid var(--border); height: 320px; display: flex; flex-direction: column; justify-content: center; }
+        .chart-box { position: relative; height: 100%; width: 100%; }
         
-        .tab-content { display: none; } .tab-content.active { display: block; }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; } .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .timeline-list { padding: 0 20px; }
         .entry-card { background: var(--card); padding: 18px; border-radius: 20px; margin-bottom: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .badge-dia { background: var(--accent); color: #000; font-size: 0.7rem; padding: 3px 8px; border-radius: 8px; margin-right: 8px; font-weight: 900; }
-        .btn-del { background: none; border: none; color: var(--red); font-size: 0.75rem; font-weight: 700; margin-top: 8px; cursor: pointer; }
+        .btn-del { background: none; border: none; color: var(--red); font-size: 0.75rem; font-weight: 700; margin-top: 8px; cursor: pointer; opacity: 0.7; }
 
         .meta-container { padding: 20px; }
         .meta-item { background: var(--card); padding: 20px; border-radius: 24px; margin-bottom: 15px; border: 1px solid var(--border); }
         .progress-container { background: #111; height: 12px; border-radius: 6px; overflow: hidden; margin-top: 15px; }
         .bar { height: 100%; border-radius: 6px; }
 
-        .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 15px 0 30px; border-top: 1px solid var(--border); z-index: 1000; }
-        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 700; }
+        .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; max-width: 500px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
+        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
         .nav-btn.active { color: var(--accent); }
         .nav-btn span { font-size: 1.2rem; }
 
-        .floating-btn { position: fixed; bottom: 110px; right: 25px; width: 65px; height: 65px; border-radius: 22px; background: var(--accent); color: #000; border: none; font-size: 32px; font-weight: 800; box-shadow: 0 10px 20px rgba(0,0,0,0.4); z-index: 999; }
+        .floating-btn { position: fixed; bottom: 120px; right: 25px; width: 65px; height: 65px; border-radius: 22px; background: var(--accent); color: #000; border: none; font-size: 32px; font-weight: 800; box-shadow: 0 10px 20px rgba(0,0,0,0.4); z-index: 999; cursor: pointer; }
         
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: flex-end; }
-        .modal-sheet { background: #000; width: 100%; border-radius: 35px 35px 0 0; padding: 35px; border-top: 1px solid var(--border); }
-        .input-grid input, .input-grid select { width: 100%; padding: 18px; margin-bottom: 12px; border-radius: 16px; border: 1px solid var(--border); background: #0A0A0A; color: #fff; font-size: 1rem; }
-        .btn-confirm { width: 100%; padding: 20px; background: var(--accent); color: #000; border: none; border-radius: 18px; font-weight: 800; font-size: 1.1rem; margin-bottom: 12px; }
-        .btn-abort { width: 100%; padding: 10px; background: none; color: var(--text-sub); border: none; font-weight: 700; }
+        .modal-sheet { background: #000; width: 100%; border-radius: 35px 35px 0 0; padding: 35px; border-top: 1px solid var(--border); max-width: 500px; margin: 0 auto; }
+        .input-grid input, .input-grid select { width: 100%; padding: 18px; margin-bottom: 12px; border-radius: 16px; border: 1px solid var(--border); background: #0A0A0A; color: #fff; font-size: 1rem; font-weight: 600; }
+        .btn-confirm { width: 100%; padding: 20px; background: var(--accent); color: #000; border: none; border-radius: 18px; font-weight: 800; font-size: 1.1rem; margin-bottom: 12px; cursor: pointer; }
+        .btn-abort { width: 100%; padding: 10px; background: none; color: var(--text-sub); border: none; font-weight: 700; cursor: pointer; }
+
+        @media (min-width: 500px) { body { display: flex; justify-content: center; background: #111; } .app-wrapper { width: 500px; background: var(--bg); min-height: 100vh; position: relative; } }
     </style>
 </head>
 <body class="dark-mode">
@@ -80,7 +84,7 @@
                 <div class="brand">Finanças<span>PRO</span></div>
                 <div class="header-utils">
                     <button id="toggleTheme" class="theme-switch">🌓</button>
-                    <button id="btnAuth" class="user-pill">ENTRAR</button>
+                    <button id="btnAuth" class="user-pill">Entrar</button>
                 </div>
             </div>
             <div class="main-balance">
@@ -93,11 +97,11 @@
             <div class="stats-row">
                 <div class="stat-card incoming">
                     <div class="icon">↑</div>
-                    <div class="data"><small>Receitas</small><b id="resumo-receita">R$ 0</b></div>
+                    <div class="data"><small>Receitas</small><br><b id="resumo-receita">R$ 0</b></div>
                 </div>
                 <div class="stat-card outgoing">
                     <div class="icon">↓</div>
-                    <div class="data"><small>Gastos</small><b id="resumo-despesa">R$ 0</b></div>
+                    <div class="data"><small>Gastos</small><br><b id="resumo-despesa">R$ 0</b></div>
                 </div>
             </div>
             <div class="viz-card">
@@ -107,7 +111,7 @@
 
         <section id="aba-extrato" class="tab-content">
             <div style="padding: 20px;">
-                <select id="filtroMes" class="input-grid" style="padding:15px; background:var(--card); font-weight:800; color: white; width: 100%;">
+                <select id="filtroMes" class="input-grid" style="margin-bottom:0; background:var(--card); font-weight:800; color:white;">
                     <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
                     <option value="março">Março</option><option value="abril" selected>Abril</option>
                     <option value="maio">Maio</option><option value="junho">Junho</option>
@@ -146,9 +150,9 @@
 
         <div id="modal" class="modal-overlay">
             <div class="modal-sheet">
-                <h3>Novo Lançamento</h3><br>
+                <h3 style="color:white; margin-bottom:15px;">Novo Lançamento</h3>
                 <div class="input-grid">
-                    <input type="text" id="desc" placeholder="Descrição">
+                    <input type="text" id="desc" placeholder="Descrição (Ex: Aluguel)">
                     <input type="number" id="valor" placeholder="Valor R$">
                     <input type="date" id="data-lancamento">
                     <select id="tipo">
@@ -168,7 +172,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE",
@@ -184,10 +188,17 @@
         window.db = getFirestore(app);
         window.doc = doc; window.setDoc = setDoc; window.getDoc = getDoc;
 
+        // ATIVAR PERSISTÊNCIA OFFLINE
+        enableIndexedDbPersistence(window.db).catch((err) => {
+            console.warn("Persistência Offline indisponível:", err.code);
+        });
+
         onAuthStateChanged(window.auth, (user) => {
             if (user) {
-                document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0].toUpperCase();
+                document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0];
                 window.carregarDados();
+            } else {
+                document.getElementById('btnAuth').innerText = "Entrar";
             }
         });
 
@@ -195,6 +206,7 @@
         window.logout = () => signOut(window.auth).then(() => location.reload());
         document.getElementById('btnAuth').onclick = () => window.auth.currentUser ? window.logout() : window.loginGoogle();
     </script>
+    
     <script>
         let currentChart;
         document.getElementById('toggleTheme').onclick = () => document.body.classList.toggle('dark-mode');
@@ -215,6 +227,8 @@
             
             let r = 0, f = 0, l = 0, i = 0, html = "";
             let trans = snap.exists() ? snap.data().transacoes : [];
+            
+            // Ordenação por data
             trans.sort((a, b) => new Date(a.data) - new Date(b.data));
 
             trans.forEach((t, idx) => {
@@ -225,7 +239,7 @@
 
                 html += `
                 <div class="entry-card">
-                    <div><span class="badge-dia">${dia}</span> <b>${t.descricao}</b></div>
+                    <div><span class="badge-dia">Dia ${dia}</span> <b>${t.descricao}</b></div>
                     <div style="text-align:right">
                         <span style="color:${t.tipo==='entrada'?'#22C55E':'#EF4444'}; font-weight:800">
                             ${t.tipo==='entrada'?'+':'-'} R$ ${v.toFixed(2)}
@@ -238,31 +252,48 @@
             document.getElementById('saldo').innerText = `R$ ${(r - (f+l+i)).toFixed(2)}`;
             document.getElementById('resumo-receita').innerText = `R$ ${r.toFixed(0)}`;
             document.getElementById('resumo-despesa').innerText = `R$ ${(f+l+i).toFixed(0)}`;
-            document.getElementById('lista').innerHTML = html || '<p style="text-align:center;opacity:0.5">Vazio</p>';
+            document.getElementById('lista').innerHTML = html || '<p style="text-align:center;opacity:0.5;padding:20px;">Nenhum lançamento este mês.</p>';
             
             updateBars(r, f, l, i);
             renderPizza(f, l, i);
         };
 
         function updateBars(r, f, l, i) {
-            const bar = (id, v, m) => {
+            const set = (id, v, m) => {
                 const p = m > 0 ? Math.min((v/m)*100, 100) : 0;
                 document.getElementById(`bar-${id}`).style.width = p + '%';
                 document.getElementById(`txt-${id}`).innerText = `R$ ${v.toFixed(0)} / ${m.toFixed(0)}`;
             };
-            bar('fixo', f, r * 0.5); bar('lazer', l, r * 0.3); bar('invest', i, r * 0.2);
+            set('fixo', f, r * 0.5); set('lazer', l, r * 0.3); set('invest', i, r * 0.2);
         }
 
         function renderPizza(f, l, i) {
             const ctx = document.getElementById('graficoPizza').getContext('2d');
             if (currentChart) currentChart.destroy();
+            
+            // Se não houver gastos, não renderiza para não bugar o alinhamento
+            if (f === 0 && l === 0 && i === 0) return;
+
             currentChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Essencial', 'Lazer', 'Invest'],
-                    datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }]
+                    datasets: [{ 
+                        data: [f, l, i], 
+                        backgroundColor: ['#EF4444', '#F97316', '#FDE047'], 
+                        borderWidth: 0,
+                        hoverOffset: 10 
+                    }]
                 },
-                options: { cutout: '85%', plugins: { legend: { position: 'bottom', labels: { color: '#fff', font: { weight: '800' } } } } }
+                options: { 
+                    cutout: '85%', 
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: { enabled: true }
+                    } 
+                }
             });
         }
 
@@ -282,6 +313,8 @@
             trans.push({ descricao: d, valor: parseFloat(v), tipo: t, data: dt });
             await window.setDoc(ref, { transacoes: trans });
             document.getElementById('modal').style.display = 'none';
+            document.getElementById('desc').value = "";
+            document.getElementById('valor').value = "";
             window.carregarDados();
         };
 
