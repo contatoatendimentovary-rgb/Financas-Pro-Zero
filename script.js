@@ -1,13 +1,12 @@
-let meuGrafico;
+let chartPizza, chartBarras;
 
-// Alternar Modo Escuro
-document.getElementById('toggleTheme').onclick = () => {
-    document.body.classList.toggle('dark-mode');
-    window.carregarDados(); // Recarrega para ajustar as cores do gráfico
-};
-
-document.getElementById('abrirModal').onclick = () => document.getElementById('modal').style.display = 'flex';
-document.getElementById('btnFechar').onclick = () => document.getElementById('modal').style.display = 'none';
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    event.currentTarget.classList.add('active');
+    window.carregarDados();
+}
 
 window.carregarDados = async () => {
     const user = window.auth.currentUser;
@@ -20,7 +19,7 @@ window.carregarDados = async () => {
     let rec = 0, fix = 0, laz = 0, inv = 0, html = "";
     let trans = snap.exists() ? snap.data().transacoes : [];
 
-    trans.forEach(t => {
+    trans.forEach((t, index) => {
         const v = parseFloat(t.valor);
         if (t.tipo === 'entrada') rec += v;
         else if (t.tipo === 'fixo') fix += v;
@@ -28,63 +27,77 @@ window.carregarDados = async () => {
         else if (t.tipo === 'investimento') inv += v;
 
         html += `
-            <li class="entry-card" style="border-left-color: ${t.tipo === 'entrada' ? '#10B981' : '#F59E0B'}">
-                <div><b>${t.descricao}</b><br><small>${t.tipo}</small></div>
-                <span style="color: ${t.tipo === 'entrada' ? '#10B981' : 'var(--text)'}">R$ ${v.toFixed(2)}</span>
+            <li class="entry-card">
+                <div><b>${t.descricao}</b><br><small style="color: #64748B">${t.tipo}</small></div>
+                <div style="text-align: right">
+                    <div style="color: ${t.tipo === 'entrada' ? '#10B981' : '#F1F5F9'}">R$ ${v.toFixed(2)}</div>
+                    <button class="btn-delete" onclick="excluirItem(${index})">Apagar</button>
+                </div>
             </li>`;
     });
 
     document.getElementById('lista').innerHTML = html;
     document.getElementById('saldo').innerText = `R$ ${(rec - (fix + laz + inv)).toFixed(2)}`;
 
-    updateBI('fixo', fix, rec * 0.5);
-    updateBI('lazer', laz, rec * 0.3);
-    updateBI('invest', inv, rec * 0.2);
+    updateProgress('fixo', fix, rec * 0.5);
+    updateProgress('lazer', laz, rec * 0.3);
+    updateProgress('invest', inv, rec * 0.2);
 
-    // Renderizar Gráfico Pizza
-    renderPizza(fix, laz, inv);
+    renderCharts(rec, fix, laz, inv);
 };
 
-function renderPizza(fix, laz, inv) {
-    const ctx = document.getElementById('meuGrafico').getContext('2d');
-    const isDarkMode = document.body.classList.contains('dark-mode');
+async function excluirItem(index) {
+    if (!confirm("Deseja apagar este registro?")) return;
+    const user = window.auth.currentUser;
+    const mes = document.getElementById('filtroMes').value;
+    const ref = window.doc(window.db, "usuarios", user.uid, "meses", mes);
     
-    if (meuGrafico) meuGrafico.destroy();
+    const snap = await window.getDoc(ref);
+    let trans = snap.data().transacoes;
+    trans.splice(index, 1);
+    
+    await window.setDoc(ref, { transacoes: trans });
+    window.carregarDados();
+}
 
-    meuGrafico = new Chart(ctx, {
-        type: 'doughnut', // Estilo Rosca (mais moderno que pizza cheia)
+function renderCharts(rec, fix, laz, inv) {
+    // Gráfico de Pizza (Aba Dashboard)
+    const ctxP = document.getElementById('graficoPizza').getContext('2d');
+    if (chartPizza) chartPizza.destroy();
+    chartPizza = new Chart(ctxP, {
+        type: 'doughnut',
         data: {
-            labels: ['Essencial', 'Lazer', 'Investimento'],
-            datasets: [{
-                data: [fix, laz, inv],
-                backgroundColor: ['#10B981', '#F59E0B', '#3B82F6'],
-                borderWidth: isDarkMode ? 0 : 2,
-                borderColor: '#ffffff'
-            }]
+            labels: ['Fixo', 'Lazer', 'Invest'],
+            datasets: [{ data: [fix, laz, inv], backgroundColor: ['#10B981', '#F59E0B', '#3B82F6'], borderWidth: 0 }]
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    labels: {
-                        color: isDarkMode ? '#F1F5F9' : '#334155',
-                        font: { size: 12, weight: 'bold' }
-                    }
-                }
-            },
-            cutout: '70%' // Deixa o gráfico estilo "anel" fino
-        }
+        options: { plugins: { legend: { position: 'bottom', labels: { color: '#F1F5F9' } } }, cutout: '75%' }
+    });
+
+    // Gráfico de Barras Geral (Receita vs Despesa)
+    const ctxB = document.getElementById('graficoBarrasGeral').getContext('2d');
+    if (chartBarras) chartBarras.destroy();
+    chartBarras = new Chart(ctxB, {
+        type: 'bar',
+        data: {
+            labels: ['Fluxo'],
+            datasets: [
+                { label: 'Receita', data: [rec], backgroundColor: '#10B981' },
+                { label: 'Despesa', data: [fix + laz + inv], backgroundColor: '#EF4444' }
+            ]
+        },
+        options: { scales: { y: { display: false } }, plugins: { legend: { labels: { color: '#F1F5F9' } } } }
     });
 }
 
-function updateBI(id, atual, meta) {
-    const perc = meta > 0 ? Math.min((atual / meta) * 100, 100) : 0;
-    const bar = document.getElementById(`bar-${id}`);
-    bar.style.width = perc + '%';
-    document.getElementById(`txt-${id}`).innerText = `R$ ${atual.toFixed(0)} / R$ ${meta.toFixed(0)}`;
-    if (atual > meta && meta > 0) bar.style.background = "#EF4444";
+function updateProgress(id, atual, meta) {
+    const p = meta > 0 ? Math.min((atual / meta) * 100, 100) : 0;
+    document.getElementById(`bar-${id}`).style.width = p + '%';
+    document.getElementById(`txt-${id}`).innerText = `R$ ${atual.toFixed(0)} / ${meta.toFixed(0)}`;
 }
 
+// Modal e Salvar (Mantidos)
+document.getElementById('abrirModal').onclick = () => document.getElementById('modal').style.display = 'flex';
+document.getElementById('btnFechar').onclick = () => document.getElementById('modal').style.display = 'none';
 document.getElementById('btnSalvar').onclick = async () => {
     const user = window.auth.currentUser;
     const desc = document.getElementById('desc').value;
@@ -92,22 +105,14 @@ document.getElementById('btnSalvar').onclick = async () => {
     const tipo = document.getElementById('tipo').value;
     const mes = document.getElementById('filtroMes').value;
 
-    if (!user || !desc || !valor) return alert("Preencha tudo!");
+    if (!user || !desc || !valor) return;
 
     const ref = window.doc(window.db, "usuarios", user.uid, "meses", mes);
     const snap = await window.getDoc(ref);
     let transacoes = snap.exists() ? snap.data().transacoes : [];
-
-    transacoes.push({
-        descricao: desc,
-        valor: parseFloat(valor),
-        tipo: tipo,
-        data: new Date().getTime()
-    });
+    transacoes.push({ descricao: desc, valor: parseFloat(valor), tipo: tipo });
 
     await window.setDoc(ref, { transacoes });
     document.getElementById('modal').style.display = 'none';
     window.carregarDados();
 };
-
-document.getElementById('filtroMes').onchange = () => window.carregarDados();
