@@ -1,13 +1,30 @@
-const CACHE_NAME = 'financas-pro-v2';
-const urlsToCache = ['./', './index.html', './style.css', './script.js', './manifest.json'];
+const CACHE_NAME = 'fpro-vfinal';
 
-self.addEventListener('install', event => {
+// Instala e força o cache
+self.addEventListener('install', (event) => {
     self.skipWaiting();
-    event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll([
+                './index.html',
+                './style.css',
+                './script.js',
+                './manifest.json'
+            ]);
+        })
+    );
 });
 
-self.addEventListener('activate', event => event.waitUntil(clients.claim()));
+// Ativa e assume o controlo imediato
+self.addEventListener('activate', (event) => {
+    event.waitUntil(clients.claim());
+});
 
-self.addEventListener('fetch', event => {
-    event.respondWith(caches.match(event.request).then(response => response || fetch(event.request)));
+// Essencial para o Chrome validar o PWA
+self.addEventListener('fetch', (event) => {
+    event.respondWith(
+        caches.match(event.request).then((response) => {
+            return response || fetch(event.request);
+        })
+    );
 });
