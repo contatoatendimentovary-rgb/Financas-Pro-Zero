@@ -13,26 +13,35 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; }
 
 header { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
 
+#btnAuth { background: var(--card); color: var(--primary); border: 1px solid var(--primary); padding: 8px 15px; border-radius: 10px; font-weight: bold; }
+
 .card-saldo { background: var(--card); margin: 20px; padding: 25px; border-radius: 20px; text-align: center; }
+.card-saldo span { color: #8E8E93; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
 .card-saldo h2 { font-size: 32px; color: var(--primary); margin-top: 10px; }
 
-.grafico-box { background: var(--card); margin: 20px; padding: 20px; border-radius: 20px; height: 250px; display: flex; justify-content: center; }
+.grafico-box { background: var(--card); margin: 20px; padding: 20px; border-radius: 20px; height: 250px; display: flex; justify-content: center; position: relative; }
 
 .acoes { padding: 0 20px; display: flex; gap: 10px; margin-bottom: 20px; }
-select { background: var(--card); color: white; border: none; padding: 12px; border-radius: 10px; flex: 1; font-size: 16px; }
+select { background: var(--card); color: white; border: 1px solid #333; padding: 12px; border-radius: 12px; flex: 1; font-size: 16px; outline: none; }
 
-.btn-floating { background: var(--primary); color: white; border: none; width: 55px; height: 55px; border-radius: 50%; font-size: 30px; position: fixed; bottom: 30px; right: 20px; box-shadow: 0 4px 15px rgba(10, 132, 255, 0.4); }
+.btn-floating { background: var(--primary); color: white; border: none; width: 60px; height: 60px; border-radius: 50%; font-size: 35px; position: fixed; bottom: 30px; right: 20px; box-shadow: 0 4px 15px rgba(10, 132, 255, 0.4); z-index: 99; }
 
-/* Modal Estilizado */
-.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 1000; }
-.modal-container { background: var(--card); padding: 30px; border-radius: 25px; width: 90%; max-width: 400px; }
-.modal-container input, .modal-container select { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #333; background: #2C2C2E; color: white; font-size: 16px; }
-
-.modal-btns { display: flex; gap: 10px; margin-top: 20px; }
-.confirmar { background: var(--primary); flex: 1; border: none; padding: 15px; border-radius: 12px; color: white; font-weight: bold; }
-.cancelar { background: #3A3A3C; flex: 1; border: none; padding: 15px; border-radius: 12px; color: white; }
-
+/* Lista de Transações */
 .transacoes-lista { list-style: none; padding: 0 20px; }
 .item-transacao { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+.item-info { display: flex; flex-direction: column; gap: 4px; }
+.item-info .desc { font-size: 16px; font-weight: 500; }
 .valor-entrada { color: var(--green); font-weight: bold; }
 .valor-saida { color: var(--red); font-weight: bold; }
+
+.btn-excluir { background: transparent; border: none; font-size: 18px; padding: 5px 10px; cursor: pointer; opacity: 0.6; }
+
+/* Modal */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+.modal-container { background: var(--card); padding: 25px; border-radius: 25px; width: 100%; max-width: 400px; }
+.modal-container h3 { margin-bottom: 20px; text-align: center; }
+.modal-container input, .modal-container select { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 1px solid #333; background: #2C2C2E; color: white; font-size: 16px; }
+
+.modal-btns { display: flex; gap: 10px; }
+.confirmar { background: var(--primary); flex: 2; border: none; padding: 15px; border-radius: 12px; color: white; font-weight: bold; }
+.cancelar { background: #3A3A3C; flex: 1; border: none; padding: 15px; border-radius: 12px; color: white; }
