@@ -7,7 +7,7 @@
     <title>FinançasPRO // Premium</title>
     
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3222/3222672.png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2489/2489756.png">
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -19,33 +19,25 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: 0.3s; }
         body { background: var(--bg); color: var(--text-main); padding-bottom: 120px; overflow-x: hidden; }
         
-        /* TELA DE BLOQUEIO */
         .app-lock-overlay { position: fixed; inset: 0; background: #000; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         
-        /* CABEÇALHO */
         .glass-header { background: var(--header-bg); padding: 40px 20px 30px; border-radius: 0 0 35px 35px; border-bottom: 1px solid var(--border); text-align: center; }
         .main-balance small { text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; font-size: 0.7rem; font-weight: 700; }
-        .main-balance h1 { font-size: 2.8rem; font-weight: 800; margin: 5px 0 15px; }
+        .main-balance h1 { font-size: 2.8rem; font-weight: 800; margin: 5px 0; }
 
-        /* ALERTAS */
         .alert-box { background: rgba(249, 115, 22, 0.15); color: var(--orange); border: 1px solid var(--orange); padding: 15px; border-radius: 18px; margin: 15px 20px; font-size: 0.85rem; font-weight: 700; display: none; border-left: 5px solid var(--orange); }
 
-        /* DASHBOARD */
         .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px; margin-top: -25px; }
         .stat-card { background: var(--card); padding: 18px; border-radius: 24px; border: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
         .viz-card { background: var(--card); margin: 25px 20px; padding: 30px; border-radius: 32px; border: 1px solid var(--border); height: 320px; display: flex; align-items: center; justify-content: center; position: relative; }
-        .chart-container { width: 100%; height: 100%; position: relative; }
-
-        /* LISTA */
+        
         .timeline-list { padding: 0 20px; }
         .entry-card { background: var(--card); padding: 18px; border-radius: 22px; margin-bottom: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         
-        /* BOTÕES */
         .user-pill { background: var(--accent); color: #000; border: none; padding: 12px 25px; border-radius: 15px; font-weight: 800; cursor: pointer; }
-        .btn-export { background: #1DB954; color: white; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 800; font-size: 0.65rem; cursor: pointer; margin-top: 10px; }
+        .btn-export { background: #1DB954; color: white; border: none; padding: 12px; border-radius: 16px; font-weight: 800; font-size: 0.8rem; cursor: pointer; width: 100%; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .floating-btn { position: fixed; bottom: 110px; right: 25px; width: 65px; height: 65px; border-radius: 22px; background: var(--accent); border: none; font-size: 32px; font-weight: 800; z-index: 999; }
 
-        /* NAVEGAÇÃO */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
         .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 0.7rem; font-weight: 700; }
         .nav-btn.active { color: var(--accent); }
@@ -74,7 +66,6 @@
             <div class="main-balance">
                 <small>Saldo Disponível</small>
                 <h1 id="saldo">R$ 0,00</h1>
-                <button onclick="exportarCSV()" class="btn-export">📊 EXPORTAR PLANILHA</button>
             </div>
         </header>
 
@@ -90,12 +81,13 @@
                 </div>
             </div>
             <div class="viz-card">
-                <div class="chart-container"><canvas id="graficoPizza"></canvas></div>
+                <div style="width:100%; height:100%; position:relative;"><canvas id="graficoPizza"></canvas></div>
             </div>
         </section>
 
         <section id="aba-extrato" class="tab-content">
             <div style="padding: 20px;">
+                <button onclick="exportarCSV()" class="btn-export">📥 BAIXAR PLANILHA (.CSV)</button>
                 <select id="filtroMes" class="input-grid" onchange="carregarDados()">
                     <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
                     <option value="março">Março</option><option value="abril" selected>Abril</option>
@@ -155,7 +147,7 @@
         window.db = getFirestore(app);
         window.doc = doc; window.setDoc = setDoc; window.getDoc = getDoc;
 
-        enableIndexedDbPersistence(window.db).catch(() => console.log("Offline Ativo"));
+        enableIndexedDbPersistence(window.db).catch(() => console.log("Offline"));
 
         onAuthStateChanged(window.auth, (user) => {
             if (user) {
@@ -192,11 +184,9 @@
                     }
                 } catch (e) {
                     console.error(e);
-                    alert("Autenticação necessária para prosseguir.");
+                    alert("Acesso negado.");
                 }
-            } else {
-                lock.style.display = 'none';
-            }
+            } else { lock.style.display = 'none'; }
         }
 
         async function exportarCSV() {
@@ -205,15 +195,12 @@
             const ref = window.doc(window.db, "usuarios", user.uid, "meses", mes);
             const snap = await window.getDoc(ref);
             if (!snap.exists()) return alert("Sem dados.");
-            
             let csv = "\uFEFFData,Descricao,Valor,Tipo\n";
-            snap.data().transacoes.forEach(t => {
-                csv += `${t.data},${t.descricao},${t.valor},${t.tipo}\n`;
-            });
+            snap.data().transacoes.forEach(t => csv += `${t.data},${t.descricao},${t.valor},${t.tipo}\n`);
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = `financas_${mes}.csv`;
+            link.download = `extrato_${mes}.csv`;
             link.click();
         }
 
@@ -229,7 +216,6 @@
             const mes = document.getElementById('filtroMes').value;
             const ref = window.doc(window.db, "usuarios", user.uid, "meses", mes);
             const snap = await window.getDoc(ref);
-            
             let r = 0, f = 0, l = 0, i = 0, html = "";
             let trans = snap.exists() ? snap.data().transacoes : [];
 
@@ -239,7 +225,6 @@
                 else if(t.tipo === 'fixo') f += v;
                 else if(t.tipo === 'lazer') l += v;
                 else i += v;
-
                 html += `<div class="entry-card">
                     <div><b>${t.descricao}</b><br><small>${t.data}</small></div>
                     <div style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}; font-weight:800">
@@ -251,14 +236,13 @@
             document.getElementById('saldo').innerText = `R$ ${(r - (f+l+i)).toFixed(2)}`;
             document.getElementById('resumo-receita').innerText = `R$ ${r.toFixed(0)}`;
             document.getElementById('resumo-despesa').innerText = `R$ ${(f+l+i).toFixed(0)}`;
-            document.getElementById('lista').innerHTML = html || '<p style="text-align:center; padding:20px; opacity:0.5;">Vazio</p>';
+            document.getElementById('lista').innerHTML = html || '<p style="text-align:center; padding:20px; opacity:0.5;">Sem registros</p>';
             
             const alerta = document.getElementById('alerta-economia');
             if (l >= (r * 0.3) * 0.8 && r > 0) {
                 alerta.style.display = 'block';
-                alerta.innerText = `⚠️ Atenção: Gastos com Lazer atingiram 80% do limite recomendado para sua receita.`;
+                alerta.innerText = `⚠️ Gastos com Lazer atingiram 80% do recomendado.`;
             } else { alerta.style.display = 'none'; }
-
             renderPizza(f, l, i);
         };
 
@@ -266,24 +250,13 @@
             const ctx = document.getElementById('graficoPizza').getContext('2d');
             if (currentChart) currentChart.destroy();
             if (f+l+i === 0) return;
-
             currentChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Essencial', 'Lazer', 'Invest'],
-                    datasets: [{ 
-                        data: [f, l, i], 
-                        backgroundColor: ['#EF4444', '#F97316', '#FDE047'], 
-                        borderWidth: 0,
-                        hoverOffset: 15
-                    }]
+                    labels: ['Fixo', 'Lazer', 'Invest'],
+                    datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }]
                 },
-                options: { 
-                    cutout: '82%', 
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } }
-                }
+                options: { cutout: '82%', plugins: { legend: { display: false } } }
             });
         }
 
@@ -293,7 +266,7 @@
         async function salvar() {
             const user = window.auth.currentUser;
             const d = document.getElementById('desc').value, v = document.getElementById('valor').value, t = document.getElementById('tipo').value, dt = document.getElementById('data-lancamento').value, m = document.getElementById('filtroMes').value;
-            if (!d || !v || !dt) return alert("Preencha todos os campos.");
+            if (!d || !v || !dt) return;
             const ref = window.doc(window.db, "usuarios", user.uid, "meses", m);
             const snap = await window.getDoc(ref);
             let trans = snap.exists() ? snap.data().transacoes : [];
