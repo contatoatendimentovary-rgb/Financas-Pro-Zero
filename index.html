@@ -5,42 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0F172A">
     <link rel="manifest" href="manifest.json">
-    <title>FinançasPRO MVP</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>FinançasPRO // Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="dark-mode">
     <div class="app-wrapper">
-        <header class="main-header">
-            <div class="header-top">
-                <span class="brand">Finanças<span>PRO</span></span>
-                <button id="btnAuth" class="login-pill">Entrar</button>
+        <header class="glass-header">
+            <div class="header-content">
+                <div class="brand">Finanças<span>PRO</span></div>
+                <div class="header-utils">
+                    <button id="toggleTheme" class="theme-switch">🌓</button>
+                    <button id="btnAuth" class="user-pill">Entrar</button>
+                </div>
             </div>
-            <div class="balance-card">
-                <label>Saldo Disponível</label>
-                <h2 id="saldo">R$ 0,00</h2>
+            <div class="main-balance">
+                <small>Saldo Geral</small>
+                <h1 id="saldo">R$ 0,00</h1>
             </div>
         </header>
 
         <section id="aba-dashboard" class="tab-content active">
-            <div class="card-section">
-                <h4 class="section-title">Composição de Gastos</h4>
-                <div class="chart-container">
-                    <canvas id="graficoPizza"></canvas>
+            <div class="stats-row">
+                <div class="stat-card incoming">
+                    <div class="icon">↑</div>
+                    <div class="data">
+                        <small>Receitas</small>
+                        <b id="resumo-receita">R$ 0</b>
+                    </div>
+                </div>
+                <div class="stat-card outgoing">
+                    <div class="icon">↓</div>
+                    <div class="data">
+                        <small>Despesas</small>
+                        <b id="resumo-despesa">R$ 0</b>
+                    </div>
                 </div>
             </div>
-            <div class="card-section">
-                <h4 class="section-title">Receitas vs Despesas</h4>
-                <div class="chart-container">
-                    <canvas id="graficoBarrasGeral"></canvas>
+
+            <div class="viz-card">
+                <h4 class="card-title">Distribuição Mensal</h4>
+                <div class="chart-box">
+                    <canvas id="graficoPizza"></canvas>
                 </div>
             </div>
         </section>
 
         <section id="aba-extrato" class="tab-content">
-            <div class="filter-row">
-                <select id="filtroMes" class="corporate-select">
+            <div class="sticky-filter">
+                <select id="filtroMes" class="modern-select">
                     <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
                     <option value="março">Março</option><option value="abril" selected>Abril</option>
                     <option value="maio">Maio</option><option value="junho">Junho</option>
@@ -49,49 +63,50 @@
                     <option value="novembro">Novembro</option><option value="dezembro">Dezembro</option>
                 </select>
             </div>
-            <ul id="lista" class="entry-list"></ul>
+            <div id="lista" class="timeline-list"></div>
         </section>
 
         <section id="aba-metas" class="tab-content">
-            <div class="bi-dashboard">
-                <div class="chart-item">
-                    <div class="chart-labels"><span>Essencial (50%)</span><b id="txt-fixo">R$ 0</b></div>
-                    <div class="progress-track"><div id="bar-fixo" class="bar-fill green"></div></div>
+            <div class="meta-container">
+                <div class="meta-item">
+                    <div class="meta-info"><span>Essencial</span><b id="txt-fixo">0 / 0</b></div>
+                    <div class="progress-container"><div id="bar-fixo" class="bar g-green"></div></div>
                 </div>
-                <div class="chart-item">
-                    <div class="chart-labels"><span>Lazer (30%)</span><b id="txt-lazer">R$ 0</b></div>
-                    <div class="progress-track"><div id="bar-lazer" class="bar-fill orange"></div></div>
+                <div class="meta-item">
+                    <div class="meta-info"><span>Estilo de Vida</span><b id="txt-lazer">0 / 0</b></div>
+                    <div class="progress-container"><div id="bar-lazer" class="bar g-orange"></div></div>
                 </div>
-                <div class="chart-item">
-                    <div class="chart-labels"><span>Investimento (20%)</span><b id="txt-invest">R$ 0</b></div>
-                    <div class="progress-track"><div id="bar-invest" class="bar-fill blue"></div></div>
+                <div class="meta-item">
+                    <div class="meta-info"><span>Investimentos</span><b id="txt-invest">0 / 0</b></div>
+                    <div class="progress-container"><div id="bar-invest" class="bar g-blue"></div></div>
                 </div>
             </div>
         </section>
 
-        <nav class="bottom-nav">
-            <button onclick="switchTab('aba-dashboard')" class="nav-item active">📊 <span>Dash</span></button>
-            <button onclick="switchTab('aba-extrato')" class="nav-item">📜 <span>Extrato</span></button>
-            <button onclick="switchTab('aba-metas')" class="nav-item">🎯 <span>Metas</span></button>
+        <nav class="bottom-tab-bar">
+            <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active">📊<span>Home</span></button>
+            <button onclick="switchTab('aba-extrato', this)" class="nav-btn">📜<span>Extrato</span></button>
+            <button onclick="switchTab('aba-metas', this)" class="nav-btn">🎯<span>Metas</span></button>
         </nav>
 
-        <button id="abrirModal" class="fab-add">+</button>
+        <button id="abrirModal" class="floating-btn">+</button>
 
         <div id="modal" class="modal-overlay">
-            <div class="modal-box">
-                <h4>Nova Transação</h4>
-                <div class="form-group">
-                    <input type="text" id="desc" placeholder="Ex: Salário, Aluguel...">
+            <div class="modal-sheet">
+                <div class="drag-handle"></div>
+                <h3>Novo Lançamento</h3>
+                <div class="input-grid">
+                    <input type="text" id="desc" placeholder="O que você comprou?">
                     <input type="number" id="valor" placeholder="R$ 0,00">
                     <select id="tipo">
-                        <option value="entrada">Receita (+)</option>
-                        <option value="fixo">Essencial (50%)</option>
-                        <option value="lazer">Lazer (30%)</option>
-                        <option value="investimento">Investimento (20%)</option>
+                        <option value="entrada">Faturamento / Receita</option>
+                        <option value="fixo">Gastos Essenciais (50%)</option>
+                        <option value="lazer">Desejos Pessoais (30%)</option>
+                        <option value="investimento">Investimentos (20%)</option>
                     </select>
                 </div>
-                <button id="btnSalvar" class="btn-save">Salvar</button>
-                <button id="btnFechar" class="btn-cancel">Cancelar</button>
+                <button id="btnSalvar" class="btn-confirm">Salvar Registro</button>
+                <button id="btnFechar" class="btn-abort">Cancelar</button>
             </div>
         </div>
     </div>
@@ -121,7 +136,7 @@
 
         onAuthStateChanged(window.auth, (user) => {
             if (user) {
-                document.getElementById('btnAuth').innerText = "Sair";
+                document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0];
                 document.getElementById('btnAuth').onclick = window.logout;
                 window.carregarDados();
             } else {
