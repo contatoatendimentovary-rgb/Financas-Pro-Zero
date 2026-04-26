@@ -30,25 +30,16 @@
             <div class="stats-row">
                 <div class="stat-card incoming">
                     <div class="icon">↑</div>
-                    <div class="data">
-                        <small>Receitas</small>
-                        <b id="resumo-receita">R$ 0</b>
-                    </div>
+                    <div class="data"><small>Receitas</small><b id="resumo-receita">R$ 0</b></div>
                 </div>
                 <div class="stat-card outgoing">
                     <div class="icon">↓</div>
-                    <div class="data">
-                        <small>Despesas</small>
-                        <b id="resumo-despesa">R$ 0</b>
-                    </div>
+                    <div class="data"><small>Despesas</small><b id="resumo-despesa">R$ 0</b></div>
                 </div>
             </div>
-
             <div class="viz-card">
                 <h4 class="card-title">Distribuição Mensal</h4>
-                <div class="chart-box">
-                    <canvas id="graficoPizza"></canvas>
-                </div>
+                <div class="chart-box"><canvas id="graficoPizza"></canvas></div>
             </div>
         </section>
 
@@ -69,15 +60,15 @@
         <section id="aba-metas" class="tab-content">
             <div class="meta-container">
                 <div class="meta-item">
-                    <div class="meta-info"><span>Essencial</span><b id="txt-fixo">0 / 0</b></div>
+                    <div class="meta-info"><span>Essencial (50%)</span><b id="txt-fixo">0 / 0</b></div>
                     <div class="progress-container"><div id="bar-fixo" class="bar g-green"></div></div>
                 </div>
                 <div class="meta-item">
-                    <div class="meta-info"><span>Estilo de Vida</span><b id="txt-lazer">0 / 0</b></div>
+                    <div class="meta-info"><span>Estilo de Vida (30%)</span><b id="txt-lazer">0 / 0</b></div>
                     <div class="progress-container"><div id="bar-lazer" class="bar g-orange"></div></div>
                 </div>
                 <div class="meta-item">
-                    <div class="meta-info"><span>Investimentos</span><b id="txt-invest">0 / 0</b></div>
+                    <div class="meta-info"><span>Investimentos (20%)</span><b id="txt-invest">0 / 0</b></div>
                     <div class="progress-container"><div id="bar-invest" class="bar g-blue"></div></div>
                 </div>
             </div>
@@ -96,17 +87,17 @@
                 <div class="drag-handle"></div>
                 <h3>Novo Lançamento</h3>
                 <div class="input-grid">
-                    <input type="text" id="desc" placeholder="O que você comprou?">
+                    <input type="text" id="desc" placeholder="Descrição">
                     <input type="number" id="valor" placeholder="R$ 0,00">
                     <select id="tipo">
-                        <option value="entrada">Faturamento / Receita</option>
-                        <option value="fixo">Gastos Essenciais (50%)</option>
-                        <option value="lazer">Desejos Pessoais (30%)</option>
-                        <option value="investimento">Investimentos (20%)</option>
+                        <option value="entrada">Receita</option>
+                        <option value="fixo">Essencial (50%)</option>
+                        <option value="lazer">Estilo de Vida (30%)</option>
+                        <option value="investimento">Investimento (20%)</option>
                     </select>
                 </div>
-                <button id="btnSalvar" class="btn-confirm">Salvar Registro</button>
-                <button id="btnFechar" class="btn-abort">Cancelar</button>
+                <button id="btnSalvar" class="btn-confirm">Confirmar</button>
+                <button id="btnFechar" class="btn-abort">Voltar</button>
             </div>
         </div>
     </div>
@@ -144,6 +135,11 @@
                 document.getElementById('btnAuth').onclick = window.loginGoogle;
             }
         });
+
+        // REGISTRO DO INSTALADOR (PWA)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./service-worker.js');
+        }
     </script>
     <script src="script.js"></script>
 </body>
