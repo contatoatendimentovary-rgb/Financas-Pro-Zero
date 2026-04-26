@@ -4,51 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FinançasPRO // Final</title>
-    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#EAB308">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* Variáveis de Cores (Padrão Escuro) */
         :root {
             --bg: #000000; --card: #0A0A0A; --text: #FFFFFF;
             --text-sub: #A1A1AA; --border: #1F2937; --accent: #FDE047;
             --green: #22C55E; --red: #EF4444;
         }
-
-        /* Classe para Modo Claro */
         body.light-mode {
             --bg: #F9FAFB; --card: #FFFFFF; --text: #111827;
             --text-sub: #6B7280; --border: #E5E7EB; --accent: #EAB308;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: var(--text); overflow-x: hidden; padding-bottom: 120px; transition: 0.3s; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 120px; transition: 0.3s; }
 
-        /* HEADER */
         .glass-header { padding: 40px 20px 30px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; }
-        .theme-toggle { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; }
+        .action-bar { display: flex; gap: 10px; align-items: center; }
+        .icon-btn { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 12px; cursor: pointer; font-size: 1.2rem; }
         
-        /* CARDS */
-        .viz-card { background: var(--card); margin: 15px; padding: 20px; border-radius: 25px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .entry-card { background: var(--card); padding: 16px; border-radius: 18px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .viz-card { background: var(--card); margin: 15px; padding: 20px; border-radius: 25px; border: 1px solid var(--border); }
+        .entry-card { background: var(--card); padding: 16px; border-radius: 18px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; animation: fadeIn 0.3s ease; }
         
-        /* NAVEGAÇÃO */
+        .btn-delete { color: var(--red); background: none; border: none; padding: 5px; font-size: 1.1rem; }
+        .btn-export { width: 100%; padding: 12px; background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 12px; font-weight: 800; margin-bottom: 15px; }
+
         .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--bg); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
-        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-weight: 700; font-size: 0.75rem; gap: 5px; }
+        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-weight: 700; font-size: 0.75rem; }
         .nav-btn.active { color: var(--accent); }
 
-        .floating-btn { position: fixed; bottom: 110px; right: 20px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); border: none; font-size: 30px; font-weight: 800; z-index: 999; color: #000; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); }
+        .floating-btn { position: fixed; bottom: 110px; right: 20px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); border: none; font-size: 30px; font-weight: 800; z-index: 999; color: #000; }
         
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: flex-end; }
         .modal-sheet { background: var(--bg); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; border-top: 1px solid var(--border); }
-        .input-grid input, .input-grid select { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); color: var(--text); outline: none; }
+        .input-grid input, .input-grid select { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); color: var(--text); }
         
-        .tab-content { display: none; animation: fadeIn 0.3s ease-out; } 
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-content { display: none; } .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -56,30 +49,27 @@
     <header class="glass-header">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <div style="font-weight:800; font-size:1.1rem;">Finanças<span style="color:var(--accent)">PRO</span></div>
-            <button onclick="toggleTheme()" class="theme-toggle">CLARO/ESCURO</button>
-            <button id="btnAuth" style="background:var(--accent); color:#000; border:none; padding:8px 15px; border-radius:12px; font-weight:800; font-size:0.7rem;" onclick="loginGoogle()">ENTRAR</button>
+            <div class="action-bar">
+                <button onclick="toggleTheme()" class="icon-btn" id="theme-icon">🌙</button>
+                <button id="btnAuth" style="background:var(--accent); color:#000; border:none; padding:8px 15px; border-radius:12px; font-weight:800; font-size:0.7rem;" onclick="loginGoogle()">ENTRAR</button>
+                <button onclick="logout()" class="icon-btn" style="font-size: 0.9rem;">🚪</button>
+            </div>
         </div>
-        <p style="color:var(--text-sub); text-transform:uppercase; font-size:0.65rem; letter-spacing:1.5px; font-weight:700;">Balanço Mensal</p>
-        <h1 id="saldo" style="font-size:2.6rem; font-weight:800; margin-top:5px;">R$ 0,00</h1>
+        <h1 id="saldo" style="font-size:2.6rem; font-weight:800;">R$ 0,00</h1>
     </header>
 
     <section id="aba-dashboard" class="tab-content active">
-        <div class="viz-card">
-            <h4 style="font-size:0.8rem; margin-bottom:15px; opacity:0.7">DISTRIBUIÇÃO</h4>
-            <canvas id="graficoPizza" style="max-height: 250px;"></canvas>
-        </div>
+        <div class="viz-card"><canvas id="graficoPizza" style="max-height: 250px;"></canvas></div>
     </section>
 
     <section id="aba-aportes" class="tab-content">
-        <div class="viz-card">
-            <h4 style="font-size:0.8rem; margin-bottom:15px; color:var(--accent)">HISTÓRICO DE APORTES</h4>
-            <canvas id="graficoBarras" style="max-height: 250px;"></canvas>
-        </div>
+        <div class="viz-card"><canvas id="graficoBarras" style="max-height: 250px;"></canvas></div>
         <div id="lista-invest" style="padding: 0 20px;"></div>
     </section>
 
     <section id="aba-extrato" class="tab-content">
         <div style="padding: 10px 20px;">
+            <button onclick="exportarExcel()" class="btn-export">📊 EXPORTAR MÊS (EXCEL)</button>
             <select id="filtroMes" class="input-grid" onchange="carregarDados()">
                 <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
                 <option value="março">Março</option><option value="abril">Abril</option>
@@ -93,18 +83,18 @@
     </section>
 
     <nav class="bottom-tab-bar">
-        <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active"><span>📊</span> Resumo</button>
-        <button onclick="switchTab('aba-aportes', this)" class="nav-btn"><span>📈</span> Aportes</button>
-        <button onclick="switchTab('aba-extrato', this)" class="nav-btn"><span>📜</span> Extrato</button>
+        <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active">📊 Resumo</button>
+        <button onclick="switchTab('aba-aportes', this)" class="nav-btn">📈 Aportes</button>
+        <button onclick="switchTab('aba-extrato', this)" class="nav-btn">📜 Extrato</button>
     </nav>
 
     <button onclick="abrirModal()" class="floating-btn">+</button>
 
     <div id="modal" class="modal-overlay">
         <div class="modal-sheet">
-            <h3 style="margin-bottom:20px;">Adicionar Transação</h3>
+            <h3>Novo Lançamento</h3><br>
             <div class="input-grid">
-                <input type="text" id="desc" placeholder="Ex: Salário, Aluguel...">
+                <input type="text" id="desc" placeholder="Descrição">
                 <input type="number" id="valor" placeholder="R$ 0,00">
                 <input type="date" id="data-reg">
                 <select id="tipo">
@@ -115,14 +105,14 @@
                 </select>
             </div>
             <button onclick="salvarRegistro()" style="width:100%; padding:18px; background:var(--accent); border:none; border-radius:15px; font-weight:800;">SALVAR</button>
-            <button onclick="fecharModal()" style="width:100%; background:none; border:none; color:var(--text-sub); padding:15px;">FECHAR</button>
+            <button onclick="fecharModal()" style="width:100%; background:none; border:none; color:var(--text-sub); padding:15px;">CANCELAR</button>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -139,10 +129,8 @@
         window.db = getFirestore(app);
         window.f_doc = doc; window.f_setDoc = setDoc; window.f_getDoc = getDoc;
 
-        // DEFINIR MÊS ATUAL AO INICIAR
-        const mesesNomes = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
-        const mesAtualIdx = new Date().getMonth();
-        document.getElementById('filtroMes').value = mesesNomes[mesAtualIdx];
+        const meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+        document.getElementById('filtroMes').value = meses[new Date().getMonth()];
 
         onAuthStateChanged(window.auth, (user) => {
             if (user) {
@@ -152,14 +140,16 @@
         });
 
         window.loginGoogle = () => signInWithPopup(window.auth, new GoogleAuthProvider());
+        window.logout = () => signOut(window.auth).then(() => location.reload());
     </script>
     
     <script>
         let chartP; let chartB;
 
         function toggleTheme() {
-            document.body.classList.toggle('light-mode');
-            window.carregarDados(); // Recarregar para atualizar cores do gráfico
+            const isLight = document.body.classList.toggle('light-mode');
+            document.getElementById('theme-icon').innerText = isLight ? '☀️' : '🌙';
+            window.carregarDados();
         }
 
         async function carregarDados() {
@@ -169,8 +159,9 @@
             
             let saldo = 0, fixo = 0, lazer = 0, invest = 0, html = "", invHtml = "";
             let trans = snap.exists() ? snap.data().transacoes : [];
-            
-            trans.forEach(t => {
+            window.dadosAtuais = trans; // Para exportação
+
+            trans.forEach((t, i_idx) => {
                 const v = parseFloat(t.valor);
                 if (t.tipo === 'entrada') saldo += v;
                 else {
@@ -179,71 +170,74 @@
                     else if(t.tipo === 'lazer') lazer += v;
                     else { invest += v; invHtml += `<div class="entry-card"><span>${t.descricao}</span><b>R$ ${v.toFixed(2)}</b></div>`; }
                 }
-                html += `<div class="entry-card"><div><b>${t.descricao}</b><br><small>${t.data}</small></div><b style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">R$ ${v.toFixed(2)}</b></div>`;
+                html += `<div class="entry-card">
+                    <div><b>${t.descricao}</b><br><small>${t.data}</small></div>
+                    <div style="display:flex; align-items:center; gap:10px">
+                        <b style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">R$ ${v.toFixed(2)}</b>
+                        <button class="btn-delete" onclick="excluirRegistro(${i_idx})">🗑️</button>
+                    </div>
+                </div>`;
             });
 
-            document.getElementById('saldo').innerText = `R$ ${saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-            document.getElementById('lista').innerHTML = html || '<p style="text-align:center; opacity:0.3; margin-top:20px;">Vazio</p>';
+            document.getElementById('saldo').innerText = `R$ ${saldo.toFixed(2)}`;
+            document.getElementById('lista').innerHTML = html || '<p style="text-align:center; opacity:0.3;">Vazio</p>';
             document.getElementById('lista-invest').innerHTML = invHtml;
             renderCharts(fixo, lazer, invest);
         }
 
-        function renderCharts(f, l, i) {
-            const isLight = document.body.classList.contains('light-mode');
-            const txtColor = isLight ? '#111827' : '#FFFFFF';
-            const gridColor = isLight ? '#E5E7EB' : '#1F2937';
+        async function excluirRegistro(idx) {
+            if(!confirm("Deseja excluir este item?")) return;
+            const user = window.auth.currentUser;
+            const mes = document.getElementById('filtroMes').value;
+            let novaLista = [...window.dadosAtuais];
+            novaLista.splice(idx, 1);
+            await window.f_setDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", mes), { transacoes: novaLista });
+            window.carregarDados();
+        }
 
+        function exportarExcel() {
+            if(!window.dadosAtuais || window.dadosAtuais.length === 0) return alert("Sem dados para exportar");
+            let csv = "Descricao,Valor,Data,Tipo\n";
+            window.dadosAtuais.forEach(t => { csv += `${t.descricao},${t.valor},${t.data},${t.tipo}\n`; });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `Financas_${document.getElementById('filtroMes').value}.csv`;
+            a.click();
+        }
+
+        function renderCharts(f, l, i) {
+            const txt = document.body.classList.contains('light-mode') ? '#000' : '#fff';
             const ctxP = document.getElementById('graficoPizza').getContext('2d');
             if(chartP) chartP.destroy();
             chartP = new Chart(ctxP, {
                 type: 'doughnut',
-                data: {
-                    labels: ['Fixo', 'Lazer', 'Invest'],
-                    datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0, hoverOffset: 15 }]
-                },
-                options: { 
-                    cutout: '70%',
-                    plugins: { legend: { position: 'bottom', labels: { color: txtColor, font: { weight: 'bold' }, padding: 20 } } } 
-                }
+                data: { labels: ['Fixo', 'Lazer', 'Invest'], datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }] },
+                options: { plugins: { legend: { labels: { color: txt } } } }
             });
 
             const ctxB = document.getElementById('graficoBarras').getContext('2d');
             if(chartB) chartB.destroy();
             chartB = new Chart(ctxB, {
                 type: 'bar',
-                data: { 
-                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-                    datasets: [{ label: 'Investimentos', data: [0,0,0,0,0,0,0,0,0,0,0,0], backgroundColor: '#FDE047', borderRadius: 6 }] 
-                },
-                options: {
-                    scales: { 
-                        y: { grid: { color: gridColor }, ticks: { color: txtColor } },
-                        x: { grid: { display: false }, ticks: { color: txtColor } }
-                    },
-                    plugins: { legend: { display: false } }
-                }
+                data: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], datasets: [{ label: 'Aportes', data: new Array(12).fill(0), backgroundColor: '#FDE047' }] },
+                options: { scales: { y: { ticks: { color: txt } }, x: { ticks: { color: txt } } }, plugins: { legend: { display: false } } }
             });
-            // Simulação simples de colocar o dado no mês certo do gráfico de barras
-            const mesIdx = document.getElementById('filtroMes').selectedIndex;
-            chartB.data.datasets[0].data[mesIdx] = i;
+            chartB.data.datasets[0].data[document.getElementById('filtroMes').selectedIndex] = i;
             chartB.update();
         }
 
         async function salvarRegistro() {
             const user = window.auth.currentUser;
             const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value, t = document.getElementById('tipo').value;
-            if (!dt || !v) return alert("Preencha Valor e Data");
-
+            if(!dt || !v) return;
             const meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
             const mesAlvo = meses[new Date(dt).getUTCMonth()];
-
-            const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mesAlvo);
-            const snap = await window.f_getDoc(ref);
+            const snap = await window.f_getDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", mesAlvo));
             let lista = snap.exists() ? snap.data().transacoes : [];
             lista.push({ descricao: d, valor: v, tipo: t, data: dt });
-            
-            await window.f_setDoc(ref, { transacoes: lista });
-            fecharModal(); carregarDados();
+            await window.f_setDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", mesAlvo), { transacoes: lista });
+            fecharModal(); window.carregarDados();
         }
 
         function switchTab(id, btn) {
@@ -253,16 +247,8 @@
             btn.classList.add('active');
             window.dispatchEvent(new Event('resize'));
         }
-
         function abrirModal() { document.getElementById('modal').style.display = 'flex'; }
         function fecharModal() { document.getElementById('modal').style.display = 'none'; }
-        
-        // PWA Register
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(reg => console.log('SW ativo')).catch(err => console.log('SW erro'));
-            });
-        }
     </script>
 </body>
 </html>
