@@ -1,8 +1,14 @@
-// Controles de interface
+let meuGrafico;
+
+// Alternar Modo Escuro
+document.getElementById('toggleTheme').onclick = () => {
+    document.body.classList.toggle('dark-mode');
+    window.carregarDados(); // Recarrega para ajustar as cores do gráfico
+};
+
 document.getElementById('abrirModal').onclick = () => document.getElementById('modal').style.display = 'flex';
 document.getElementById('btnFechar').onclick = () => document.getElementById('modal').style.display = 'none';
 
-// Função para carregar e calcular dados
 window.carregarDados = async () => {
     const user = window.auth.currentUser;
     if (!user) return;
@@ -22,20 +28,54 @@ window.carregarDados = async () => {
         else if (t.tipo === 'investimento') inv += v;
 
         html += `
-            <li class="entry-card" style="border-left: 4px solid ${t.tipo === 'entrada' ? '#10B981' : '#F59E0B'}">
+            <li class="entry-card" style="border-left-color: ${t.tipo === 'entrada' ? '#10B981' : '#F59E0B'}">
                 <div><b>${t.descricao}</b><br><small>${t.tipo}</small></div>
-                <span style="color: ${t.tipo === 'entrada' ? '#10B981' : '#334155'}">R$ ${v.toFixed(2)}</span>
+                <span style="color: ${t.tipo === 'entrada' ? '#10B981' : 'var(--text)'}">R$ ${v.toFixed(2)}</span>
             </li>`;
     });
 
     document.getElementById('lista').innerHTML = html;
     document.getElementById('saldo').innerText = `R$ ${(rec - (fix + laz + inv)).toFixed(2)}`;
 
-    // Atualiza as metas BI
     updateBI('fixo', fix, rec * 0.5);
     updateBI('lazer', laz, rec * 0.3);
     updateBI('invest', inv, rec * 0.2);
+
+    // Renderizar Gráfico Pizza
+    renderPizza(fix, laz, inv);
 };
+
+function renderPizza(fix, laz, inv) {
+    const ctx = document.getElementById('meuGrafico').getContext('2d');
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    
+    if (meuGrafico) meuGrafico.destroy();
+
+    meuGrafico = new Chart(ctx, {
+        type: 'doughnut', // Estilo Rosca (mais moderno que pizza cheia)
+        data: {
+            labels: ['Essencial', 'Lazer', 'Investimento'],
+            datasets: [{
+                data: [fix, laz, inv],
+                backgroundColor: ['#10B981', '#F59E0B', '#3B82F6'],
+                borderWidth: isDarkMode ? 0 : 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: isDarkMode ? '#F1F5F9' : '#334155',
+                        font: { size: 12, weight: 'bold' }
+                    }
+                }
+            },
+            cutout: '70%' // Deixa o gráfico estilo "anel" fino
+        }
+    });
+}
 
 function updateBI(id, atual, meta) {
     const perc = meta > 0 ? Math.min((atual / meta) * 100, 100) : 0;
@@ -45,7 +85,6 @@ function updateBI(id, atual, meta) {
     if (atual > meta && meta > 0) bar.style.background = "#EF4444";
 }
 
-// SALVAMENTO REAL NO FIREBASE
 document.getElementById('btnSalvar').onclick = async () => {
     const user = window.auth.currentUser;
     const desc = document.getElementById('desc').value;
@@ -53,35 +92,22 @@ document.getElementById('btnSalvar').onclick = async () => {
     const tipo = document.getElementById('tipo').value;
     const mes = document.getElementById('filtroMes').value;
 
-    if (!user || !desc || !valor) {
-        alert("Preencha a descrição e o valor!");
-        return;
-    }
+    if (!user || !desc || !valor) return alert("Preencha tudo!");
 
-    try {
-        const ref = window.doc(window.db, "usuarios", user.uid, "meses", mes);
-        const snap = await window.getDoc(ref);
-        let transacoes = snap.exists() ? snap.data().transacoes : [];
+    const ref = window.doc(window.db, "usuarios", user.uid, "meses", mes);
+    const snap = await window.getDoc(ref);
+    let transacoes = snap.exists() ? snap.data().transacoes : [];
 
-        transacoes.push({
-            descricao: desc,
-            valor: parseFloat(valor),
-            tipo: tipo,
-            data: new Date().getTime()
-        });
+    transacoes.push({
+        descricao: desc,
+        valor: parseFloat(valor),
+        tipo: tipo,
+        data: new Date().getTime()
+    });
 
-        await window.setDoc(ref, { transacoes });
-        
-        // Limpar e fechar
-        document.getElementById('modal').style.display = 'none';
-        document.getElementById('desc').value = "";
-        document.getElementById('valor').value = "";
-        
-        window.carregarDados();
-        alert("Registrado com sucesso!");
-    } catch (e) {
-        alert("Erro ao salvar: " + e.message);
-    }
+    await window.setDoc(ref, { transacoes });
+    document.getElementById('modal').style.display = 'none';
+    window.carregarDados();
 };
 
 document.getElementById('filtroMes').onchange = () => window.carregarDados();
