@@ -18,7 +18,8 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: var(--text-main); padding-bottom: 120px; overflow-x: hidden; }
         
-        .app-lock-overlay { position: fixed; inset: 0; background: #000; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        /* TELA DE BLOQUEIO */
+        .app-lock-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         
         .glass-header { background: var(--bg); padding: 40px 20px 30px; border-bottom: 1px solid var(--border); text-align: center; }
         .main-balance h1 { font-size: 2.8rem; font-weight: 800; margin: 5px 0; }
@@ -46,8 +47,8 @@
 
     <div id="app-lock" class="app-lock-overlay">
         <div style="font-weight:800; font-size:1.5rem; margin-bottom:15px;">FinançasPRO Locked</div>
-        <button onclick="autenticarBio()" class="user-pill">USAR BIOMETRIA</button>
-        <p id="msg-erro" style="color:var(--red); font-size:0.7rem; margin-top:15px; display:none;">Biometria indisponível. Tentando acesso...</p>
+        <button onclick="autenticarBio()" class="user-pill">DESBLOQUEAR AGORA</button>
+        <p style="color:var(--text-sub); font-size:0.7rem; margin-top:20px;">Clique acima para entrar</p>
     </div>
 
     <div class="app-wrapper">
@@ -74,7 +75,7 @@
 
         <section id="aba-investimentos" class="tab-content">
             <div class="viz-card">
-                <h3 style="margin-bottom:20px; font-size:0.9rem;">Patrimônio Acumulado (Total)</h3>
+                <h3 style="margin-bottom:20px; font-size:0.9rem;">Patrimônio Acumulado</h3>
                 <div style="width:100%; height:100%;"><canvas id="graficoBarras"></canvas></div>
             </div>
         </section>
@@ -156,23 +157,21 @@
     <script>
         let chartP, chartB;
 
-        // AJUSTE NA BIOMETRIA: Tenta autenticar, mas libera se o dispositivo der erro de chave
+        // FUNÇÃO DE DESBLOQUEIO CORRIGIDA
         async function autenticarBio() {
             const lock = document.getElementById('app-lock');
+            
+            // Tentativa de biometria
             try {
                 if (window.PublicKeyCredential) {
                     await navigator.credentials.get({ 
-                        publicKey: { 
-                            challenge: crypto.getRandomValues(new Uint8Array(32)), 
-                            timeout: 5000, // Timeout menor para não travar
-                            userVerification: "required" 
-                        } 
+                        publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), timeout: 2000, userVerification: "required" } 
                     });
                 }
+                // Se chegar aqui ou der erro de "chave indisponível", ele fecha a tela preta
                 lock.style.display = 'none';
             } catch (e) { 
-                console.log("Erro biometria:", e.name);
-                // Mesmo com o erro das imagens, ele libera o app
+                console.warn("Bypass de biometria ativado devido ao erro de chave.");
                 lock.style.display = 'none'; 
             }
         }
@@ -180,5 +179,121 @@
         async function carregarDados() {
             const user = window.auth.currentUser; if (!user) return;
             const mesSel = document.getElementById('filtroMes').value;
-            const ref = window.doc(window.db, "usuarios
-                                   
+            const ref = window.doc(window.db, "usuarios", user.uid, "meses", mesSel);
+            const snap = await window.getDoc(ref);
+            
+            let saldoMes = 0, f = 0, l = 0, i = 0, html = "";
+            let trans = snap.exists() ? snap.data().transacoes : [];
+            
+            // FILTRO: Só mostra e soma o que for do mês selecionado
+            trans.sort((a, b) => new Date(a.data) - new Date(b.data)).forEach((t, idx) => {
+                const v = parseFloat(t.valor);
+                if (t.tipo === 'entrada') saldoMes += v;
+                else {
+                    saldoMes -= v;
+                    if(t.tipo === 'fixo') f += v;
+                    else if(t.tipo === 'lazer') l += v;
+                    else if(t.tipo === 'investimento') i += v;
+                }
+
+                html += `
+                <div class="entry-card">
+                    <div><b>${t.descricao}</b><br><small>${t.data.split('-').reverse().join('/')}</small></div>
+                    <div style="display:flex; align-items:center;">
+                        <b style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">${t.tipo==='entrada'?'+':'-'} R$${v.toFixed(2)}</b>
+                        <button class="btn-delete" style="margin-left:10px;" onclick="excluir(${idx})">✕</button>
+                    </div>
+                </div>`;
+            });
+
+            document.getElementById('saldo').innerText = `R$ ${saldoMes.toFixed(2)}`;
+            document.getElementById('txt-label-saldo').innerText = `Saldo de ${mesSel.charAt(0).toUpperCase() + mesSel.slice(1)}`;
+            document.getElementById('lista').innerHTML = html || '<p style="text-align:center; opacity:0.3; margin-top:20px;">Sem registros</p>';
+            
+            const ctx = document.getElementById('graficoPizza').getContext('2d');
+            if (chartP) chartP.destroy();
+            chartP = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: ['Essencial', 'Lazer', 'Investimento'], datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }] },
+                options: { cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } } }
+            });
+        }
+
+        async function renderInvestimentos() {
+            const user = window.auth.currentUser;
+            const meses = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+            let dados = []; let acumulado = 0;
+
+            for (let m of meses) {
+                const snap = await window.getDoc(window.doc(window.db, "usuarios", user.uid, "meses", m));
+                if(snap.exists()) {
+                    snap.data().transacoes.forEach(t => { if(t.tipo==='investimento') acumulado += parseFloat(t.valor); });
+                }
+                dados.push(acumulado);
+            }
+
+            const ctx = document.getElementById('graficoBarras').getContext('2d');
+            if(chartB) chartB.destroy();
+            chartB = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'], datasets: [{ data: dados, backgroundColor:'#FDE047' }] },
+                options: { plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#1F2937' }, ticks: { color: '#fff' } }, x: { ticks: { color: '#fff' } } } }
+            });
+        }
+
+        async function salvar() {
+            const user = window.auth.currentUser;
+            const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data-lancamento').value, t = document.getElementById('tipo').value;
+            const mesAlvo = document.getElementById('filtroMes').value;
+            
+            if(!d || !v || !dt) return alert("Preencha tudo");
+
+            const ref = window.doc(window.db, "usuarios", user.uid, "meses", mesAlvo);
+            const snap = await window.getDoc(ref);
+            let trans = snap.exists() ? snap.data().transacoes : [];
+            trans.push({ descricao: d, valor: parseFloat(v), tipo: t, data: dt });
+            
+            await window.setDoc(ref, { transacoes: trans });
+            fecharModal(); carregarDados();
+        }
+
+        async function excluir(index) {
+            if(!confirm("Excluir?")) return;
+            const user = window.auth.currentUser;
+            const mes = document.getElementById('filtroMes').value;
+            const ref = window.doc(window.db, "usuarios", user.uid, "meses", mes);
+            const snap = await window.getDoc(ref);
+            let trans = snap.data().transacoes;
+            trans.splice(index, 1);
+            await window.setDoc(ref, { transacoes: trans });
+            carregarDados();
+        }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+            if(id === 'aba-investimentos') renderInvestimentos();
+        }
+
+        function abrirModal() { document.getElementById('modal').style.display = 'flex'; }
+        function fecharModal() { document.getElementById('modal').style.display = 'none'; }
+        
+        async function exportarCSV() {
+            const user = window.auth.currentUser;
+            const mes = document.getElementById('filtroMes').value;
+            const ref = window.doc(window.db, "usuarios", user.uid, "meses", mes);
+            const snap = await window.getDoc(ref);
+            if(!snap.exists()) return;
+            let csv = "\uFEFFData,Descricao,Valor,Tipo\n";
+            snap.data().transacoes.forEach(t => csv += `${t.data},${t.descricao},${t.valor},${t.tipo}\n`);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `extrato_${mes}.csv`;
+            link.click();
+        }
+    </script>
+</body>
+</html>
