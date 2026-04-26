@@ -1,6 +1,6 @@
 let currentChart;
 
-// Alternador de Tema
+// Tema e Navegação
 document.getElementById('toggleTheme').onclick = () => {
     document.body.classList.toggle('dark-mode');
     window.carregarDados();
@@ -14,6 +14,7 @@ function switchTab(tabId, el) {
     window.carregarDados();
 }
 
+// Carregamento de Dados
 window.carregarDados = async () => {
     const user = window.auth.currentUser;
     if (!user) return;
@@ -34,9 +35,7 @@ window.carregarDados = async () => {
 
         html += `
             <div class="entry-card">
-                <div class="info">
-                    <b>${t.descricao}</b><br><small>${t.tipo.toUpperCase()}</small>
-                </div>
+                <div class="info"><b>${t.descricao}</b><br><small>${t.tipo}</small></div>
                 <div class="amt">
                     <span style="color: ${t.tipo === 'entrada' ? 'var(--green)' : 'var(--text-main)'}">
                         ${t.tipo === 'entrada' ? '+' : '-'} R$ ${v.toFixed(2)}
@@ -46,22 +45,19 @@ window.carregarDados = async () => {
             </div>`;
     });
 
-    // Atualiza Interface
     document.getElementById('saldo').innerText = `R$ ${(rec - (fix + laz + inv)).toFixed(2)}`;
     document.getElementById('resumo-receita').innerText = `R$ ${rec.toFixed(0)}`;
     document.getElementById('resumo-despesa').innerText = `R$ ${(fix + laz + inv).toFixed(0)}`;
-    document.getElementById('lista').innerHTML = html;
+    document.getElementById('lista').innerHTML = html || '<p style="text-align:center; padding:20px; opacity:0.5;">Nenhum registro.</p>';
 
-    renderBI(rec, fix, laz, inv);
+    renderDash(rec, fix, laz, inv);
 };
 
-function renderBI(rec, fix, laz, inv) {
-    // Barras 50-30-20
+function renderDash(rec, fix, laz, inv) {
     updateBar('fixo', fix, rec * 0.5);
     updateBar('lazer', laz, rec * 0.3);
     updateBar('invest', inv, rec * 0.2);
 
-    // Gráfico de Pizza Premium
     const ctx = document.getElementById('graficoPizza').getContext('2d');
     const isDark = document.body.classList.contains('dark-mode');
     
@@ -80,7 +76,7 @@ function renderBI(rec, fix, laz, inv) {
         options: {
             cutout: '80%',
             plugins: {
-                legend: { position: 'bottom', labels: { color: isDark ? '#94A3B8' : '#64748B', font: { size: 10, weight: '600' }, padding: 20 } }
+                legend: { position: 'bottom', labels: { color: isDark ? '#94A3B8' : '#64748B', font: { size: 10, weight: '600' } } }
             }
         }
     });
@@ -93,7 +89,7 @@ function updateBar(id, val, meta) {
     if (val > meta && meta > 0) document.getElementById(`bar-${id}`).style.background = '#EF4444';
 }
 
-// Funções de Modal e Firebase (Salvar/Deletar)
+// Funções de Registro
 document.getElementById('abrirModal').onclick = () => document.getElementById('modal').style.display = 'flex';
 document.getElementById('btnFechar').onclick = () => document.getElementById('modal').style.display = 'none';
 
@@ -104,19 +100,22 @@ document.getElementById('btnSalvar').onclick = async () => {
     const tipo = document.getElementById('tipo').value;
     const mes = document.getElementById('filtroMes').value;
 
-    if (!user || !desc || !valor) return alert("Preencha os campos!");
+    if (!user || !desc || !valor) return;
 
     const ref = window.doc(window.db, "usuarios", user.uid, "meses", mes);
     const snap = await window.getDoc(ref);
     let trans = snap.exists() ? snap.data().transacoes : [];
-    trans.push({ descricao: desc, valor: parseFloat(valor), tipo: tipo, data: new Date().getTime() });
+    trans.push({ descricao: desc, valor: parseFloat(valor), tipo: tipo });
 
     await window.setDoc(ref, { transacoes: trans });
     document.getElementById('modal').style.display = 'none';
+    document.getElementById('desc').value = "";
+    document.getElementById('valor').value = "";
     window.carregarDados();
 };
 
 window.deletar = async (index) => {
+    if (!confirm("Excluir item?")) return;
     const user = window.auth.currentUser;
     const mes = document.getElementById('filtroMes').value;
     const ref = window.doc(window.db, "usuarios", user.uid, "meses", mes);
