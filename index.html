@@ -1,89 +1,99 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinançasPRO Premium</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FinançasPRO</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="dark-mode"> <header>
-        <div class="header-top">
-            <h1>Finanças<span>PRO</span></h1>
-            <div class="header-btns">
-                <button id="toggleTheme">🌓</button>
-                <button id="btnAuth">Login</button>
+<body class="light-theme">
+    <div class="app-container">
+        <header>
+            <div class="top-bar">
+                <button id="toggleTheme" class="icon-btn">🌓</button>
+                <h1 class="logo">Finanças<span>PRO</span></h1>
+                <button id="btnAuth" class="auth-btn">Login</button>
             </div>
-        </div>
-        <div class="card-main">
-            <span>Saldo Disponível</span>
-            <h2 id="saldo">R$ 0,00</h2>
-        </div>
-    </header>
+            <div class="main-balance">
+                <span>Saldo Disponível</span>
+                <h2 id="saldo">R$ 0,00</h2>
+            </div>
+        </header>
 
-    <main>
-        <section class="budget-section">
-            <h3>Orçamento Projetado (50-30-20)</h3>
-            <div class="budget-card">
-                <div class="budget-info">
-                    <span>Fixo (50%)</span>
-                    <span id="txt-fixo">R$ 0 / R$ 0</span>
+        <main>
+            <section class="budget-dashboard">
+                <div class="section-title">
+                    <h3>Orçamento Projetado</h3>
+                    <span class="badge">Regra 50-30-20</span>
                 </div>
-                <div class="progress-bar"><div id="bar-fixo" class="progress"></div></div>
-            </div>
-            <div class="budget-card">
-                <div class="budget-info">
-                    <span>Lazer (30%)</span>
-                    <span id="txt-lazer">R$ 0 / R$ 0</span>
+
+                <div class="budget-grid">
+                    <div class="b-card fixed">
+                        <div class="b-info">
+                            <label>Essencial (50%)</label>
+                            <b id="txt-fixo">R$ 0</b>
+                        </div>
+                        <div class="p-bar"><div id="bar-fixo" class="fill"></div></div>
+                    </div>
+
+                    <div class="b-card leisure">
+                        <div class="b-info">
+                            <label>Lazer (30%)</label>
+                            <b id="txt-lazer">R$ 0</b>
+                        </div>
+                        <div class="p-bar"><div id="bar-lazer" class="fill"></div></div>
+                    </div>
+
+                    <div class="b-card invest">
+                        <div class="b-info">
+                            <label>Investir (20%)</label>
+                            <b id="txt-invest">R$ 0</b>
+                        </div>
+                        <div class="p-bar"><div id="bar-invest" class="fill"></div></div>
+                    </div>
                 </div>
-                <div class="progress-bar"><div id="bar-lazer" class="progress"></div></div>
+            </section>
+
+            <div class="list-controls">
+                <select id="filtroMes">
+                    <option value="janeiro">Janeiro</option>
+                    <option value="fevereiro">Fevereiro</option>
+                    <option value="março">Março</option>
+                    <option value="abril" selected>Abril</option>
+                    <option value="maio">Maio</option>
+                    <option value="junho">Junho</option>
+                    <option value="julho">Julho</option>
+                    <option value="agosto">Agosto</option>
+                    <option value="setembro">Setembro</option>
+                    <option value="outubro">Outubro</option>
+                    <option value="novembro">Novembro</option>
+                    <option value="dezembro">Dezembro</option>
+                </select>
             </div>
-            <div class="budget-card">
-                <div class="budget-info">
-                    <span>Investir (20%)</span>
-                    <span id="txt-invest">R$ 0 / R$ 0</span>
+
+            <ul id="lista" class="transaction-list"></ul>
+        </main>
+
+        <button id="abrirModal" class="floating-btn">+</button>
+
+        <div id="modal" class="modal-overlay">
+            <div class="modal-card">
+                <h3>Novo Registro</h3>
+                <div class="input-group">
+                    <input type="text" id="desc" placeholder="Ex: Aluguel, Salário...">
+                    <input type="number" id="valor" placeholder="R$ 0,00">
+                    <select id="tipo">
+                        <option value="entrada">📈 Receita (Entrada)</option>
+                        <option value="fixo">🏠 Gasto Fixo (50%)</option>
+                        <option value="lazer">🍹 Lazer/Variável (30%)</option>
+                        <option value="investimento">💰 Investimento (20%)</option>
+                    </select>
                 </div>
-                <div class="progress-bar"><div id="bar-invest" class="progress"></div></div>
-            </div>
-        </section>
-
-        <section class="controles">
-            <select id="filtroMes">
-                <option value="janeiro">Janeiro</option>
-                <option value="fevereiro">Fevereiro</option>
-                <option value="março">Março</option>
-                <option value="abril" selected>Abril</option>
-                <option value="maio">Maio</option>
-                <option value="junho">Junho</option>
-                <option value="julho">Julho</option>
-                <option value="agosto">Agosto</option>
-                <option value="setembro">Setembro</option>
-                <option value="outubro">Outubro</option>
-                <option value="novembro">Novembro</option>
-                <option value="dezembro">Dezembro</option>
-            </select>
-        </section>
-
-        <ul id="lista" class="lista-transacoes"></ul>
-    </main>
-
-    <button id="abrirModal" class="fab">+</button>
-
-    <div id="modal" class="modal-overlay">
-        <div class="modal-content">
-            <h3>Novo Lançamento</h3>
-            <input type="text" id="desc" placeholder="O que você comprou?">
-            <input type="number" id="valor" placeholder="Valor R$">
-            <select id="tipo">
-                <option value="entrada">Receita (Entrada)</option>
-                <option value="fixo">Gasto Fixo (Aluguel, Luz...)</option>
-                <option value="lazer">Lazer (iFood, Cinema...)</option>
-                <option value="investimento">Investimento / Reserva</option>
-            </select>
-            <div class="modal-actions">
-                <button id="btnSalvar" class="btn-primary">Registrar</button>
-                <button id="btnFechar" class="btn-sec">Voltar</button>
+                <div class="modal-footer">
+                    <button id="btnSalvar" class="save-btn">Confirmar</button>
+                    <button id="btnFechar" class="cancel-btn">Cancelar</button>
+                </div>
             </div>
         </div>
     </div>
@@ -94,6 +104,7 @@
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // MANTENDO SUAS CONFIGURAÇÕES ORIGINAIS DO FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE",
             authDomain: "financaspro-1e0e8.firebaseapp.com",
