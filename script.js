@@ -1,15 +1,13 @@
-// script.js - Versão Final Consolidada
 let meuGrafico;
 
-// 1. Função para carregar e calcular tudo do Firebase
+// 1. Carregar dados do Firebase
 window.carregarDadosDoFirebase = async () => {
     const user = window.auth.currentUser;
-    const mesSelecionado = document.getElementById('filtroMes').value;
+    const mes = document.getElementById('filtroMes').value;
     
     if (!user) return;
 
-    // Referência correta da pasta do usuário e mês
-    const dadosRef = window.doc(window.db, "usuarios", user.uid, "meses", mesSelecionado);
+    const dadosRef = window.doc(window.db, "usuarios", user.uid, "meses", mes);
     
     try {
         const docSnap = await window.getDoc(dadosRef);
@@ -21,44 +19,56 @@ window.carregarDadosDoFirebase = async () => {
             transacoes = docSnap.data().transacoes || [];
         }
 
-        // Limpa a lista antes de preencher
         const listaUl = document.getElementById('lista');
         listaUl.innerHTML = "";
 
-        // Processa cada lançamento
-        transacoes.forEach(t => {
+        transacoes.forEach((t, index) => {
             const valorNum = parseFloat(t.valor);
-            if (t.tipo === 'entrada') {
-                entradas += valorNum;
-            } else {
-                saidas += valorNum;
-            }
+            if (t.tipo === 'entrada') entradas += valorNum;
+            else saidas += valorNum;
 
-            // Adiciona na lista visual
             listaUl.innerHTML += `
                 <li class="item-transacao">
-                    <span>${t.descricao}</span>
-                    <span class="valor-${t.tipo}">R$ ${valorNum.toFixed(2)}</span>
+                    <div class="item-info">
+                        <span class="desc">${t.descricao}</span>
+                        <span class="valor-${t.tipo}">R$ ${valorNum.toFixed(2)}</span>
+                    </div>
+                    <button class="btn-excluir" onclick="excluirTransacao(${index})">🗑️</button>
                 </li>`;
         });
 
-        // Atualiza Saldo e Gráfico
-        const saldoTotal = entradas - saidas;
-        document.getElementById('saldo').innerText = `R$ ${saldoTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-        
+        document.getElementById('saldo').innerText = `R$ ${(entradas - saidas).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
         desenharGrafico(entradas, saidas);
 
-    } catch (error) {
-        console.error("Erro ao carregar dados:", error);
+    } catch (e) {
+        console.error("Erro ao carregar:", e);
     }
 };
 
-// 2. Função do Gráfico (Ajustada para Mobile)
+// 2. Função de Excluir
+window.excluirTransacao = async (index) => {
+    if (!confirm("Deseja apagar este registro?")) return;
+
+    const user = window.auth.currentUser;
+    const mes = document.getElementById('filtroMes').value;
+    const dadosRef = window.doc(window.db, "usuarios", user.uid, "meses", mes);
+
+    try {
+        const docSnap = await window.getDoc(dadosRef);
+        if (docSnap.exists()) {
+            let transacoes = docSnap.data().transacoes;
+            transacoes.splice(index, 1); // Remove pelo índice
+            await window.setDoc(dadosRef, { transacoes });
+            window.carregarDadosDoFirebase(); // Atualiza a tela
+        }
+    } catch (e) {
+        alert("Erro ao excluir.");
+    }
+};
+
+// 3. Gráfico
 function desenharGrafico(entradas, saidas) {
-    const canvas = document.getElementById('meuGrafico');
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
+    const ctx = document.getElementById('meuGrafico').getContext('2d');
     if (meuGrafico) meuGrafico.destroy();
 
     const temDados = entradas > 0 || saidas > 0;
@@ -68,7 +78,7 @@ function desenharGrafico(entradas, saidas) {
         data: {
             labels: ['Entradas', 'Saídas'],
             datasets: [{
-                data: temDados ? [entradas, saidas] : [1, 0.00001], 
+                data: temDados ? [entradas, saidas] : [1, 0],
                 backgroundColor: temDados ? ['#32D74B', '#FF453A'] : ['#333', '#333'],
                 borderWidth: 0
             }]
@@ -77,14 +87,12 @@ function desenharGrafico(entradas, saidas) {
             cutout: '75%',
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
-            }
+            plugins: { legend: { display: false } }
         }
     });
 }
 
-// 3. Evento de Salvar Registro
+// 4. Salvar Novo Registro
 document.getElementById('btnSalvar').onclick = async () => {
     const desc = document.getElementById('desc').value;
     const valorRaw = document.getElementById('valor').value;
@@ -92,8 +100,7 @@ document.getElementById('btnSalvar').onclick = async () => {
     const mes = document.getElementById('filtroMes').value;
     const user = window.auth.currentUser;
 
-    if (!user) return alert("Erro: Usuário não identificado. Faça login novamente.");
-    if (!desc || !valorRaw) return alert("Preencha a descrição e o valor.");
+    if (!user || !desc || !valorRaw) return alert("Preencha tudo!");
 
     const valor = parseFloat(valorRaw);
     const dadosRef = window.doc(window.db, "usuarios", user.uid, "meses", mes);
@@ -101,37 +108,24 @@ document.getElementById('btnSalvar').onclick = async () => {
     try {
         const docSnap = await window.getDoc(dadosRef);
         let transacoes = docSnap.exists() ? docSnap.data().transacoes : [];
-
-        transacoes.push({
-            descricao: desc,
-            valor: valor,
-            tipo: tipo,
-            data: new Date().getTime()
-        });
+        transacoes.push({ descricao: desc, valor, tipo, data: new Date().getTime() });
 
         await window.setDoc(dadosRef, { transacoes });
-        
         document.getElementById('modal').style.display = 'none';
-        // Limpa campos
         document.getElementById('desc').value = "";
         document.getElementById('valor').value = "";
-        
-        // Recarrega os dados sem dar reload na página inteira
         window.carregarDadosDoFirebase();
-        
     } catch (e) {
-        alert("Erro ao salvar no banco de dados.");
-        console.error(e);
+        alert("Erro ao salvar.");
     }
 };
 
-// 4. Controles de Interface
+// 5. Interface
 document.getElementById('abrirModal').onclick = () => document.getElementById('modal').style.display = 'flex';
 document.getElementById('btnFechar').onclick = () => document.getElementById('modal').style.display = 'none';
 document.getElementById('filtroMes').onchange = () => window.carregarDadosDoFirebase();
 
-// 5. Inicialização Automática
-// Aguarda o Firebase avisar que o usuário está logado
+// 6. Monitor de Login
 const checkAuth = setInterval(() => {
     if (window.auth && window.auth.currentUser) {
         window.carregarDadosDoFirebase();
