@@ -12,16 +12,17 @@
     <style>
         :root {
             --bg: #FFFFFF; --card: #F4F4F5; --text-main: #09090B; --text-sub: #71717A;
-            --border: #E4E4E7; --accent: #FDE047; --green: #22C55E; --red: #EF4444;
+            --border: #E4E4E7; --accent: #FDE047; --green: #22C55E; --red: #EF4444; --gray: #A1A1AA;
         }
 
         body.dark-mode {
-            --bg: #000000; --card: #0A0A0A; --text-main: #FFFFFF; --text-sub: #A1A1AA; --border: #1F2937;
+            --bg: #000000; --card: #111111; --text-main: #FFFFFF; --text-sub: #A1A1AA; --border: #1F2937;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.3s, color 0.3s; }
         body { background: var(--bg); color: var(--text-main); padding-bottom: 120px; overflow-x: hidden; }
         
+        /* TELA DE BLOQUEIO */
         .app-lock-overlay { position: fixed; inset: 0; background: #000; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white; }
         
         .glass-header { background: var(--bg); padding: 40px 20px 30px; border-radius: 0 0 35px 35px; border-bottom: 1px solid var(--border); text-align: center; }
@@ -29,7 +30,11 @@
 
         .viz-card { background: var(--card); margin: 20px; padding: 25px; border-radius: 32px; border: 1px solid var(--border); height: 350px; display: flex; flex-direction: column; align-items: center; }
         
+        /* ESTILIZAÇÃO DO EXTRATO */
         .entry-card { background: var(--card); padding: 18px; border-radius: 22px; margin-bottom: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .entry-card.future { opacity: 0.6; border-style: dashed; }
+        .future-badge { font-size: 0.6rem; background: var(--gray); color: #000; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; margin-left: 5px; }
+
         .btn-delete { background: var(--red); color: white; border: none; width: 28px; height: 28px; border-radius: 10px; font-weight: 800; cursor: pointer; margin-left: 10px; display: flex; align-items: center; justify-content: center; }
         
         .user-pill { background: var(--accent); color: #000; border: none; padding: 10px 18px; border-radius: 12px; font-weight: 800; cursor: pointer; }
@@ -51,8 +56,8 @@
 <body class="dark-mode">
 
     <div id="app-lock" class="app-lock-overlay">
-        <div style="font-weight:800; font-size:1.5rem; margin-bottom:10px;">Finanças<span>PRO</span></div>
-        <button onclick="autenticarBio()" class="user-pill">DESBLOQUEAR APP</button>
+        <div style="font-weight:800; font-size:1.5rem; margin-bottom:10px;">FinançasPRO Locked</div>
+        <button onclick="autenticarBio()" class="user-pill">USAR BIOMETRIA</button>
     </div>
 
     <div class="app-wrapper">
@@ -65,7 +70,7 @@
                 </div>
             </div>
             <div class="main-balance">
-                <small style="color:var(--text-sub)">Saldo Atual</small>
+                <small style="color:var(--text-sub)">Saldo Real (Até Hoje)</small>
                 <h1 id="saldo">R$ 0,00</h1>
             </div>
         </header>
@@ -79,7 +84,7 @@
 
         <section id="aba-investimentos" class="tab-content">
             <div class="viz-card">
-                <h3 style="margin-bottom:20px; font-size:0.9rem;">Evolução de Investimentos (Anual)</h3>
+                <h3 style="margin-bottom:20px; font-size:0.9rem;">Evolução de Investimentos</h3>
                 <div style="width:100%; height:100%;"><canvas id="graficoBarras"></canvas></div>
             </div>
         </section>
@@ -88,21 +93,15 @@
             <div style="padding: 20px;">
                 <button onclick="exportarCSV()" class="user-pill" style="width:100%; margin-bottom:15px; background:#1DB954; color:white;">EXPORTAR PLANILHA</button>
                 <select id="filtroMes" class="input-grid" onchange="carregarDados()">
-                    <option value="janeiro">Janeiro</option>
-                    <option value="fevereiro">Fevereiro</option>
-                    <option value="março">Março</option>
-                    <option value="abril" selected>Abril</option>
-                    <option value="maio">Maio</option>
-                    <option value="junho">Junho</option>
-                    <option value="julho">Julho</option>
-                    <option value="agosto">Agosto</option>
-                    <option value="setembro">Setembro</option>
-                    <option value="outubro">Outubro</option>
-                    <option value="novembro">Novembro</option>
-                    <option value="dezembro">Dezembro</option>
+                    <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
+                    <option value="março">Março</option><option value="abril" selected>Abril</option>
+                    <option value="maio">Maio</option><option value="junho">Junho</option>
+                    <option value="julho">Julho</option><option value="agosto">Agosto</option>
+                    <option value="setembro">Setembro</option><option value="outubro">Outubro</option>
+                    <option value="novembro">Novembro</option><option value="dezembro">Dezembro</option>
                 </select>
             </div>
-            <div id="lista" class="timeline-list"></div>
+            <div id="lista" class="timeline-list" style="padding: 0 20px;"></div>
         </section>
 
         <nav class="bottom-nav">
@@ -117,7 +116,7 @@
             <div class="modal-sheet">
                 <h3 style="margin-bottom:20px;">Novo Registro</h3>
                 <div class="input-grid">
-                    <input type="text" id="desc" placeholder="Ex: Salário, Aluguel...">
+                    <input type="text" id="desc" placeholder="Descrição">
                     <input type="number" id="valor" placeholder="Valor R$">
                     <input type="date" id="data-lancamento">
                     <select id="tipo">
@@ -127,7 +126,7 @@
                         <option value="investimento">Investimento (20%)</option>
                     </select>
                 </div>
-                <button onclick="salvar()" class="user-pill" style="width:100%; padding:20px; border-radius:18px;">SALVAR AGORA</button>
+                <button onclick="salvar()" class="user-pill" style="width:100%; padding:20px; border-radius:18px;">SALVAR</button>
                 <button onclick="fecharModal()" style="width:100%; background:none; border:none; color:var(--text-sub); padding:15px;">CANCELAR</button>
             </div>
         </div>
@@ -157,8 +156,6 @@
                 document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0];
                 document.getElementById('btnLogout').style.display = 'block';
                 window.carregarDados();
-            } else {
-                document.getElementById('btnLogout').style.display = 'none';
             }
         });
 
@@ -170,47 +167,56 @@
         let currentChart, barChart;
 
         function toggleTheme() {
-            const body = document.body;
-            const icon = document.getElementById('themeIcon');
-            body.classList.toggle('dark-mode');
-            const isDark = body.classList.contains('dark-mode');
-            icon.innerText = isDark ? '☀️' : '🌙';
-            window.carregarDados(); // Recarrega para atualizar cores do gráfico
+            document.body.classList.toggle('dark-mode');
+            document.getElementById('themeIcon').innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+            window.carregarDados();
         }
 
         async function autenticarBio() {
             const lock = document.getElementById('app-lock');
             try {
-                const cred = await navigator.credentials.create({
-                    publicKey: {
-                        challenge: crypto.getRandomValues(new Uint8Array(32)),
-                        rp: { name: "FinancasPRO" },
-                        user: { id: crypto.getRandomValues(new Uint8Array(16)), name: "user", displayName: "User" },
-                        pubKeyCredParams: [{ alg: -7, type: "public-key" }],
-                        authenticatorSelection: { userVerification: "required" },
-                        timeout: 60000
-                    }
-                });
-                if (cred) { lock.style.opacity = '0'; setTimeout(() => lock.style.display = 'none', 500); }
+                const cred = await navigator.credentials.get({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), timeout: 60000, userVerification: "required" } });
+                lock.style.display = 'none';
             } catch (e) { lock.style.display = 'none'; }
         }
 
         async function carregarDados() {
             const user = window.auth.currentUser; if (!user) return;
-            const mes = document.getElementById('filtroMes').value;
-            const ref = window.doc(window.db, "usuarios", user.uid, "meses", mes);
+            const mesSel = document.getElementById('filtroMes').value;
+            const ref = window.doc(window.db, "usuarios", user.uid, "meses", mesSel);
             const snap = await window.getDoc(ref);
-            let r = 0, f = 0, l = 0, i = 0, html = "";
+            
+            let saldoReal = 0, f = 0, l = 0, i = 0, html = "";
             let trans = snap.exists() ? snap.data().transacoes : [];
+            
+            // Data de hoje para comparação (resetando horas para comparar apenas datas)
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
 
-            trans.forEach((t, index) => {
+            trans.sort((a, b) => new Date(a.data) - new Date(b.data)).forEach((t, index) => {
+                const dataTrans = new Date(t.data + "T12:00:00"); // Forçar meio-dia para evitar erros de fuso
+                dataTrans.setHours(0,0,0,0);
+                
+                const isFuturo = dataTrans > hoje;
                 const v = parseFloat(t.valor);
-                if (t.tipo === 'entrada') r += v;
-                else if(t.tipo === 'fixo') f += v;
-                else if(t.tipo === 'lazer') l += v;
-                else i += v;
-                html += `<div class="entry-card">
-                    <div><b>${t.descricao}</b><br><small>${t.data}</small></div>
+
+                // Só soma no saldo e nos gráficos se a data já chegou ou passou
+                if (!isFuturo) {
+                    if (t.tipo === 'entrada') saldoReal += v;
+                    else {
+                        saldoReal -= v;
+                        if(t.tipo === 'fixo') f += v;
+                        else if(t.tipo === 'lazer') l += v;
+                        else if(t.tipo === 'investimento') i += v;
+                    }
+                }
+
+                html += `
+                <div class="entry-card ${isFuturo ? 'future' : ''}">
+                    <div>
+                        <b>${t.descricao}</b> ${isFuturo ? '<span class="future-badge">Agendado</span>' : ''}<br>
+                        <small>${t.data.split('-').reverse().join('/')}</small>
+                    </div>
                     <div style="display:flex; align-items:center;">
                         <b style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">${t.tipo==='entrada'?'+':'-'} R$${v.toFixed(2)}</b>
                         <button class="btn-delete" onclick="excluir(${index})">✕</button>
@@ -218,13 +224,13 @@
                 </div>`;
             });
 
-            document.getElementById('saldo').innerText = `R$ ${(r - (f+l+i)).toFixed(2)}`;
-            document.getElementById('lista').innerHTML = html || '<p style="text-align:center; padding:30px; opacity:0.3;">Nenhum lançamento</p>';
+            document.getElementById('saldo').innerText = `R$ ${saldoReal.toFixed(2)}`;
+            document.getElementById('lista').innerHTML = html || '<p style="text-align:center; opacity:0.3; margin-top:20px;">Sem registros</p>';
             renderPizza(f, l, i);
         }
 
         async function excluir(index) {
-            if(!confirm("Deseja apagar este item?")) return;
+            if(!confirm("Excluir este lançamento?")) return;
             const user = window.auth.currentUser;
             const mes = document.getElementById('filtroMes').value;
             const ref = window.doc(window.db, "usuarios", user.uid, "meses", mes);
@@ -237,50 +243,42 @@
 
         function renderPizza(f, l, i) {
             const ctx = document.getElementById('graficoPizza').getContext('2d');
-            const isDark = document.body.classList.contains('dark-mode');
             if (currentChart) currentChart.destroy();
             currentChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Fixo (50%)', 'Lazer (30%)', 'Invest (20%)'],
+                    labels: ['Essencial', 'Lazer', 'Invest'],
                     datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }]
                 },
-                options: { 
-                    cutout: '75%', 
-                    plugins: { 
-                        legend: { position: 'bottom', labels: { color: isDark ? '#fff' : '#000' } } 
-                    } 
-                }
+                options: { cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: document.body.classList.contains('dark-mode') ? '#fff' : '#000' } } } }
             });
         }
 
         async function renderInvestimentos() {
             const user = window.auth.currentUser;
-            const mesesLabels = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
             const mesesRefs = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+            const hoje = new Date();
             let dados = [];
 
             for (let m of mesesRefs) {
                 const ref = window.doc(window.db, "usuarios", user.uid, "meses", m);
                 const snap = await window.getDoc(ref);
                 let total = 0;
-                if(snap.exists()) snap.data().transacoes.forEach(t => { if(t.tipo==='investimento') total += t.valor; });
+                if(snap.exists()) {
+                    snap.data().transacoes.forEach(t => {
+                        const dataT = new Date(t.data + "T12:00:00");
+                        if(t.tipo==='investimento' && dataT <= hoje) total += t.valor;
+                    });
+                }
                 dados.push(total);
             }
 
             const ctx = document.getElementById('graficoBarras').getContext('2d');
-            const isDark = document.body.classList.contains('dark-mode');
             if(barChart) barChart.destroy();
             barChart = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: mesesLabels, datasets: [{ label:'Investido', data: dados, backgroundColor:'#FDE047', borderRadius: 8 }] },
-                options: { 
-                    scales: { 
-                        y: { ticks: { color: isDark ? '#aaa' : '#666' }, grid: { color: isDark ? '#1f1f1f' : '#eee' } },
-                        x: { ticks: { color: isDark ? '#aaa' : '#666' }, grid: { display: false } }
-                    },
-                    plugins: { legend: { display: false } } 
-                }
+                data: { labels: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'], datasets: [{ data: dados, backgroundColor:'#FDE047', borderRadius: 5 }] },
+                options: { plugins: { legend: { display: false } } }
             });
         }
 
@@ -298,13 +296,16 @@
         async function salvar() {
             const user = window.auth.currentUser;
             const d = document.getElementById('desc').value, v = document.getElementById('valor').value, t = document.getElementById('tipo').value, dt = document.getElementById('data-lancamento').value, m = document.getElementById('filtroMes').value;
-            if(!d || !v || !dt) return alert("Preencha todos os campos!");
+            if(!d || !v || !dt) return alert("Preencha tudo!");
+            
             const ref = window.doc(window.db, "usuarios", user.uid, "meses", m);
             const snap = await window.getDoc(ref);
             let trans = snap.exists() ? snap.data().transacoes : [];
             trans.push({ descricao: d, valor: parseFloat(v), tipo: t, data: dt });
+            
             await window.setDoc(ref, { transacoes: trans });
-            fecharModal(); window.carregarDados();
+            fecharModal();
+            window.carregarDados();
         }
 
         async function exportarCSV() {
@@ -312,8 +313,8 @@
             const mes = document.getElementById('filtroMes').value;
             const ref = window.doc(window.db, "usuarios", user.uid, "meses", mes);
             const snap = await window.getDoc(ref);
-            if(!snap.exists()) return alert("Sem dados.");
-            let csv = "\uFEFFData,Descrição,Valor,Tipo\n";
+            if(!snap.exists()) return;
+            let csv = "\uFEFFData,Descricao,Valor,Tipo\n";
             snap.data().transacoes.forEach(t => csv += `${t.data},${t.descricao},${t.valor},${t.tipo}\n`);
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
