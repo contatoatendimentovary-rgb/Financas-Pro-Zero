@@ -2,36 +2,58 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinançasPRO - Corporate BI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0F172A">
+    <link rel="manifest" href="manifest.json">
+    <title>FinançasPRO MVP</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="light-mode">
+<body class="dark-mode">
     <div class="app-wrapper">
         <header class="main-header">
             <div class="header-top">
                 <span class="brand">Finanças<span>PRO</span></span>
-                <div class="header-actions">
-                    <button id="toggleTheme" class="theme-btn">🌓</button>
-                    <button id="btnAuth" class="login-pill">Carregando...</button>
-                </div>
+                <button id="btnAuth" class="login-pill">Entrar</button>
             </div>
             <div class="balance-card">
-                <label>Patrimônio Líquido</label>
+                <label>Saldo Disponível</label>
                 <h2 id="saldo">R$ 0,00</h2>
             </div>
         </header>
 
-        <main class="content-area">
-            <section class="chart-section">
+        <section id="aba-dashboard" class="tab-content active">
+            <div class="card-section">
+                <h4 class="section-title">Composição de Gastos</h4>
                 <div class="chart-container">
-                    <canvas id="meuGrafico"></canvas>
+                    <canvas id="graficoPizza"></canvas>
                 </div>
-            </section>
+            </div>
+            <div class="card-section">
+                <h4 class="section-title">Receitas vs Despesas</h4>
+                <div class="chart-container">
+                    <canvas id="graficoBarrasGeral"></canvas>
+                </div>
+            </div>
+        </section>
 
-            <section class="bi-dashboard">
+        <section id="aba-extrato" class="tab-content">
+            <div class="filter-row">
+                <select id="filtroMes" class="corporate-select">
+                    <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
+                    <option value="março">Março</option><option value="abril" selected>Abril</option>
+                    <option value="maio">Maio</option><option value="junho">Junho</option>
+                    <option value="julho">Julho</option><option value="agosto">Agosto</option>
+                    <option value="setembro">Setembro</option><option value="outubro">Outubro</option>
+                    <option value="novembro">Novembro</option><option value="dezembro">Dezembro</option>
+                </select>
+            </div>
+            <ul id="lista" class="entry-list"></ul>
+        </section>
+
+        <section id="aba-metas" class="tab-content">
+            <div class="bi-dashboard">
                 <div class="chart-item">
                     <div class="chart-labels"><span>Essencial (50%)</span><b id="txt-fixo">R$ 0</b></div>
                     <div class="progress-track"><div id="bar-fixo" class="bar-fill green"></div></div>
@@ -44,44 +66,31 @@
                     <div class="chart-labels"><span>Investimento (20%)</span><b id="txt-invest">R$ 0</b></div>
                     <div class="progress-track"><div id="bar-invest" class="bar-fill blue"></div></div>
                 </div>
-            </section>
-
-            <div class="filter-row">
-                <select id="filtroMes" class="corporate-select">
-                    <option value="janeiro">Janeiro</option>
-                    <option value="fevereiro">Fevereiro</option>
-                    <option value="março">Março</option>
-                    <option value="abril" selected>Abril</option>
-                    <option value="maio">Maio</option>
-                    <option value="junho">Junho</option>
-                    <option value="julho">Julho</option>
-                    <option value="agosto">Agosto</option>
-                    <option value="setembro">Setembro</option>
-                    <option value="outubro">Outubro</option>
-                    <option value="novembro">Novembro</option>
-                    <option value="dezembro">Dezembro</option>
-                </select>
             </div>
+        </section>
 
-            <ul id="lista" class="entry-list"></ul>
-        </main>
+        <nav class="bottom-nav">
+            <button onclick="switchTab('aba-dashboard')" class="nav-item active">📊 <span>Dash</span></button>
+            <button onclick="switchTab('aba-extrato')" class="nav-item">📜 <span>Extrato</span></button>
+            <button onclick="switchTab('aba-metas')" class="nav-item">🎯 <span>Metas</span></button>
+        </nav>
 
-        <button id="abrirModal" class="btn-primary-action">Novo Lançamento</button>
+        <button id="abrirModal" class="fab-add">+</button>
 
         <div id="modal" class="modal-overlay">
             <div class="modal-box">
-                <h4>Nova Movimentação</h4>
+                <h4>Nova Transação</h4>
                 <div class="form-group">
-                    <input type="text" id="desc" placeholder="Descrição">
-                    <input type="number" id="valor" placeholder="Valor R$">
+                    <input type="text" id="desc" placeholder="Ex: Salário, Aluguel...">
+                    <input type="number" id="valor" placeholder="R$ 0,00">
                     <select id="tipo">
-                        <option value="entrada">Receita (+) </option>
+                        <option value="entrada">Receita (+)</option>
                         <option value="fixo">Essencial (50%)</option>
                         <option value="lazer">Lazer (30%)</option>
                         <option value="investimento">Investimento (20%)</option>
                     </select>
                 </div>
-                <button id="btnSalvar" class="btn-save">Confirmar</button>
+                <button id="btnSalvar" class="btn-save">Salvar</button>
                 <button id="btnFechar" class="btn-cancel">Cancelar</button>
             </div>
         </div>
@@ -102,25 +111,22 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        window.auth = getAuth(app);
+        window.db = getFirestore(app);
+        window.doc = doc; window.setDoc = setDoc; window.getDoc = getDoc;
         const provider = new GoogleAuthProvider();
 
-        window.auth = auth; window.db = db; window.doc = doc; 
-        window.setDoc = setDoc; window.getDoc = getDoc;
+        window.loginGoogle = () => signInWithPopup(window.auth, provider);
+        window.logout = () => signOut(window.auth).then(() => location.reload());
 
-        window.loginGoogle = () => signInWithPopup(auth, provider);
-        window.logout = () => signOut(auth).then(() => location.reload());
-
-        onAuthStateChanged(auth, (user) => {
-            const btn = document.getElementById('btnAuth');
+        onAuthStateChanged(window.auth, (user) => {
             if (user) {
-                btn.innerText = "Sair (" + user.displayName.split(' ')[0] + ")";
-                btn.onclick = window.logout;
+                document.getElementById('btnAuth').innerText = "Sair";
+                document.getElementById('btnAuth').onclick = window.logout;
                 window.carregarDados();
             } else {
-                btn.innerText = "Entrar";
-                btn.onclick = window.loginGoogle;
+                document.getElementById('btnAuth').innerText = "Entrar";
+                document.getElementById('btnAuth').onclick = window.loginGoogle;
             }
         });
     </script>
