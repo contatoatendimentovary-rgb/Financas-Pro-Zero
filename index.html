@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinançasPRO</title>
+    <title>FinançasPRO - Gestão 2026</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,14 +12,18 @@
     <header>
         <div class="header-content">
             <h1>FinançasPRO</h1>
-            <button id="btnAuth">Login Google</button>
+            <button id="btnAuth">Login</button>
         </div>
     </header>
 
     <main>
-        <section class="resumo-cards">
-            <div class="card-saldo">
-                <span>Saldo Atual</span>
+        <section class="resumo-topo">
+            <div class="card-mini">
+                <span>Saldo Total Acumulado</span>
+                <h4 id="saldoTotal">R$ 0,00</h4>
+            </div>
+            <div class="card-principal">
+                <span>Saldo do Mês</span>
                 <h2 id="saldo">R$ 0,00</h2>
             </div>
             <div class="grafico-box">
@@ -32,7 +36,7 @@
                 <option value="janeiro">Janeiro</option>
                 <option value="fevereiro">Fevereiro</option>
                 <option value="março">Março</option>
-                <option value="abril">Abril</option>
+                <option value="abril" selected>Abril</option>
                 <option value="maio">Maio</option>
                 <option value="junho">Junho</option>
                 <option value="julho">Julho</option>
@@ -51,12 +55,25 @@
     <div id="modal" class="modal-overlay">
         <div class="modal-container">
             <h3>Novo Lançamento</h3>
-            <input type="text" id="desc" placeholder="Descrição">
+            <input type="text" id="desc" placeholder="Descrição (Ex: Aluguel)">
             <input type="number" id="valor" placeholder="Valor R$">
+            
+            <label>Categoria:</label>
+            <select id="categoria">
+                <option value="🏠 Moradia">Moradia</option>
+                <option value="🍔 Alimentação">Alimentação</option>
+                <option value="🚗 Transporte">Transporte</option>
+                <option value="🎭 Lazer">Lazer</option>
+                <option value="💰 Salário">Salário/Renda</option>
+                <option value="🛠️ Outros">Outros</option>
+            </select>
+
+            <label>Tipo:</label>
             <select id="tipo">
                 <option value="entrada">Entrada (+)</option>
                 <option value="saida">Saída (-)</option>
             </select>
+
             <div class="modal-btns">
                 <button id="btnSalvar" class="confirmar">Salvar</button>
                 <button id="btnFechar" class="cancelar">Fechar</button>
@@ -68,7 +85,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE",
@@ -85,21 +102,19 @@
         window.doc = doc;
         window.setDoc = setDoc;
         window.getDoc = getDoc;
+        window.collection = collection;
+        window.getDocs = getDocs;
         
         const provider = new GoogleAuthProvider();
-
-        window.loginGoogle = () => {
-            signInWithPopup(window.auth, provider).then(() => location.reload());
-        };
+        window.loginGoogle = () => signInWithPopup(window.auth, provider).then(() => location.reload());
 
         onAuthStateChanged(window.auth, (user) => {
             const btn = document.getElementById('btnAuth');
             if (user) {
                 btn.innerText = "Sair";
                 btn.onclick = () => window.auth.signOut().then(() => location.reload());
-                if (window.carregarDadosDoFirebase) window.carregarDadosDoFirebase();
             } else {
-                btn.innerText = "Login Google";
+                btn.innerText = "Login";
                 btn.onclick = window.loginGoogle;
             }
         });
