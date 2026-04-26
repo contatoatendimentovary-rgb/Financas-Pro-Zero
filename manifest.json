@@ -1,15 +1,18 @@
 {
-  "name": "FinançasPRO",
-  "short_name": "FPRO",
-  "start_url": "index.html",
+  "name": "FinançasPRO Premium",
+  "short_name": "FinançasPRO",
+  "description": "Gestão Financeira Pessoal com Metas 50-30-20",
+  "id": "/",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0F172A",
-  "theme_color": "#3B82F6",
+  "theme_color": "#6366F1",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/2341/2341103.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
