@@ -3,86 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FinançasPRO // Premium</title>
-    
+    <meta name="theme-color" content="#000000">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2489/2489756.png">
+    <title>FinançasPRO // Premium</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    
     <style>
         :root {
-            --bg: #000000; --card: #111111; --text-main: #FFFFFF; --text-sub: #A1A1AA;
-            --border: #1F2937; --accent: #FDE047; --green: #22C55E; --red: #EF4444;
+            --bg: #000000; --header-bg: #000000; --card: #0A0A0A; --text-main: #FFFFFF;
+            --text-sub: #A1A1AA; --border: #1F2937; --accent: #FDE047;
+            --green: #22C55E; --orange: #F97316; --red: #EF4444;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: var(--text-main); padding-bottom: 120px; overflow-x: hidden; }
         
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: 0.3s; }
+        body { background: var(--bg); color: var(--text-main); padding-bottom: 120px; min-height: 100vh; overflow-x: hidden; }
+        
+        /* TELA DE BLOQUEIO BIOMÉTRICO */
         .app-lock-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        
-        .glass-header { background: var(--bg); padding: 40px 20px 30px; border-bottom: 1px solid var(--border); text-align: center; }
-        .main-balance h1 { font-size: 2.8rem; font-weight: 800; margin: 5px 0; }
+        .lock-btn { background: var(--accent); color: #000; border: none; padding: 15px 30px; border-radius: 20px; font-weight: 800; cursor: pointer; margin-top: 20px; }
 
-        .viz-card { background: var(--card); margin: 20px; padding: 25px; border-radius: 32px; border: 1px solid var(--border); height: 350px; display: flex; flex-direction: column; align-items: center; }
+        .glass-header { background: var(--header-bg); padding: 40px 20px 30px; border-bottom: 1px solid var(--border); }
+        .header-content { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .brand { font-weight: 800; font-size: 1.2rem; } .brand span { color: var(--accent); }
+        .user-pill { background: var(--accent); color: #000; border: none; padding: 8px 18px; border-radius: 20px; font-weight: 800; }
         
-        .entry-card { background: var(--card); padding: 18px; border-radius: 22px; margin-bottom: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .btn-delete { background: var(--red); color: white; border: none; width: 28px; height: 28px; border-radius: 10px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .main-balance { text-align: center; }
+        .main-balance h1 { font-size: 2.8rem; font-weight: 800; color: var(--text-main); margin-top: 5px; }
+
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px; margin-top: -30px; }
+        .stat-card { background: var(--card); padding: 18px; border-radius: 24px; border: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
         
-        .user-pill { background: var(--accent); color: #000; border: none; padding: 10px 18px; border-radius: 12px; font-weight: 800; cursor: pointer; }
+        .viz-card { background: var(--card); margin: 25px 20px; padding: 25px; border-radius: 30px; border: 1px solid var(--border); height: 320px; display: flex; flex-direction: column; justify-content: center; }
+        .chart-box { position: relative; height: 100%; width: 100%; }
         
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--bg); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
-        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 0.65rem; font-weight: 700; cursor: pointer; }
+        .tab-content { display: none; } .tab-content.active { display: block; }
+
+        .entry-card { background: var(--card); padding: 18px; border-radius: 20px; margin-bottom: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .btn-del { background: none; border: none; color: var(--red); font-size: 0.75rem; font-weight: 700; cursor: pointer; }
+
+        .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; max-width: 500px; left: 50%; transform: translateX(-50%); background: #000; display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
+        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
         .nav-btn.active { color: var(--accent); }
 
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: flex-end; }
-        .modal-sheet { background: var(--bg); width: 100%; border-radius: 35px 35px 0 0; padding: 35px; border-top: 1px solid var(--border); }
-        .input-grid input, .input-grid select { width: 100%; padding: 18px; margin-bottom: 12px; border-radius: 16px; background: var(--card); color: var(--text-main); border: 1px solid var(--border); font-size: 1rem; }
-
-        .floating-btn { position: fixed; bottom: 110px; right: 25px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); border: none; font-size: 28px; font-weight: 800; z-index: 999; }
-        .tab-content { display: none; } .tab-content.active { display: block; }
+        .floating-btn { position: fixed; bottom: 120px; right: 25px; width: 65px; height: 65px; border-radius: 22px; background: var(--accent); border: none; font-size: 32px; font-weight: 800; z-index: 999; }
+        
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: flex-end; }
+        .modal-sheet { background: #000; width: 100%; border-radius: 35px 35px 0 0; padding: 35px; border-top: 1px solid var(--border); max-width: 500px; margin: 0 auto; }
+        .input-grid input, .input-grid select { width: 100%; padding: 18px; margin-bottom: 12px; border-radius: 16px; border: 1px solid var(--border); background: #0A0A0A; color: #fff; }
     </style>
 </head>
-<body>
+<body class="dark-mode">
 
     <div id="app-lock" class="app-lock-overlay">
-        <div style="font-weight:800; font-size:1.5rem; margin-bottom:15px;">FinançasPRO Locked</div>
-        <button onclick="autenticarBio()" class="user-pill">DESBLOQUEAR COM DIGITAL</button>
+        <div style="font-weight:800; font-size:1.5rem;">FinançasPRO Locked</div>
+        <button onclick="validarDigital()" class="lock-btn">USAR BIOMETRIA</button>
     </div>
 
     <div class="app-wrapper">
         <header class="glass-header">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <div style="width:40px;"></div>
-                <div style="display:flex; align-items:center;">
-                    <button id="btnAuth" class="user-pill" onclick="loginGoogle()">Entrar</button>
-                    <button id="btnLogout" onclick="sair()" style="display:none; background:none; color:var(--red); border:1px solid var(--red); padding:5px 10px; border-radius:8px; margin-left:10px; font-size:0.7rem; font-weight:800;">SAIR</button>
-                </div>
+            <div class="header-content">
+                <div class="brand">Finanças<span>PRO</span></div>
+                <button id="btnAuth" class="user-pill">Entrar</button>
             </div>
             <div class="main-balance">
-                <small id="txt-label-saldo" style="color:var(--text-sub)">Saldo Mensal</small>
+                <small>Saldo Disponível</small>
                 <h1 id="saldo">R$ 0,00</h1>
             </div>
         </header>
 
         <section id="aba-dashboard" class="tab-content active">
-            <div class="viz-card">
-                <h3 style="margin-bottom:20px; font-size:0.9rem;">Distribuição de Gastos</h3>
-                <div style="width:100%; height:100%; position:relative;">
-                    <canvas id="graficoPizza"></canvas>
-                </div>
+            <div class="stats-row">
+                <div class="stat-card"><div class="icon">↑</div><div><small>Receitas</small><br><b id="resumo-receita">R$ 0</b></div></div>
+                <div class="stat-card"><div class="icon">↓</div><div><small>Gastos</small><br><b id="resumo-despesa">R$ 0</b></div></div>
             </div>
-        </section>
-
-        <section id="aba-investimentos" class="tab-content">
             <div class="viz-card">
-                <h3 style="margin-bottom:20px; font-size:0.9rem;">Patrimônio Acumulado</h3>
-                <div style="width:100%; height:100%;"><canvas id="graficoBarras"></canvas></div>
+                <div class="chart-box"><canvas id="graficoPizza"></canvas></div>
             </div>
         </section>
 
         <section id="aba-extrato" class="tab-content">
             <div style="padding: 20px;">
-                <button onclick="exportarCSV()" class="user-pill" style="width:100%; margin-bottom:15px; background:#1DB954; color:white;">EXPORTAR PLANILHA</button>
                 <select id="filtroMes" class="input-grid" onchange="carregarDados()">
                     <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
                     <option value="março">Março</option><option value="abril">Abril</option>
@@ -95,30 +94,29 @@
             <div id="lista" style="padding: 0 20px;"></div>
         </section>
 
-        <nav class="bottom-nav">
-            <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active">📊 Resumo</button>
-            <button onclick="switchTab('aba-investimentos', this)" class="nav-btn">📈 Aportes</button>
+        <nav class="bottom-tab-bar">
+            <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active">📊 Home</button>
             <button onclick="switchTab('aba-extrato', this)" class="nav-btn">📜 Extrato</button>
         </nav>
 
-        <button onclick="abrirModal()" class="floating-btn">+</button>
+        <button onclick="document.getElementById('modal').style.display='flex'" class="floating-btn">+</button>
 
         <div id="modal" class="modal-overlay">
             <div class="modal-sheet">
-                <h3 style="margin-bottom:20px;">Novo Registro</h3>
+                <h3 style="color:white; margin-bottom:15px;">Novo Lançamento</h3>
                 <div class="input-grid">
                     <input type="text" id="desc" placeholder="Descrição">
                     <input type="number" id="valor" placeholder="Valor R$">
                     <input type="date" id="data-lancamento">
                     <select id="tipo">
                         <option value="entrada">Receita (+)</option>
-                        <option value="fixo">Essencial (50%)</option>
-                        <option value="lazer">Lazer (30%)</option>
-                        <option value="investimento">Investimento (20%)</option>
+                        <option value="fixo">Essencial</option>
+                        <option value="lazer">Lazer</option>
+                        <option value="investimento">Investimento</option>
                     </select>
                 </div>
-                <button onclick="salvar()" class="user-pill" style="width:100%; padding:20px;">SALVAR</button>
-                <button onclick="fecharModal()" style="width:100%; background:none; border:none; color:var(--text-sub); padding:15px;">CANCELAR</button>
+                <button onclick="salvarLancamento()" style="width:100%; padding:20px; background:var(--accent); border:none; border-radius:18px; font-weight:800;">CONFIRMAR</button>
+                <button onclick="document.getElementById('modal').style.display='none'" style="width:100%; background:none; border:none; color:var(--text-sub); padding:10px;">CANCELAR</button>
             </div>
         </div>
     </div>
@@ -127,8 +125,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore as fs, doc as d, setDoc as sd, getDoc as gd } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE",
@@ -140,119 +137,107 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        window.auth = getAuth(app); 
-        window.db = fs(app);
-        window.doc = d; window.setDoc = sd; window.getDoc = gd;
+        window.auth = getAuth(app);
+        window.db = getFirestore(app);
+        window.doc = doc; window.setDoc = setDoc; window.getDoc = getDoc;
 
         onAuthStateChanged(window.auth, (user) => {
             if (user) {
                 document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0];
-                document.getElementById('btnLogout').style.display = 'block';
                 window.carregarDados();
             }
         });
 
         window.loginGoogle = () => signInWithPopup(window.auth, new GoogleAuthProvider());
-        window.sair = () => signOut(window.auth).then(() => location.reload());
+        document.getElementById('btnAuth').onclick = () => window.loginGoogle();
     </script>
-
+    
     <script>
-        let chartP, chartB;
+        let currentChart;
 
-        // CORREÇÃO BIOMETRIA: Força o uso da digital do dispositivo
-        async function autenticarBio() {
-            const lock = document.getElementById('app-lock');
+        // BIOMETRIA MODELO QUE FUNCIONA
+        async function validarDigital() {
             try {
                 if (window.PublicKeyCredential) {
-                    // Tenta o desafio padrão para acionar a digital
-                    const challenge = new Uint8Array(32);
-                    window.crypto.getRandomValues(challenge);
-                    
                     await navigator.credentials.get({
-                        publicKey: {
-                            challenge: challenge,
-                            timeout: 60000,
-                            userVerification: "required",
-                            allowCredentials: [] // Isso evita erro de "chave não encontrada"
-                        }
+                        publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), timeout: 60000, userVerification: "required" }
                     });
                 }
-                lock.style.display = 'none';
+                document.getElementById('app-lock').style.display = 'none';
             } catch (e) {
-                console.log("Ignorando erro de chave inexistente e liberando acesso.");
-                lock.style.display = 'none';
+                alert("Erro na biometria ou cancelado.");
             }
         }
 
-        async function carregarDados() {
+        function switchTab(tabId, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            el.classList.add('active');
+            window.carregarDados();
+        }
+
+        window.carregarDados = async () => {
             const user = window.auth.currentUser; if (!user) return;
-            const mesSel = document.getElementById('filtroMes').value;
-            const ref = window.doc(window.db, "usuarios", user.uid, "meses", mesSel);
+            const mes = document.getElementById('filtroMes').value;
+            const ref = window.doc(window.db, "usuarios", user.uid, "meses", mes);
             const snap = await window.getDoc(ref);
             
-            let saldoMes = 0, f = 0, l = 0, i = 0, html = "";
+            let r = 0, f = 0, l = 0, i = 0, html = "";
             let trans = snap.exists() ? snap.data().transacoes : [];
             
-            trans.sort((a, b) => new Date(a.data) - new Date(b.data)).forEach((t, idx) => {
+            trans.forEach((t, idx) => {
                 const v = parseFloat(t.valor);
-                if (t.tipo === 'entrada') saldoMes += v;
-                else {
-                    saldoMes -= v;
-                    if(t.tipo === 'fixo') f += v;
-                    else if(t.tipo === 'lazer') l += v;
-                    else if(t.tipo === 'investimento') i += v;
-                }
-                html += `<div class="entry-card"><div><b>${t.descricao}</b><br><small>${t.data}</small></div><div style="display:flex; align-items:center;"><b style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">R$${v.toFixed(2)}</b><button class="btn-delete" style="margin-left:10px;" onclick="excluir(${idx})">✕</button></div></div>`;
+                if (t.tipo === 'entrada') r += v;
+                else { if(t.tipo === 'fixo') f += v; else if(t.tipo === 'lazer') l += v; else i += v; }
+                html += `<div class="entry-card"><div><b>${t.descricao}</b><br><small>${t.data}</small></div><div style="text-align:right"><b style="color:${t.tipo==='entrada'?'#22C55E':'#EF4444'}">R$ ${v.toFixed(2)}</b><br><button class="btn-del" onclick="deletar(${idx})">Remover</button></div></div>`;
             });
 
-            document.getElementById('saldo').innerText = `R$ ${saldoMes.toFixed(2)}`;
-            document.getElementById('lista').innerHTML = html || '<p style="text-align:center; opacity:0.3; margin-top:20px;">Sem registros</p>';
-            
-            // CORREÇÃO DO GRÁFICO: Destruir e recriar para atualizar
+            document.getElementById('saldo').innerText = `R$ ${(r - (f+l+i)).toFixed(2)}`;
+            document.getElementById('resumo-receita').innerText = `R$ ${r.toFixed(0)}`;
+            document.getElementById('resumo-despesa').innerText = `R$ ${(f+l+i).toFixed(0)}`;
+            document.getElementById('lista').innerHTML = html || '<p style="text-align:center;opacity:0.3;padding:20px;">Vazio</p>';
+            renderPizza(f, l, i);
+        };
+
+        function renderPizza(f, l, i) {
             const ctx = document.getElementById('graficoPizza').getContext('2d');
-            if (chartP) chartP.destroy();
-            chartP = new Chart(ctx, {
+            if (currentChart) currentChart.destroy();
+            currentChart = new Chart(ctx, {
                 type: 'doughnut',
-                data: { labels: ['Fixo', 'Lazer', 'Invest.'], datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }] },
-                options: { cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } } }
+                data: { labels: ['Fixo', 'Lazer', 'Invest'], datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }] },
+                options: { cutout: '80%', plugins: { legend: { display: false } } }
             });
         }
 
-        async function salvar() {
+        window.salvarLancamento = async () => {
             const user = window.auth.currentUser;
             const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data-lancamento').value, t = document.getElementById('tipo').value;
-            const mesAlvo = document.getElementById('filtroMes').value;
-            if(!d || !v || !dt) return alert("Preencha tudo");
+            
+            if (!dt) return alert("Selecione a data!");
+            
+            // PEGA O MÊS DA DATA PARA SALVAR NO LUGAR CERTO
+            const meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+            const mesAlvo = meses[new Date(dt).getUTCMonth()];
 
             const ref = window.doc(window.db, "usuarios", user.uid, "meses", mesAlvo);
             const snap = await window.getDoc(ref);
             let trans = snap.exists() ? snap.data().transacoes : [];
             trans.push({ descricao: d, valor: parseFloat(v), tipo: t, data: dt });
+            
             await window.setDoc(ref, { transacoes: trans });
-            fecharModal(); carregarDados();
-        }
+            document.getElementById('modal').style.display = 'none';
+            window.carregarDados();
+        };
 
-        async function excluir(index) {
-            const user = window.auth.currentUser;
-            const mes = document.getElementById('filtroMes').value;
-            const ref = window.doc(window.db, "usuarios", user.uid, "meses", mes);
+        window.deletar = async (idx) => {
+            const user = window.auth.currentUser; const m = document.getElementById('filtroMes').value;
+            const ref = window.doc(window.db, "usuarios", user.uid, "meses", m);
             const snap = await window.getDoc(ref);
-            let trans = snap.data().transacoes;
-            trans.splice(index, 1);
+            let trans = snap.data().transacoes; trans.splice(idx, 1);
             await window.setDoc(ref, { transacoes: trans });
-            carregarDados();
-        }
-
-        function switchTab(id, btn) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            btn.classList.add('active');
-            if(id === 'aba-dashboard') carregarDados();
-        }
-
-        function abrirModal() { document.getElementById('modal').style.display = 'flex'; }
-        function fecharModal() { document.getElementById('modal').style.display = 'none'; }
+            window.carregarDados();
+        };
     </script>
 </body>
 </html>
