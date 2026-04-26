@@ -1,30 +1,6 @@
-const CACHE_NAME = 'fpro-vfinal';
-
-// Instala e força o cache
-self.addEventListener('install', (event) => {
+self.addEventListener('install', e => {
     self.skipWaiting();
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll([
-                './index.html',
-                './style.css',
-                './script.js',
-                './manifest.json'
-            ]);
-        })
-    );
+    e.waitUntil(caches.open('fpro-v5').then(c => c.addAll(['./', 'index.html', 'style.css', 'script.js', 'manifest.json'])));
 });
-
-// Ativa e assume o controlo imediato
-self.addEventListener('activate', (event) => {
-    event.waitUntil(clients.claim());
-});
-
-// Essencial para o Chrome validar o PWA
-self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        caches.match(event.request).then((response) => {
-            return response || fetch(event.request);
-        })
-    );
-});
+self.addEventListener('activate', e => e.waitUntil(clients.claim()));
+self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))));
