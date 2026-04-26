@@ -3,12 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#6366F1">
+    <meta name="theme-color" content="#000000">
     <link rel="manifest" href="manifest.json">
     <title>FinançasPRO // Premium</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #F8FAFC; --header-bg: #FFFFFF; --card: #FFFFFF; --text-main: #1E293B;
+            --text-sub: #64748B; --border: #E2E8F0; --accent: #FDE047;
+            --green: #22C55E; --orange: #F97316; --red: #EF4444;
+        }
+        /* MODO ESCURO: PRETO TOTAL E CORES VIBRANTES */
+        body.dark-mode {
+            --bg: #000000;
+            --header-bg: #000000;
+            --card: #0A0A0A;
+            --text-main: #FFFFFF;
+            --text-sub: #A1A1AA;
+            --border: #1F2937;
+            --accent: #FDE047; /* Amarelo */
+            --green: #22C55E;
+            --orange: #F97316; /* Laranja */
+            --red: #EF4444;    /* Vermelho */
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: 0.3s; }
+        body { background: var(--bg); color: var(--text-main); padding-bottom: 100px; }
+        
+        .glass-header { background: var(--header-bg); padding: 40px 20px 30px; border-radius: 0 0 35px 35px; border-bottom: 1px solid var(--border); }
+        .header-content { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .brand { font-weight: 800; font-size: 1.2rem; } .brand span { color: var(--accent); }
+        .theme-switch { background: none; border: 1px solid var(--border); padding: 8px 12px; border-radius: 12px; cursor: pointer; }
+        .user-pill { background: var(--accent); color: #000; border: none; padding: 8px 18px; border-radius: 20px; font-weight: 800; }
+        
+        .main-balance { text-align: center; }
+        .main-balance small { text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; font-weight: 700; font-size: 0.7rem; }
+        .main-balance h1 { font-size: 2.8rem; font-weight: 800; color: var(--text-main); margin-top: 5px; }
+
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px; margin-top: -30px; }
+        .stat-card { background: var(--card); padding: 18px; border-radius: 24px; border: 1px solid var(--border); display: flex; align-items: center; gap: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .stat-card.incoming .icon { color: var(--green); }
+        .stat-card.outgoing .icon { color: var(--red); }
+        
+        .viz-card { background: var(--card); margin: 25px 20px; padding: 25px; border-radius: 30px; border: 1px solid var(--border); }
+        .chart-box { height: 260px; }
+        
+        .tab-content { display: none; } .tab-content.active { display: block; }
+
+        .timeline-list { padding: 0 20px; }
+        .entry-card { background: var(--card); padding: 18px; border-radius: 20px; margin-bottom: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .badge-dia { background: var(--accent); color: #000; font-size: 0.7rem; padding: 3px 8px; border-radius: 8px; margin-right: 8px; font-weight: 900; }
+        .btn-del { background: none; border: none; color: var(--red); font-size: 0.75rem; font-weight: 700; margin-top: 8px; cursor: pointer; }
+
+        .meta-container { padding: 20px; }
+        .meta-item { background: var(--card); padding: 20px; border-radius: 24px; margin-bottom: 15px; border: 1px solid var(--border); }
+        .progress-container { background: #111; height: 12px; border-radius: 6px; overflow: hidden; margin-top: 15px; }
+        .bar { height: 100%; border-radius: 6px; }
+
+        .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 15px 0 30px; border-top: 1px solid var(--border); z-index: 1000; }
+        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 700; }
+        .nav-btn.active { color: var(--accent); }
+        .nav-btn span { font-size: 1.2rem; }
+
+        .floating-btn { position: fixed; bottom: 110px; right: 25px; width: 65px; height: 65px; border-radius: 22px; background: var(--accent); color: #000; border: none; font-size: 32px; font-weight: 800; box-shadow: 0 10px 20px rgba(0,0,0,0.4); z-index: 999; }
+        
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: flex-end; }
+        .modal-sheet { background: #000; width: 100%; border-radius: 35px 35px 0 0; padding: 35px; border-top: 1px solid var(--border); }
+        .input-grid input, .input-grid select { width: 100%; padding: 18px; margin-bottom: 12px; border-radius: 16px; border: 1px solid var(--border); background: #0A0A0A; color: #fff; font-size: 1rem; }
+        .btn-confirm { width: 100%; padding: 20px; background: var(--accent); color: #000; border: none; border-radius: 18px; font-weight: 800; font-size: 1.1rem; margin-bottom: 12px; }
+        .btn-abort { width: 100%; padding: 10px; background: none; color: var(--text-sub); border: none; font-weight: 700; }
+    </style>
 </head>
 <body class="dark-mode">
     <div class="app-wrapper">
@@ -17,11 +80,11 @@
                 <div class="brand">Finanças<span>PRO</span></div>
                 <div class="header-utils">
                     <button id="toggleTheme" class="theme-switch">🌓</button>
-                    <button id="btnAuth" class="user-pill">Entrar</button>
+                    <button id="btnAuth" class="user-pill">ENTRAR</button>
                 </div>
             </div>
             <div class="main-balance">
-                <small>Saldo Geral</small>
+                <small>Saldo Disponível</small>
                 <h1 id="saldo">R$ 0,00</h1>
             </div>
         </header>
@@ -34,18 +97,17 @@
                 </div>
                 <div class="stat-card outgoing">
                     <div class="icon">↓</div>
-                    <div class="data"><small>Despesas</small><b id="resumo-despesa">R$ 0</b></div>
+                    <div class="data"><small>Gastos</small><b id="resumo-despesa">R$ 0</b></div>
                 </div>
             </div>
             <div class="viz-card">
-                <h4 class="card-title">Distribuição Mensal</h4>
                 <div class="chart-box"><canvas id="graficoPizza"></canvas></div>
             </div>
         </section>
 
         <section id="aba-extrato" class="tab-content">
-            <div class="sticky-filter">
-                <select id="filtroMes" class="modern-select">
+            <div style="padding: 20px;">
+                <select id="filtroMes" class="input-grid" style="padding:15px; background:var(--card); font-weight:800; color: white; width: 100%;">
                     <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
                     <option value="março">Março</option><option value="abril" selected>Abril</option>
                     <option value="maio">Maio</option><option value="junho">Junho</option>
@@ -60,49 +122,49 @@
         <section id="aba-metas" class="tab-content">
             <div class="meta-container">
                 <div class="meta-item">
-                    <div class="meta-info"><span>Essencial (50%)</span><b id="txt-fixo">0 / 0</b></div>
-                    <div class="progress-container"><div id="bar-fixo" class="bar g-green"></div></div>
+                    <div class="meta-info"><span>Essencial (50%)</span><br><b id="txt-fixo">R$ 0 / 0</b></div>
+                    <div class="progress-container"><div id="bar-fixo" class="bar" style="background: var(--red);"></div></div>
                 </div>
                 <div class="meta-item">
-                    <div class="meta-info"><span>Desejos (30%)</span><b id="txt-lazer">0 / 0</b></div>
-                    <div class="progress-container"><div id="bar-lazer" class="bar g-orange"></div></div>
+                    <div class="meta-info"><span>Lazer (30%)</span><br><b id="txt-lazer">R$ 0 / 0</b></div>
+                    <div class="progress-container"><div id="bar-lazer" class="bar" style="background: var(--orange);"></div></div>
                 </div>
                 <div class="meta-item">
-                    <div class="meta-info"><span>Investimento (20%)</span><b id="txt-invest">0 / 0</b></div>
-                    <div class="progress-container"><div id="bar-invest" class="bar g-blue"></div></div>
+                    <div class="meta-info"><span>Investimento (20%)</span><br><b id="txt-invest">R$ 0 / 0</b></div>
+                    <div class="progress-container"><div id="bar-invest" class="bar" style="background: var(--accent);"></div></div>
                 </div>
             </div>
         </section>
 
         <nav class="bottom-tab-bar">
-            <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active">📊<span>Home</span></button>
-            <button onclick="switchTab('aba-extrato', this)" class="nav-btn">📜<span>Extrato</span></button>
-            <button onclick="switchTab('aba-metas', this)" class="nav-btn">🎯<span>Metas</span></button>
+            <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active"><span>📊</span>Home</button>
+            <button onclick="switchTab('aba-extrato', this)" class="nav-btn"><span>📜</span>Extrato</button>
+            <button onclick="switchTab('aba-metas', this)" class="nav-btn"><span>🎯</span>Metas</button>
         </nav>
 
         <button id="abrirModal" class="floating-btn">+</button>
 
         <div id="modal" class="modal-overlay">
             <div class="modal-sheet">
-                <div class="drag-handle"></div>
-                <h3>Novo Lançamento</h3>
+                <h3>Novo Lançamento</h3><br>
                 <div class="input-grid">
-                    <input type="text" id="desc" placeholder="Descrição (ex: Aluguel)">
-                    <input type="number" id="valor" placeholder="R$ 0,00">
+                    <input type="text" id="desc" placeholder="Descrição">
+                    <input type="number" id="valor" placeholder="Valor R$">
                     <input type="date" id="data-lancamento">
                     <select id="tipo">
                         <option value="entrada">Receita (+)</option>
-                        <option value="fixo">Essencial (50%)</option>
-                        <option value="lazer">Lazer (30%)</option>
-                        <option value="investimento">Investimento (20%)</option>
+                        <option value="fixo">Essencial (Vermelho)</option>
+                        <option value="lazer">Lazer (Laranja)</option>
+                        <option value="investimento">Investimento (Amarelo)</option>
                     </select>
                 </div>
-                <button id="btnSalvar" class="btn-confirm">Salvar</button>
-                <button id="btnFechar" class="btn-abort">Voltar</button>
+                <button id="btnSalvar" class="btn-confirm">CONFIRMAR</button>
+                <button id="btnFechar" class="btn-abort">CANCELAR</button>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -124,23 +186,114 @@
 
         onAuthStateChanged(window.auth, (user) => {
             if (user) {
-                document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0];
+                document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0].toUpperCase();
                 window.carregarDados();
-            } else {
-                document.getElementById('btnAuth').innerText = "Entrar";
             }
         });
 
         window.loginGoogle = () => signInWithPopup(window.auth, new GoogleAuthProvider());
         window.logout = () => signOut(window.auth).then(() => location.reload());
         document.getElementById('btnAuth').onclick = () => window.auth.currentUser ? window.logout() : window.loginGoogle();
+    </script>
+    <script>
+        let currentChart;
+        document.getElementById('toggleTheme').onclick = () => document.body.classList.toggle('dark-mode');
 
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js').then(reg => reg.update());
+        function switchTab(tabId, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            el.classList.add('active');
+            window.carregarDados();
+        }
+
+        window.carregarDados = async () => {
+            const user = window.auth.currentUser; if (!user) return;
+            const mes = document.getElementById('filtroMes').value;
+            const ref = window.doc(window.db, "usuarios", user.uid, "meses", mes);
+            const snap = await window.getDoc(ref);
+            
+            let r = 0, f = 0, l = 0, i = 0, html = "";
+            let trans = snap.exists() ? snap.data().transacoes : [];
+            trans.sort((a, b) => new Date(a.data) - new Date(b.data));
+
+            trans.forEach((t, idx) => {
+                const v = parseFloat(t.valor);
+                if (t.tipo === 'entrada') r += v;
+                else { if(t.tipo === 'fixo') f += v; else if(t.tipo === 'lazer') l += v; else i += v; }
+                const dia = t.data ? t.data.split('-')[2] : '??';
+
+                html += `
+                <div class="entry-card">
+                    <div><span class="badge-dia">${dia}</span> <b>${t.descricao}</b></div>
+                    <div style="text-align:right">
+                        <span style="color:${t.tipo==='entrada'?'#22C55E':'#EF4444'}; font-weight:800">
+                            ${t.tipo==='entrada'?'+':'-'} R$ ${v.toFixed(2)}
+                        </span><br>
+                        <button class="btn-del" onclick="deletar(${idx})">Remover</button>
+                    </div>
+                </div>`;
+            });
+
+            document.getElementById('saldo').innerText = `R$ ${(r - (f+l+i)).toFixed(2)}`;
+            document.getElementById('resumo-receita').innerText = `R$ ${r.toFixed(0)}`;
+            document.getElementById('resumo-despesa').innerText = `R$ ${(f+l+i).toFixed(0)}`;
+            document.getElementById('lista').innerHTML = html || '<p style="text-align:center;opacity:0.5">Vazio</p>';
+            
+            updateBars(r, f, l, i);
+            renderPizza(f, l, i);
+        };
+
+        function updateBars(r, f, l, i) {
+            const bar = (id, v, m) => {
+                const p = m > 0 ? Math.min((v/m)*100, 100) : 0;
+                document.getElementById(`bar-${id}`).style.width = p + '%';
+                document.getElementById(`txt-${id}`).innerText = `R$ ${v.toFixed(0)} / ${m.toFixed(0)}`;
+            };
+            bar('fixo', f, r * 0.5); bar('lazer', l, r * 0.3); bar('invest', i, r * 0.2);
+        }
+
+        function renderPizza(f, l, i) {
+            const ctx = document.getElementById('graficoPizza').getContext('2d');
+            if (currentChart) currentChart.destroy();
+            currentChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Essencial', 'Lazer', 'Invest'],
+                    datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }]
+                },
+                options: { cutout: '85%', plugins: { legend: { position: 'bottom', labels: { color: '#fff', font: { weight: '800' } } } } }
             });
         }
+
+        document.getElementById('abrirModal').onclick = () => {
+            document.getElementById('modal').style.display = 'flex';
+            document.getElementById('data-lancamento').valueAsDate = new Date();
+        };
+        document.getElementById('btnFechar').onclick = () => document.getElementById('modal').style.display = 'none';
+
+        document.getElementById('btnSalvar').onclick = async () => {
+            const user = window.auth.currentUser;
+            const d = document.getElementById('desc').value, v = document.getElementById('valor').value, t = document.getElementById('tipo').value, dt = document.getElementById('data-lancamento').value, m = document.getElementById('filtroMes').value;
+            if (!user || !d || !v || !dt) return;
+            const ref = window.doc(window.db, "usuarios", user.uid, "meses", m);
+            const snap = await window.getDoc(ref);
+            let trans = snap.exists() ? snap.data().transacoes : [];
+            trans.push({ descricao: d, valor: parseFloat(v), tipo: t, data: dt });
+            await window.setDoc(ref, { transacoes: trans });
+            document.getElementById('modal').style.display = 'none';
+            window.carregarDados();
+        };
+
+        window.deletar = async (idx) => {
+            const user = window.auth.currentUser; const m = document.getElementById('filtroMes').value;
+            const ref = window.doc(window.db, "usuarios", user.uid, "meses", m);
+            const snap = await window.getDoc(ref);
+            let trans = snap.data().transacoes; trans.splice(idx, 1);
+            await window.setDoc(ref, { transacoes: trans });
+            window.carregarDados();
+        };
+        document.getElementById('filtroMes').onchange = () => window.carregarDados();
     </script>
-    <script src="script.js"></script>
 </body>
 </html>
