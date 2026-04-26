@@ -60,11 +60,17 @@
     </header>
 
     <section id="aba-dashboard" class="tab-content active">
-        <div class="viz-card"><canvas id="graficoPizza" style="max-height: 260px;"></canvas></div>
+        <div class="viz-card">
+             <h4 style="font-size:0.75rem; margin-bottom:15px; opacity:0.6">DISTRIBUIÇÃO MENSAL</h4>
+             <canvas id="graficoPizza" style="max-height: 260px;"></canvas>
+        </div>
     </section>
 
     <section id="aba-aportes" class="tab-content">
-        <div class="viz-card"><canvas id="graficoBarras" style="max-height: 250px;"></canvas></div>
+        <div class="viz-card">
+            <h4 style="font-size:0.75rem; margin-bottom:15px; color:var(--accent)">VISÃO ANUAL DE INVESTIMENTOS</h4>
+            <canvas id="graficoBarras" style="max-height: 250px;"></canvas>
+        </div>
         <div id="lista-invest" style="padding: 0 20px;"></div>
     </section>
 
@@ -84,9 +90,9 @@
     </section>
 
     <nav class="bottom-tab-bar">
-        <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active">📊 Resumo</button>
-        <button onclick="switchTab('aba-aportes', this)" class="nav-btn">📈 Aportes</button>
-        <button onclick="switchTab('aba-extrato', this)" class="nav-btn">📜 Extrato</button>
+        <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active"><span>📊</span> Resumo</button>
+        <button onclick="switchTab('aba-aportes', this)" class="nav-btn"><span>📈</span> Aportes</button>
+        <button onclick="switchTab('aba-extrato', this)" class="nav-btn"><span>📜</span> Extrato</button>
     </nav>
 
     <button onclick="abrirModal()" class="floating-btn">+</button>
@@ -130,7 +136,6 @@
         window.db = getFirestore(app);
         window.f_doc = doc; window.f_setDoc = setDoc; window.f_getDoc = getDoc;
 
-        // DEFINIÇÃO GLOBAL DOS MESES
         window.mesesNomes = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
         document.getElementById('filtroMes').value = window.mesesNomes[new Date().getMonth()];
 
@@ -159,7 +164,7 @@
             const mes = document.getElementById('filtroMes').value;
             const snap = await window.f_getDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", mes));
             
-            let saldo = 0, fixo = 0, lazer = 0, invest = 0, html = "", invHtml = "";
+            let saldo = 0, fixo = 0, lazer = 0, investMes = 0, html = "", invHtml = "";
             let trans = snap.exists() ? snap.data().transacoes : [];
             window.dadosAtuais = trans; 
 
@@ -170,7 +175,10 @@
                     saldo -= v;
                     if(t.tipo === 'fixo') fixo += v;
                     else if(t.tipo === 'lazer') lazer += v;
-                    else { invest += v; invHtml += `<div class="entry-card"><span>${t.descricao}</span><b>R$ ${v.toFixed(2)}</b></div>`; }
+                    else { 
+                        investMes += v; 
+                        invHtml += `<div class="entry-card"><span>${t.descricao}</span><b style="color:var(--accent)">R$ ${v.toFixed(2)}</b></div>`; 
+                    }
                 }
                 html += `<div class="entry-card">
                     <div><b>${t.descricao}</b><br><small>${t.data}</small></div>
@@ -184,7 +192,54 @@
             document.getElementById('saldo').innerText = `R$ ${saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
             document.getElementById('lista').innerHTML = html || '<p style="text-align:center; opacity:0.3; margin-top:30px;">Vazio.</p>';
             document.getElementById('lista-invest').innerHTML = invHtml;
-            renderCharts(fixo, lazer, invest);
+            
+            renderPizza(fixo, lazer, investMes);
+            carregarHistoricoAnual(); // Atualiza o gráfico de barras com todos os meses
+        }
+
+        function renderPizza(f, l, i) {
+            const txt = document.body.classList.contains('light-mode') ? '#111827' : '#FFFFFF';
+            const ctxP = document.getElementById('graficoPizza').getContext('2d');
+            if(chartP) chartP.destroy();
+            chartP = new Chart(ctxP, {
+                type: 'doughnut',
+                data: { labels: ['Fixo', 'Lazer', 'Invest'], datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }] },
+                options: { cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: txt, font: {weight:'bold'} } } } }
+            });
+        }
+
+        async function carregarHistoricoAnual() {
+            const user = window.auth.currentUser;
+            const investAnuais = new Array(12).fill(0);
+            const txt = document.body.classList.contains('light-mode') ? '#111827' : '#FFFFFF';
+
+            // Busca os dados de cada um dos 12 meses no Firebase
+            const promessas = window.mesesNomes.map(async (m, idx) => {
+                const s = await window.f_getDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", m));
+                if(s.exists()) {
+                    const trans = s.data().transacoes || [];
+                    investAnuais[idx] = trans.filter(t => t.tipo === 'investimento').reduce((acc, curr) => acc + parseFloat(curr.valor), 0);
+                }
+            });
+
+            await Promise.all(promessas);
+
+            const ctxB = document.getElementById('graficoBarras').getContext('2d');
+            if(chartB) chartB.destroy();
+            chartB = new Chart(ctxB, {
+                type: 'bar',
+                data: { 
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], 
+                    datasets: [{ label: 'Aportes', data: investAnuais, backgroundColor: '#FDE047', borderRadius: 5 }] 
+                },
+                options: { 
+                    scales: { 
+                        y: { ticks: { color: txt }, grid: { color: 'rgba(255,255,255,0.05)' } }, 
+                        x: { ticks: { color: txt }, grid: { display: false } } 
+                    }, 
+                    plugins: { legend: { display: false } } 
+                }
+            });
         }
 
         async function excluirRegistro(idx) {
@@ -208,34 +263,11 @@
             a.click();
         }
 
-        function renderCharts(f, l, i) {
-            const txt = document.body.classList.contains('light-mode') ? '#111827' : '#FFFFFF';
-            const ctxP = document.getElementById('graficoPizza').getContext('2d');
-            if(chartP) chartP.destroy();
-            chartP = new Chart(ctxP, {
-                type: 'doughnut',
-                data: { labels: ['Fixo', 'Lazer', 'Invest'], datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }] },
-                options: { cutout: '75%', plugins: { legend: { labels: { color: txt } } } }
-            });
-
-            const ctxB = document.getElementById('graficoBarras').getContext('2d');
-            if(chartB) chartB.destroy();
-            chartB = new Chart(ctxB, {
-                type: 'bar',
-                data: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], datasets: [{ label: 'Aportes', data: new Array(12).fill(0), backgroundColor: '#FDE047', borderRadius: 5 }] },
-                options: { scales: { y: { ticks: { color: txt } }, x: { ticks: { color: txt } } }, plugins: { legend: { display: false } } }
-            });
-            chartB.data.datasets[0].data[document.getElementById('filtroMes').selectedIndex] = i;
-            chartB.update();
-        }
-
         async function salvarRegistro() {
             const user = window.auth.currentUser;
             const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value, t = document.getElementById('tipo').value;
-            
             if(!dt || !v) return alert("Preencha Valor e Data!");
             
-            // CORREÇÃO: Usando window.mesesNomes definido globalmente
             const mesAlvo = window.mesesNomes[new Date(dt).getUTCMonth()];
             const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mesAlvo);
             const snap = await window.f_getDoc(ref);
