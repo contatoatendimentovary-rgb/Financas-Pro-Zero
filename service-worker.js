@@ -1,40 +1,13 @@
-const CACHE_NAME = 'fpro-v1';
-const assets = [
-  './',
-  './index.html',
-  './style.css',
-  './script.js',
-  './manifest.json',
-  'https://cdn.jsdelivr.net/npm/chart.js',
-  'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap'
-];
+const CACHE_NAME = 'financas-pro-v2';
+const urlsToCache = ['./', './index.html', './style.css', './script.js', './manifest.json'];
 
-// Instalação do Service Worker e Cache
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('FPRO: Ficheiros em cache para instalação');
-      return cache.addAll(assets);
-    })
-  );
+self.addEventListener('install', event => {
+    self.skipWaiting();
+    event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
 });
 
-// Ativação e limpeza de caches antigos
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-      );
-    })
-  );
-});
+self.addEventListener('activate', event => event.waitUntil(clients.claim()));
 
-// Resposta às requisições (Offline Mode)
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
-  );
+self.addEventListener('fetch', event => {
+    event.respondWith(caches.match(event.request).then(response => response || fetch(event.request)));
 });
