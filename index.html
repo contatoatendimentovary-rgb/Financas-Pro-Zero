@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#000000">
     <title>FinançasPRO // Premium</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3222/3222672.png">
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -18,7 +22,7 @@
         /* TELA DE BLOQUEIO */
         .app-lock-overlay { position: fixed; inset: 0; background: #000; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         
-        /* CABEÇALHO E BALANCE */
+        /* CABEÇALHO */
         .glass-header { background: var(--header-bg); padding: 40px 20px 30px; border-radius: 0 0 35px 35px; border-bottom: 1px solid var(--border); text-align: center; }
         .main-balance small { text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; font-size: 0.7rem; font-weight: 700; }
         .main-balance h1 { font-size: 2.8rem; font-weight: 800; margin: 5px 0 15px; }
@@ -26,30 +30,29 @@
         /* ALERTAS */
         .alert-box { background: rgba(249, 115, 22, 0.15); color: var(--orange); border: 1px solid var(--orange); padding: 15px; border-radius: 18px; margin: 15px 20px; font-size: 0.85rem; font-weight: 700; display: none; border-left: 5px solid var(--orange); }
 
-        /* CARDS E GRÁFICO */
+        /* DASHBOARD */
         .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px; margin-top: -25px; }
         .stat-card { background: var(--card); padding: 18px; border-radius: 24px; border: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
         .viz-card { background: var(--card); margin: 25px 20px; padding: 30px; border-radius: 32px; border: 1px solid var(--border); height: 320px; display: flex; align-items: center; justify-content: center; position: relative; }
         .chart-container { width: 100%; height: 100%; position: relative; }
 
-        /* LISTA DE LANÇAMENTOS */
+        /* LISTA */
         .timeline-list { padding: 0 20px; }
         .entry-card { background: var(--card); padding: 18px; border-radius: 22px; margin-bottom: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         
         /* BOTÕES */
         .user-pill { background: var(--accent); color: #000; border: none; padding: 12px 25px; border-radius: 15px; font-weight: 800; cursor: pointer; }
         .btn-export { background: #1DB954; color: white; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 800; font-size: 0.65rem; cursor: pointer; margin-top: 10px; }
-        .floating-btn { position: fixed; bottom: 110px; right: 25px; width: 65px; height: 65px; border-radius: 22px; background: var(--accent); border: none; font-size: 32px; font-weight: 800; z-index: 999; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+        .floating-btn { position: fixed; bottom: 110px; right: 25px; width: 65px; height: 65px; border-radius: 22px; background: var(--accent); border: none; font-size: 32px; font-weight: 800; z-index: 999; }
 
-        /* MENU INFERIOR */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
+        /* NAVEGAÇÃO */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
         .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 0.7rem; font-weight: 700; }
         .nav-btn.active { color: var(--accent); }
 
-        /* MODAL */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: flex-end; }
         .modal-sheet { background: #080808; width: 100%; border-radius: 35px 35px 0 0; padding: 35px; border-top: 1px solid var(--border); }
-        .input-grid input, .input-grid select { width: 100%; padding: 18px; margin-bottom: 12px; border-radius: 16px; background: #000; color: #fff; border: 1px solid var(--border); font-size: 1rem; }
+        .input-grid input, .input-grid select { width: 100%; padding: 18px; margin-bottom: 12px; border-radius: 16px; background: #000; color: #fff; border: 1px solid var(--border); }
 
         .tab-content { display: none; } .tab-content.active { display: block; }
     </style>
@@ -87,9 +90,7 @@
                 </div>
             </div>
             <div class="viz-card">
-                <div class="chart-container">
-                    <canvas id="graficoPizza"></canvas>
-                </div>
+                <div class="chart-container"><canvas id="graficoPizza"></canvas></div>
             </div>
         </section>
 
@@ -129,7 +130,7 @@
                     </select>
                 </div>
                 <button onclick="salvar()" class="user-pill" style="width:100%; padding:20px; border-radius:18px;">CONFIRMAR</button>
-                <button onclick="fecharModal()" style="width:100%; background:none; border:none; color:var(--text-sub); padding:15px; font-weight:700;">CANCELAR</button>
+                <button onclick="fecharModal()" style="width:100%; background:none; border:none; color:var(--text-sub); padding:15px;">CANCELAR</button>
             </div>
         </div>
     </div>
@@ -170,7 +171,6 @@
     <script>
         let currentChart;
 
-        // BIOMETRIA FORÇADA
         async function autenticarBio() {
             const lock = document.getElementById('app-lock');
             if (window.PublicKeyCredential) {
@@ -192,14 +192,13 @@
                     }
                 } catch (e) {
                     console.error(e);
-                    alert("Autenticação necessária.");
+                    alert("Autenticação necessária para prosseguir.");
                 }
             } else {
                 lock.style.display = 'none';
             }
         }
 
-        // EXPORTAÇÃO CSV
         async function exportarCSV() {
             const user = window.auth.currentUser;
             const mes = document.getElementById('filtroMes').value;
@@ -254,7 +253,6 @@
             document.getElementById('resumo-despesa').innerText = `R$ ${(f+l+i).toFixed(0)}`;
             document.getElementById('lista').innerHTML = html || '<p style="text-align:center; padding:20px; opacity:0.5;">Vazio</p>';
             
-            // INSIGHTS
             const alerta = document.getElementById('alerta-economia');
             if (l >= (r * 0.3) * 0.8 && r > 0) {
                 alerta.style.display = 'block';
@@ -295,7 +293,7 @@
         async function salvar() {
             const user = window.auth.currentUser;
             const d = document.getElementById('desc').value, v = document.getElementById('valor').value, t = document.getElementById('tipo').value, dt = document.getElementById('data-lancamento').value, m = document.getElementById('filtroMes').value;
-            if (!d || !v || !dt) return alert("Preencha tudo!");
+            if (!d || !v || !dt) return alert("Preencha todos os campos.");
             const ref = window.doc(window.db, "usuarios", user.uid, "meses", m);
             const snap = await window.getDoc(ref);
             let trans = snap.exists() ? snap.data().transacoes : [];
