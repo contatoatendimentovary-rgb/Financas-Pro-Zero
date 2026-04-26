@@ -1,109 +1,141 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FinançasPRO // CYBER</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinançasPRO - Gestão Corporativa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="cyber-theme">
-    <div class="glitch-overlay"></div>
+<body>
+    <div class="sidebar-info">SISTEMA DE GESTÃO FINANCEIRA</div>
     
-    <div class="app-container">
-        <header class="neon-header">
-            <div class="top-bar">
-                <div class="status-blink">ACTIVE // SYSTEM</div>
-                <h1 class="logo">FPRO::<span>CYBER</span></h1>
-                <button id="btnAuth" class="auth-btn_neon">LOG_IN</button>
+    <div class="app-wrapper">
+        <header class="main-header">
+            <div class="header-top">
+                <span class="brand">Finanças<span>PRO</span></span>
+                <button id="btnAuth" class="login-pill">Entrar com Google</button>
             </div>
-            
-            <div class="balance-pod">
-                <div class="pod-label">TOTAL_LIQUIDITY</div>
-                <h2 id="saldo" class="neon-text_green">$$ 0.00</h2>
-                <div class="pod-scan"></div>
+            <div class="balance-card">
+                <label>Fluxo de Caixa Total</label>
+                <h2 id="saldo">R$ 0,00</h2>
             </div>
         </header>
 
-        <main>
-            <section class="cyber-dashboard">
-                <div class="dash-title">
-                    <h3>ORÇAMENTO_PROJETADO</h3>
-                    <div class="dash-protocol">50.30.20 // PROTOCOL</div>
+        <main class="content-area">
+            <section class="bi-dashboard">
+                <div class="bi-header">
+                    <h3>Análise de Alocação (50-30-20)</h3>
                 </div>
-
-                <div class="data-grids">
-                    <div class="d-card essential_tech">
-                        <div class="d-info">
-                            <label>ESSENCIAL [50%]</label>
-                            <b id="txt-fixo" class="neon-text_green">0 / 0</b>
+                
+                <div class="chart-container">
+                    <div class="chart-item">
+                        <div class="chart-labels">
+                            <span>Essencial (50%)</span>
+                            <b id="txt-fixo">R$ 0</b>
                         </div>
-                        <div class="energy-bar"><div id="bar-fixo" class="energy-fill_green"></div></div>
+                        <div class="progress-track"><div id="bar-fixo" class="bar-fill green"></div></div>
                     </div>
 
-                    <div class="d-card leisure_tech">
-                        <div class="d-info">
-                            <label>LAZER [30%]</label>
-                            <b id="txt-lazer" class="neon-text_orange">0 / 0</b>
+                    <div class="chart-item">
+                        <div class="chart-labels">
+                            <span>Estilo de Vida (30%)</span>
+                            <b id="txt-lazer">R$ 0</b>
                         </div>
-                        <div class="energy-bar"><div id="bar-lazer" class="energy-fill_orange"></div></div>
+                        <div class="progress-track"><div id="bar-lazer" class="bar-fill orange"></div></div>
                     </div>
 
-                    <div class="d-card invest_tech">
-                        <div class="d-info">
-                            <label>INVESTIR [20%]</label>
-                            <b id="txt-invest" class="neon-text_blue">0 / 0</b>
+                    <div class="chart-item">
+                        <div class="chart-labels">
+                            <span>Investimento (20%)</span>
+                            <b id="txt-invest">R$ 0</b>
                         </div>
-                        <div class="energy-bar"><div id="bar-invest" class="energy-fill_blue"></div></div>
+                        <div class="progress-track"><div id="bar-invest" class="bar-fill blue"></div></div>
                     </div>
                 </div>
             </section>
 
-            <div class="list-controls_cyber">
-                <select id="filtroMes">
-                    <option value="janeiro">JANEIRO</option>
-                    <option value="fevereiro">FEVEREIRO</option>
-                    <option value="março">MARÇO</option>
-                    <option value="abril" selected>ABRIL</option>
-                    <option value="maio">MAIO</option>
-                    <option value="junho">JUNHO</option>
-                    <option value="julho">JULHO</option>
-                    <option value="agosto">AGOSTO</option>
-                    <option value="setembro">SETEMBRO</option>
-                    <option value="outubro">OUTUBRO</option>
-                    <option value="novembro">NOVEMBRO</option>
-                    <option value="dezembro">DEZEMBRO</option>
+            <div class="filter-row">
+                <select id="filtroMes" class="corporate-select">
+                    <option value="janeiro">Janeiro</option>
+                    <option value="fevereiro">Fevereiro</option>
+                    <option value="março">Março</option>
+                    <option value="abril" selected>Abril</option>
+                    <option value="maio">Maio</option>
+                    <option value="junho">Junho</option>
+                    <option value="julho">Julho</option>
+                    <option value="agosto">Agosto</option>
+                    <option value="setembro">Setembro</option>
+                    <option value="outubro">Outubro</option>
+                    <option value="novembro">Novembro</option>
+                    <option value="dezembro">Dezembro</option>
                 </select>
-                <div class="select-glow"></div>
             </div>
 
-            <ul id="lista" class="cyber-list">
-                </ul>
+            <ul id="lista" class="entry-list"></ul>
         </main>
 
-        <button id="abrirModal" class="fab_neon">+</button>
+        <button id="abrirModal" class="btn-primary-action">Novo Lançamento</button>
 
-        <div id="modal" class="modal-overlay_cyber">
-            <div class="modal-card_cyber">
-                <h3>// NOVO_REGISTRO</h3>
-                <div class="input-scanner">
-                    <input type="text" id="desc" placeholder="> DESCR_">
-                    <input type="number" id="valor" placeholder="> R$_VAL_">
+        <div id="modal" class="modal-overlay">
+            <div class="modal-box">
+                <h4>Registrar Transação</h4>
+                <div class="form-group">
+                    <input type="text" id="desc" placeholder="Descrição (ex: Venda de Produto)">
+                    <input type="number" id="valor" placeholder="Valor (R$)">
                     <select id="tipo">
-                        <option value="entrada">:: RECEITA_IN_</option>
-                        <option value="fixo">:: GASTO_FIXO_50_</option>
-                        <option value="lazer">:: LAZER_VAR_30_</option>
-                        <option value="investimento">:: INVEST_20_</option>
+                        <option value="entrada">Receita / Aporte</option>
+                        <option value="fixo">Custo Fixo (Essencial)</option>
+                        <option value="lazer">Custo Variável (Lazer)</option>
+                        <option value="investimento">Reserva / Investimento</option>
                     </select>
                 </div>
-                <div class="modal-footer_cyber">
-                    <button id="btnSalvar" class="save-btn_neon">CONFIRM // EXEC</button>
-                    <button id="btnFechar" class="cancel-btn_neon">ABORT</button>
+                <div class="modal-actions">
+                    <button id="btnSalvar" class="btn-save">Confirmar Registro</button>
+                    <button id="btnFechar" class="btn-cancel">Voltar</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="script.js"></script>
-    </body>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE",
+            authDomain: "financaspro-1e0e8.firebaseapp.com",
+            projectId: "financaspro-1e0e8",
+            storageBucket: "financaspro-1e0e8.firebasestorage.app",
+            messagingSenderId: "659521706556",
+            appId: "1:659521706556:web:86f2174c4c8a89335ac139"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        window.auth = getAuth(app); 
+        window.db = getFirestore(app);
+        window.doc = doc; 
+        window.setDoc = setDoc; 
+        window.getDoc = getDoc;
+        
+        const provider = new GoogleAuthProvider();
+
+        window.loginGoogle = () => signInWithPopup(window.auth, provider).catch(err => console.error("Erro Login:", err));
+        window.logout = () => signOut(window.auth);
+
+        onAuthStateChanged(window.auth, (user) => {
+            const btn = document.getElementById('btnAuth');
+            if (user) {
+                btn.innerText = "Sair (" + user.displayName.split(' ')[0] + ")";
+                btn.onclick = window.logout;
+                if(window.carregarDados) window.carregarDados();
+            } else {
+                btn.innerText = "Entrar com Google";
+                btn.onclick = window.loginGoogle;
+            }
+        });
+    </script>
+</body>
 </html>
