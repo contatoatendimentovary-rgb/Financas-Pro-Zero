@@ -20,7 +20,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: var(--text); padding-bottom: 120px; transition: 0.3s; }
 
-        /* HEADER */
         .glass-header { padding: 40px 20px 30px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; }
         .action-bar { display: flex; gap: 12px; align-items: center; }
         
@@ -28,12 +27,11 @@
         .logout-btn { background: none; border: none; color: var(--red); font-weight: 800; font-size: 0.75rem; padding: 5px; cursor: pointer; text-transform: uppercase; }
         
         .viz-card { background: var(--card); margin: 15px; padding: 20px; border-radius: 25px; border: 1px solid var(--border); }
-        .entry-card { background: var(--card); padding: 16px; border-radius: 18px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; animation: fadeIn 0.3s ease; }
+        .entry-card { background: var(--card); padding: 16px; border-radius: 18px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         
         .btn-delete { color: var(--red); background: none; border: none; padding: 5px; font-size: 1.1rem; cursor: pointer; }
         .btn-export { width: 100%; padding: 14px; background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 15px; font-weight: 800; margin-bottom: 20px; font-size: 0.8rem; }
 
-        /* NAV */
         .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--bg); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
         .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-weight: 700; font-size: 0.75rem; gap: 4px; }
         .nav-btn.active { color: var(--accent); }
@@ -45,7 +43,6 @@
         .input-grid input, .input-grid select { width: 100%; padding: 15px; margin-bottom: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); color: var(--text); outline: none; }
         
         .tab-content { display: none; } .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -59,7 +56,6 @@
                 <button onclick="logout()" class="logout-btn">Sair</button>
             </div>
         </div>
-        <p style="color:var(--text-sub); text-transform:uppercase; font-size:0.65rem; letter-spacing:1px; font-weight:700;">Balanço Mensal</p>
         <h1 id="saldo" style="font-size:2.6rem; font-weight:800;">R$ 0,00</h1>
     </header>
 
@@ -68,10 +64,7 @@
     </section>
 
     <section id="aba-aportes" class="tab-content">
-        <div class="viz-card">
-            <h4 style="font-size:0.75rem; margin-bottom:15px; color:var(--accent)">HISTÓRICO DE APORTES</h4>
-            <canvas id="graficoBarras" style="max-height: 250px;"></canvas>
-        </div>
+        <div class="viz-card"><canvas id="graficoBarras" style="max-height: 250px;"></canvas></div>
         <div id="lista-invest" style="padding: 0 20px;"></div>
     </section>
 
@@ -91,9 +84,9 @@
     </section>
 
     <nav class="bottom-tab-bar">
-        <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active"><span>📊</span> Resumo</button>
-        <button onclick="switchTab('aba-aportes', this)" class="nav-btn"><span>📈</span> Aportes</button>
-        <button onclick="switchTab('aba-extrato', this)" class="nav-btn"><span>📜</span> Extrato</button>
+        <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active">📊 Resumo</button>
+        <button onclick="switchTab('aba-aportes', this)" class="nav-btn">📈 Aportes</button>
+        <button onclick="switchTab('aba-extrato', this)" class="nav-btn">📜 Extrato</button>
     </nav>
 
     <button onclick="abrirModal()" class="floating-btn">+</button>
@@ -102,7 +95,7 @@
         <div class="modal-sheet">
             <h3 style="margin-bottom:20px;">Novo Registro</h3>
             <div class="input-grid">
-                <input type="text" id="desc" placeholder="O que você comprou/recebeu?">
+                <input type="text" id="desc" placeholder="Descrição">
                 <input type="number" id="valor" placeholder="R$ 0,00">
                 <input type="date" id="data-reg">
                 <select id="tipo">
@@ -112,8 +105,8 @@
                     <option value="investimento">Investimento (-)</option>
                 </select>
             </div>
-            <button onclick="salvarRegistro()" style="width:100%; padding:18px; background:var(--accent); border:none; border-radius:15px; font-weight:800; color:#000">SALVAR AGORA</button>
-            <button onclick="fecharModal()" style="width:100%; background:none; border:none; color:var(--text-sub); padding:15px; font-size:0.8rem;">CANCELAR</button>
+            <button onclick="salvarRegistro()" style="width:100%; padding:18px; background:var(--accent); border:none; border-radius:15px; font-weight:800; color:#000">SALVAR</button>
+            <button onclick="fecharModal()" style="width:100%; background:none; border:none; color:var(--text-sub); padding:15px;">CANCELAR</button>
         </div>
     </div>
 
@@ -137,9 +130,9 @@
         window.db = getFirestore(app);
         window.f_doc = doc; window.f_setDoc = setDoc; window.f_getDoc = getDoc;
 
-        // SELECIONA MÊS ATUAL AUTOMATICAMENTE
-        const mesesNomes = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
-        document.getElementById('filtroMes').value = mesesNomes[new Date().getMonth()];
+        // DEFINIÇÃO GLOBAL DOS MESES
+        window.mesesNomes = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+        document.getElementById('filtroMes').value = window.mesesNomes[new Date().getMonth()];
 
         onAuthStateChanged(window.auth, (user) => {
             if (user) {
@@ -177,7 +170,7 @@
                     saldo -= v;
                     if(t.tipo === 'fixo') fixo += v;
                     else if(t.tipo === 'lazer') lazer += v;
-                    else { invest += v; invHtml += `<div class="entry-card"><span>${t.descricao}</span><b style="color:var(--accent)">R$ ${v.toFixed(2)}</b></div>`; }
+                    else { invest += v; invHtml += `<div class="entry-card"><span>${t.descricao}</span><b>R$ ${v.toFixed(2)}</b></div>`; }
                 }
                 html += `<div class="entry-card">
                     <div><b>${t.descricao}</b><br><small>${t.data}</small></div>
@@ -189,13 +182,13 @@
             });
 
             document.getElementById('saldo').innerText = `R$ ${saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-            document.getElementById('lista').innerHTML = html || '<p style="text-align:center; opacity:0.3; margin-top:30px;">Nada por aqui ainda.</p>';
+            document.getElementById('lista').innerHTML = html || '<p style="text-align:center; opacity:0.3; margin-top:30px;">Vazio.</p>';
             document.getElementById('lista-invest').innerHTML = invHtml;
             renderCharts(fixo, lazer, invest);
         }
 
         async function excluirRegistro(idx) {
-            if(!confirm("Deseja apagar esse registro?")) return;
+            if(!confirm("Deseja apagar?")) return;
             const user = window.auth.currentUser;
             const mes = document.getElementById('filtroMes').value;
             let novaLista = [...window.dadosAtuais];
@@ -205,26 +198,24 @@
         }
 
         function exportarExcel() {
-            if(!window.dadosAtuais || window.dadosAtuais.length === 0) return alert("Não há dados para exportar neste mês.");
-            let csv = "Descrição;Valor;Data;Tipo\n";
-            window.dadosAtuais.forEach(t => { csv += `${t.descricao};${t.valor};${t.data};${t.tipo}\n`; });
+            if(!window.dadosAtuais || window.dadosAtuais.length === 0) return alert("Sem dados.");
+            let csv = "Descricao;Valor;Data;Tipo\r\n";
+            window.dadosAtuais.forEach(t => { csv += `${t.descricao};${t.valor};${t.data};${t.tipo}\r\n`; });
             const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url; a.download = `Relatorio_${document.getElementById('filtroMes').value}.csv`;
+            a.href = url; a.download = `Planilha_${document.getElementById('filtroMes').value}.csv`;
             a.click();
         }
 
         function renderCharts(f, l, i) {
-            const isLight = document.body.classList.contains('light-mode');
-            const txt = isLight ? '#111827' : '#FFFFFF';
-
+            const txt = document.body.classList.contains('light-mode') ? '#111827' : '#FFFFFF';
             const ctxP = document.getElementById('graficoPizza').getContext('2d');
             if(chartP) chartP.destroy();
             chartP = new Chart(ctxP, {
                 type: 'doughnut',
                 data: { labels: ['Fixo', 'Lazer', 'Invest'], datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }] },
-                options: { cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: txt, font: { weight: 'bold' } } } } }
+                options: { cutout: '75%', plugins: { legend: { labels: { color: txt } } } }
             });
 
             const ctxB = document.getElementById('graficoBarras').getContext('2d');
@@ -241,15 +232,20 @@
         async function salvarRegistro() {
             const user = window.auth.currentUser;
             const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value, t = document.getElementById('tipo').value;
-            if(!dt || !v) return alert("Por favor, preencha o valor e a data.");
             
-            const mesAlvo = mesesNomes[new Date(dt).getUTCMonth()];
-            const snap = await window.f_getDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", mesAlvo));
+            if(!dt || !v) return alert("Preencha Valor e Data!");
+            
+            // CORREÇÃO: Usando window.mesesNomes definido globalmente
+            const mesAlvo = window.mesesNomes[new Date(dt).getUTCMonth()];
+            const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mesAlvo);
+            const snap = await window.f_getDoc(ref);
+            
             let lista = snap.exists() ? snap.data().transacoes : [];
-            lista.push({ descricao: d, valor: v, tipo: t, data: dt });
+            lista.push({ descricao: d || "Sem nome", valor: v, tipo: t, data: dt });
             
-            await window.f_setDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", mesAlvo), { transacoes: lista });
-            fecharModal(); window.carregarDados();
+            await window.f_setDoc(ref, { transacoes: lista });
+            fecharModal(); 
+            window.carregarDados();
         }
 
         function switchTab(id, btn) {
