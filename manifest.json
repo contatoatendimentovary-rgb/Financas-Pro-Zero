@@ -1,7 +1,7 @@
 {
-  "name": "FinançasPRO",
-  "short_name": "FPRO",
-  "start_url": "index.html",
+  "name": "FinançasPRO Premium",
+  "short_name": "FinançasPRO",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0F172A",
   "theme_color": "#6366F1",
