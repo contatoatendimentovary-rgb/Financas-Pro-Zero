@@ -1,57 +1,38 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinançasPRO - Gestão Corporativa</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>FinançasPRO - Corporate BI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="sidebar-info">SISTEMA DE GESTÃO FINANCEIRA</div>
-    
     <div class="app-wrapper">
         <header class="main-header">
             <div class="header-top">
                 <span class="brand">Finanças<span>PRO</span></span>
-                <button id="btnAuth" class="login-pill">Entrar com Google</button>
+                <button id="btnAuth" class="login-pill">Carregando...</button>
             </div>
             <div class="balance-card">
-                <label>Fluxo de Caixa Total</label>
+                <label>Patrimônio Líquido</label>
                 <h2 id="saldo">R$ 0,00</h2>
             </div>
         </header>
 
         <main class="content-area">
             <section class="bi-dashboard">
-                <div class="bi-header">
-                    <h3>Análise de Alocação (50-30-20)</h3>
+                <div class="chart-item">
+                    <div class="chart-labels"><span>Essencial (50%)</span><b id="txt-fixo">R$ 0</b></div>
+                    <div class="progress-track"><div id="bar-fixo" class="bar-fill green"></div></div>
                 </div>
-                
-                <div class="chart-container">
-                    <div class="chart-item">
-                        <div class="chart-labels">
-                            <span>Essencial (50%)</span>
-                            <b id="txt-fixo">R$ 0</b>
-                        </div>
-                        <div class="progress-track"><div id="bar-fixo" class="bar-fill green"></div></div>
-                    </div>
-
-                    <div class="chart-item">
-                        <div class="chart-labels">
-                            <span>Estilo de Vida (30%)</span>
-                            <b id="txt-lazer">R$ 0</b>
-                        </div>
-                        <div class="progress-track"><div id="bar-lazer" class="bar-fill orange"></div></div>
-                    </div>
-
-                    <div class="chart-item">
-                        <div class="chart-labels">
-                            <span>Investimento (20%)</span>
-                            <b id="txt-invest">R$ 0</b>
-                        </div>
-                        <div class="progress-track"><div id="bar-invest" class="bar-fill blue"></div></div>
-                    </div>
+                <div class="chart-item">
+                    <div class="chart-labels"><span>Lazer (30%)</span><b id="txt-lazer">R$ 0</b></div>
+                    <div class="progress-track"><div id="bar-lazer" class="bar-fill orange"></div></div>
+                </div>
+                <div class="chart-item">
+                    <div class="chart-labels"><span>Investimento (20%)</span><b id="txt-invest">R$ 0</b></div>
+                    <div class="progress-track"><div id="bar-invest" class="bar-fill blue"></div></div>
                 </div>
             </section>
 
@@ -79,26 +60,23 @@
 
         <div id="modal" class="modal-overlay">
             <div class="modal-box">
-                <h4>Registrar Transação</h4>
+                <h4>Nova Movimentação</h4>
                 <div class="form-group">
-                    <input type="text" id="desc" placeholder="Descrição (ex: Venda de Produto)">
-                    <input type="number" id="valor" placeholder="Valor (R$)">
+                    <input type="text" id="desc" placeholder="Descrição">
+                    <input type="number" id="valor" placeholder="Valor R$">
                     <select id="tipo">
-                        <option value="entrada">Receita / Aporte</option>
-                        <option value="fixo">Custo Fixo (Essencial)</option>
-                        <option value="lazer">Custo Variável (Lazer)</option>
-                        <option value="investimento">Reserva / Investimento</option>
+                        <option value="entrada">Receita (+) </option>
+                        <option value="fixo">Essencial (50%)</option>
+                        <option value="lazer">Lazer (30%)</option>
+                        <option value="investimento">Investimento (20%)</option>
                     </select>
                 </div>
-                <div class="modal-actions">
-                    <button id="btnSalvar" class="btn-save">Confirmar Registro</button>
-                    <button id="btnFechar" class="btn-cancel">Voltar</button>
-                </div>
+                <button id="btnSalvar" class="btn-save">Confirmar</button>
+                <button id="btnFechar" class="btn-cancel">Cancelar</button>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -114,28 +92,32 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        window.auth = getAuth(app); 
-        window.db = getFirestore(app);
-        window.doc = doc; 
-        window.setDoc = setDoc; 
-        window.getDoc = getDoc;
-        
+        const auth = getAuth(app);
+        const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        window.loginGoogle = () => signInWithPopup(window.auth, provider).catch(err => console.error("Erro Login:", err));
-        window.logout = () => signOut(window.auth);
+        // Torna as funções acessíveis ao script.js e aos botões
+        window.auth = auth; window.db = db; window.doc = doc; 
+        window.setDoc = setDoc; window.getDoc = getDoc;
 
-        onAuthStateChanged(window.auth, (user) => {
+        window.loginGoogle = () => {
+            signInWithPopup(auth, provider).catch(err => alert("Erro ao logar: " + err.message));
+        };
+
+        window.logout = () => signOut(auth).then(() => location.reload());
+
+        onAuthStateChanged(auth, (user) => {
             const btn = document.getElementById('btnAuth');
             if (user) {
                 btn.innerText = "Sair (" + user.displayName.split(' ')[0] + ")";
                 btn.onclick = window.logout;
-                if(window.carregarDados) window.carregarDados();
+                window.carregarDados();
             } else {
                 btn.innerText = "Entrar com Google";
                 btn.onclick = window.loginGoogle;
             }
         });
     </script>
+    <script src="script.js"></script>
 </body>
 </html>
