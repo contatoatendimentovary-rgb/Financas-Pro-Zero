@@ -25,6 +25,7 @@ body { background: var(--bg); color: var(--text-main); padding-bottom: 100px; }
 .tab-content { display: none; } .tab-content.active { display: block; }
 .timeline-list { padding: 0 20px; }
 .entry-card { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.badge-dia { background: var(--accent); color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 6px; margin-right: 5px; font-weight: 800; vertical-align: middle; }
 .btn-del { background: none; border: none; color: var(--red); font-size: 0.7rem; cursor: pointer; margin-top: 5px; }
 .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--header-bg); display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid var(--border); z-index: 1000; }
 .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; font-weight: 600; width: 33%; }
@@ -32,8 +33,9 @@ body { background: var(--bg); color: var(--text-main); padding-bottom: 100px; }
 .floating-btn { position: fixed; bottom: 85px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 28px; z-index: 999; }
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 2000; align-items: flex-end; }
 .modal-sheet { background: var(--card); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; }
-.input-grid input, .input-grid select { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); }
-.btn-confirm { width: 100%; padding: 15px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: 700; }
+.input-grid input, .input-grid select { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); font-size: 1rem; }
+.btn-confirm { width: 100%; padding: 15px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: 700; margin-bottom: 10px; }
+.btn-abort { width: 100%; padding: 10px; background: none; color: var(--text-sub); border: none; font-weight: 600; }
 .meta-container { padding: 20px; }
 .meta-item { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 10px; border: 1px solid var(--border); }
 .progress-container { background: var(--bg); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 10px; }
