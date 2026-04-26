@@ -1,15 +1,15 @@
 {
   "name": "FinançasPRO",
-  "short_name": "FinançasPRO",
-  "start_url": "/",
+  "short_name": "FPRO",
+  "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#0A84FF",
+  "background_color": "#0F172A",
+  "theme_color": "#3B82F6",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/552/552791.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/2341/2341103.png",
       "sizes": "512x512",
       "type": "image/png"
     }
   ]
-} 
+}
