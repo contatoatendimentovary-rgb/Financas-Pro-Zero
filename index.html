@@ -87,8 +87,9 @@
                 <div class="drag-handle"></div>
                 <h3>Novo Lançamento</h3>
                 <div class="input-grid">
-                    <input type="text" id="desc" placeholder="Descrição">
+                    <input type="text" id="desc" placeholder="Descrição (ex: Aluguel)">
                     <input type="number" id="valor" placeholder="R$ 0,00">
+                    <input type="date" id="data-lancamento">
                     <select id="tipo">
                         <option value="entrada">Receita (+)</option>
                         <option value="fixo">Essencial (50%)</option>
@@ -136,8 +137,7 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
-                .then(reg => { reg.update(); console.log("PWA Pronto"); });
+                navigator.serviceWorker.register('./service-worker.js').then(reg => reg.update());
             });
         }
     </script>
