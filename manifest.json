@@ -1,12 +1,10 @@
 {
   "name": "FinançasPRO Premium",
   "short_name": "FinançasPRO",
-  "description": "Sistema de Gestão Financeira Pessoal",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0F172A",
   "theme_color": "#6366F1",
-  "orientation": "portrait",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/2341/2341103.png",
