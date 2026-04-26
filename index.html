@@ -1,33 +1,54 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinançasPRO</title>
+    <title>FinançasPRO Premium</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
-    <header>
-        <div class="header-content">
-            <h1>FinançasPRO</h1>
-            <button id="btnAuth">Login Google</button>
+<body class="dark-mode"> <header>
+        <div class="header-top">
+            <h1>Finanças<span>PRO</span></h1>
+            <div class="header-btns">
+                <button id="toggleTheme">🌓</button>
+                <button id="btnAuth">Login</button>
+            </div>
+        </div>
+        <div class="card-main">
+            <span>Saldo Disponível</span>
+            <h2 id="saldo">R$ 0,00</h2>
         </div>
     </header>
 
     <main>
-        <section class="resumo-cards">
-            <div class="card-saldo">
-                <span>Saldo Atual</span>
-                <h2 id="saldo">R$ 0,00</h2>
+        <section class="budget-section">
+            <h3>Orçamento Projetado (50-30-20)</h3>
+            <div class="budget-card">
+                <div class="budget-info">
+                    <span>Fixo (50%)</span>
+                    <span id="txt-fixo">R$ 0 / R$ 0</span>
+                </div>
+                <div class="progress-bar"><div id="bar-fixo" class="progress"></div></div>
             </div>
-            <div class="grafico-box">
-                <canvas id="meuGrafico"></canvas>
+            <div class="budget-card">
+                <div class="budget-info">
+                    <span>Lazer (30%)</span>
+                    <span id="txt-lazer">R$ 0 / R$ 0</span>
+                </div>
+                <div class="progress-bar"><div id="bar-lazer" class="progress"></div></div>
+            </div>
+            <div class="budget-card">
+                <div class="budget-info">
+                    <span>Investir (20%)</span>
+                    <span id="txt-invest">R$ 0 / R$ 0</span>
+                </div>
+                <div class="progress-bar"><div id="bar-invest" class="progress"></div></div>
             </div>
         </section>
 
-        <section class="acoes">
+        <section class="controles">
             <select id="filtroMes">
                 <option value="janeiro">Janeiro</option>
                 <option value="fevereiro">Fevereiro</option>
@@ -42,24 +63,27 @@
                 <option value="novembro">Novembro</option>
                 <option value="dezembro">Dezembro</option>
             </select>
-            <button id="abrirModal" class="btn-floating">+</button>
         </section>
 
-        <ul id="lista" class="transacoes-lista"></ul>
+        <ul id="lista" class="lista-transacoes"></ul>
     </main>
 
+    <button id="abrirModal" class="fab">+</button>
+
     <div id="modal" class="modal-overlay">
-        <div class="modal-container">
+        <div class="modal-content">
             <h3>Novo Lançamento</h3>
-            <input type="text" id="desc" placeholder="Descrição">
+            <input type="text" id="desc" placeholder="O que você comprou?">
             <input type="number" id="valor" placeholder="Valor R$">
             <select id="tipo">
-                <option value="entrada">Entrada (+)</option>
-                <option value="saida">Saída (-)</option>
+                <option value="entrada">Receita (Entrada)</option>
+                <option value="fixo">Gasto Fixo (Aluguel, Luz...)</option>
+                <option value="lazer">Lazer (iFood, Cinema...)</option>
+                <option value="investimento">Investimento / Reserva</option>
             </select>
-            <div class="modal-btns">
-                <button id="btnSalvar" class="confirmar">Salvar</button>
-                <button id="btnFechar" class="cancelar">Fechar</button>
+            <div class="modal-actions">
+                <button id="btnSalvar" class="btn-primary">Registrar</button>
+                <button id="btnFechar" class="btn-sec">Voltar</button>
             </div>
         </div>
     </div>
@@ -80,28 +104,20 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        window.auth = getAuth(app);
-        window.db = getFirestore(app);
-        window.doc = doc;
-        window.setDoc = setDoc;
-        window.getDoc = getDoc;
-        
+        window.auth = getAuth(app); window.db = getFirestore(app);
+        window.doc = doc; window.setDoc = setDoc; window.getDoc = getDoc;
         const provider = new GoogleAuthProvider();
 
-        window.loginGoogle = () => {
-            signInWithPopup(window.auth, provider).then(() => location.reload());
-        };
+        window.loginGoogle = () => signInWithPopup(window.auth, provider).then(() => location.reload());
 
         onAuthStateChanged(window.auth, (user) => {
             const btn = document.getElementById('btnAuth');
             if (user) {
                 btn.innerText = "Sair";
                 btn.onclick = () => window.auth.signOut().then(() => location.reload());
-                if (typeof window.carregarDadosDoFirebase === "function") {
-                    window.carregarDadosDoFirebase();
-                }
+                if(window.carregarDados) window.carregarDados();
             } else {
-                btn.innerText = "Login Google";
+                btn.innerText = "Login";
                 btn.onclick = window.loginGoogle;
             }
         });
