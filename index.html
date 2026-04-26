@@ -18,7 +18,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: var(--text-main); padding-bottom: 120px; overflow-x: hidden; }
         
-        /* OVERLAY DE BLOQUEIO CORRIGIDA */
         .app-lock-overlay { position: fixed; inset: 0; background: #000; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         
         .glass-header { background: var(--bg); padding: 40px 20px 30px; border-bottom: 1px solid var(--border); text-align: center; }
@@ -36,7 +35,7 @@
         .nav-btn.active { color: var(--accent); }
 
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: flex-end; }
-        .modal-sheet { background: var(--bg); width: 100%; border-radius: 35px 35px 0; padding: 35px; border-top: 1px solid var(--border); }
+        .modal-sheet { background: var(--bg); width: 100%; border-radius: 35px 35px 0 0; padding: 35px; border-top: 1px solid var(--border); }
         .input-grid input, .input-grid select { width: 100%; padding: 18px; margin-bottom: 12px; border-radius: 16px; background: var(--card); color: var(--text-main); border: 1px solid var(--border); font-size: 1rem; }
 
         .floating-btn { position: fixed; bottom: 110px; right: 25px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); border: none; font-size: 28px; font-weight: 800; z-index: 999; }
@@ -48,7 +47,6 @@
     <div id="app-lock" class="app-lock-overlay">
         <div style="font-weight:800; font-size:1.5rem; margin-bottom:15px;">FinançasPRO Locked</div>
         <button onclick="autenticarBio()" class="user-pill">USAR BIOMETRIA</button>
-        <small style="color:var(--text-sub); margin-top:15px; font-size:0.6rem;">Pressione para desbloquear</small>
     </div>
 
     <div class="app-wrapper">
@@ -61,7 +59,7 @@
                 </div>
             </div>
             <div class="main-balance">
-                <small id="txt-label-saldo" style="color:var(--text-sub)">Saldo do Mês</small>
+                <small id="txt-label-saldo" style="color:var(--text-sub)">Saldo Mensal</small>
                 <h1 id="saldo">R$ 0,00</h1>
             </div>
         </header>
@@ -75,7 +73,7 @@
 
         <section id="aba-investimentos" class="tab-content">
             <div class="viz-card">
-                <h3 style="margin-bottom:20px; font-size:0.9rem;">Patrimônio Acumulado (Histórico)</h3>
+                <h3 style="margin-bottom:20px; font-size:0.9rem;">Patrimônio Acumulado (Total)</h3>
                 <div style="width:100%; height:100%;"><canvas id="graficoBarras"></canvas></div>
             </div>
         </section>
@@ -157,21 +155,16 @@
     <script>
         let chartP, chartB;
 
-        // CORREÇÃO DA BIOMETRIA: Se der erro de chave não disponível, apenas desbloqueia
         async function autenticarBio() {
             const lock = document.getElementById('app-lock');
             try {
                 if (window.PublicKeyCredential) {
-                    // Timeout curto para não prender o usuário no erro do Google
                     await navigator.credentials.get({ 
-                        publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), timeout: 2000, userVerification: "required" } 
+                        publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), timeout: 60000, userVerification: "required" } 
                     });
-                }
-                lock.style.display = 'none';
-            } catch (e) { 
-                console.warn("Biometria não disponível, acessando via bypass.");
-                lock.style.display = 'none'; 
-            }
+                    lock.style.display = 'none';
+                } else { lock.style.display = 'none'; }
+            } catch (e) { console.error("Erro na biometria", e); }
         }
 
         async function carregarDados() {
@@ -183,7 +176,7 @@
             let saldoMes = 0, f = 0, l = 0, i = 0, html = "";
             let trans = snap.exists() ? snap.data().transacoes : [];
             
-            // FILTRO DINÂMICO: Calcula saldo APENAS do mês que você está vendo
+            // CORREÇÃO: Filtra e calcula saldo apenas para o mês exibido
             trans.sort((a, b) => new Date(a.data) - new Date(b.data)).forEach((t, idx) => {
                 const v = parseFloat(t.valor);
                 if (t.tipo === 'entrada') saldoMes += v;
@@ -206,17 +199,13 @@
 
             document.getElementById('saldo').innerText = `R$ ${saldoMes.toFixed(2)}`;
             document.getElementById('txt-label-saldo').innerText = `Saldo de ${mesSel.charAt(0).toUpperCase() + mesSel.slice(1)}`;
-            document.getElementById('lista').innerHTML = html || '<p style="text-align:center; opacity:0.3; margin-top:20px;">Nenhum registro para este mês</p>';
+            document.getElementById('lista').innerHTML = html || '<p style="text-align:center; opacity:0.3; margin-top:20px;">Sem registros</p>';
             
-            renderPizza(f, l, i);
-        }
-
-        function renderPizza(f, l, i) {
             const ctx = document.getElementById('graficoPizza').getContext('2d');
             if (chartP) chartP.destroy();
             chartP = new Chart(ctx, {
                 type: 'doughnut',
-                data: { labels: ['Essencial', 'Lazer', 'Invest'], datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }] },
+                data: { labels: ['Essencial', 'Lazer', 'Investimento'], datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }] },
                 options: { cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } } }
             });
         }
@@ -260,7 +249,7 @@
         }
 
         async function excluir(index) {
-            if(!confirm("Excluir lançamento?")) return;
+            if(!confirm("Excluir?")) return;
             const user = window.auth.currentUser;
             const mes = document.getElementById('filtroMes').value;
             const ref = window.doc(window.db, "usuarios", user.uid, "meses", mes);
