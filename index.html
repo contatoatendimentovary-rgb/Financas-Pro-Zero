@@ -2,77 +2,92 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinançasPRO - Gestão 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>FinançasPRO - Gestão Comercial Premium</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
-    <header>
+<body class="dark-theme"> <header>
         <div class="header-content">
-            <h1>FinançasPRO</h1>
-            <button id="btnAuth">Login</button>
+            <h1 class="logo">FinançasPRO</h1>
+            <div class="header-actions">
+                <button id="theme-toggle" class="btn-theme-toggle">
+                    <span id="theme-icon-sun">☀️</span>
+                    <span id="theme-icon-moon">🌙</span>
+                </button>
+                <button id="btnAuth" class="btn-auth">Entrar</button>
+            </div>
         </div>
     </header>
 
-    <main>
-        <section class="resumo-topo">
-            <div class="card-mini">
-                <span>Saldo Total Acumulado</span>
-                <h4 id="saldoTotal">R$ 0,00</h4>
+    <main class="main-content">
+        <section class="dashboard">
+            <div class="card-acumulado">
+                <span>Saldo Acumulado (2026)</span>
+                <h2 id="saldoTotal">R$ 0,00</h2>
             </div>
+            
             <div class="card-principal">
-                <span>Saldo do Mês</span>
-                <h2 id="saldo">R$ 0,00</h2>
-            </div>
-            <div class="grafico-box">
-                <canvas id="meuGrafico"></canvas>
+                <div class="grafico-box">
+                    <canvas id="meuGrafico"></canvas>
+                </div>
+                <div class="resumo-mes">
+                    <span>Fluxo de</span>
+                    <select id="filtroMes" class="mes-select">
+                        <option value="janeiro">Janeiro</option>
+                        <option value="fevereiro">Fevereiro</option>
+                        <option value="março">Março</option>
+                        <option value="abril" selected>Abril</option>
+                        <option value="maio">Maio</option>
+                        <option value="junho">Junho</option>
+                        <option value="julho">Julho</option>
+                        <option value="agosto">Agosto</option>
+                        <option value="setembro">Setembro</option>
+                        <option value="outubro">Outubro</option>
+                        <option value="novembro">Novembro</option>
+                        <option value="dezembro">Dezembro</option>
+                    </select>
+                    <h3 id="saldoMes">R$ 0,00</h3>
+                </div>
             </div>
         </section>
 
-        <section class="acoes">
-            <select id="filtroMes">
-                <option value="janeiro">Janeiro</option>
-                <option value="fevereiro">Fevereiro</option>
-                <option value="março">Março</option>
-                <option value="abril" selected>Abril</option>
-                <option value="maio">Maio</option>
-                <option value="junho">Junho</option>
-                <option value="julho">Julho</option>
-                <option value="agosto">Agosto</option>
-                <option value="setembro">Setembro</option>
-                <option value="outubro">Outubro</option>
-                <option value="novembro">Novembro</option>
-                <option value="dezembro">Dezembro</option>
-            </select>
-            <button id="abrirModal" class="btn-floating">+</button>
-        </section>
-
-        <ul id="lista" class="transacoes-lista"></ul>
+        <ul id="lista" class="transacoes-lista">
+            </ul>
     </main>
 
+    <nav class="bottom-bar">
+        <button id="abrirModal" class="btn-quick-add">+</button>
+    </nav>
+
     <div id="modal" class="modal-overlay">
-        <div class="modal-container">
-            <h3>Novo Lançamento</h3>
-            <input type="text" id="desc" placeholder="Descrição (Ex: Aluguel)">
+        <div class="modal-container bottom-sheet">
+            <div class="modal-handle"></div>
+            <h3 class="modal-title">Novo Lançamento</h3>
+            
+            <input type="text" id="desc" placeholder="Descrição (Ex: Salário, Aluguel)">
             <input type="number" id="valor" placeholder="Valor R$">
             
-            <label>Categoria:</label>
-            <select id="categoria">
-                <option value="🏠 Moradia">Moradia</option>
-                <option value="🍔 Alimentação">Alimentação</option>
-                <option value="🚗 Transporte">Transporte</option>
-                <option value="🎭 Lazer">Lazer</option>
-                <option value="💰 Salário">Salário/Renda</option>
-                <option value="🛠️ Outros">Outros</option>
-            </select>
+            <div class="input-group">
+                <label>Categoria:</label>
+                <select id="categoria">
+                    <option value="🏠 Moradia">Moradia</option>
+                    <option value="🍔 Alimentação">Alimentação</option>
+                    <option value="🚗 Transporte">Transporte</option>
+                    <option value="🎭 Lazer">Lazer</option>
+                    <option value="💰 Salário">Salário/Renda</option>
+                    <option value="🛠️ Outros">Outros</option>
+                </select>
+            </div>
 
-            <label>Tipo:</label>
-            <select id="tipo">
-                <option value="entrada">Entrada (+)</option>
-                <option value="saida">Saída (-)</option>
-            </select>
+            <div class="input-group">
+                <label>Tipo:</label>
+                <select id="tipo">
+                    <option value="entrada">Entrada (+)</option>
+                    <option value="saida">Saída (-)</option>
+                </select>
+            </div>
 
             <div class="modal-btns">
                 <button id="btnSalvar" class="confirmar">Salvar</button>
@@ -114,7 +129,7 @@
                 btn.innerText = "Sair";
                 btn.onclick = () => window.auth.signOut().then(() => location.reload());
             } else {
-                btn.innerText = "Login";
+                btn.innerText = "Entrar";
                 btn.onclick = window.loginGoogle;
             }
         });
