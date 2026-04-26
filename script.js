@@ -222,4 +222,4 @@ const checkAuth = setInterval(() => {
         window.carregarDadosDoFirebase();
         clearInterval(checkAuth);
     }
-}, 1000);
+}, 1000); 
