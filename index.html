@@ -3,125 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FinançasPRO // Premium</title>
+    <title>FinançasPRO // Final</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #000000; --card: #0A0A0A; --text-main: #FFFFFF;
-            --text-sub: #A1A1AA; --border: #1F2937; --accent: #FDE047;
-            --green: #22C55E; --red: #EF4444;
+            --bg: #FFFFFF; --card: #F4F4F5; --text-main: #000000;
+            --text-sub: #71717A; --border: #E4E4E7; --accent: #EAB308;
+            --green: #16A34A; --red: #DC2626;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: var(--text-main); overflow-x: hidden; }
 
-        /* TELA DE BLOQUEIO */
-        #app-lock { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .lock-btn { background: var(--accent); color: #000; border: none; padding: 18px 35px; border-radius: 20px; font-weight: 800; cursor: pointer; margin-top: 20px; width: 80%; }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #000000; --card: #0A0A0A; --text-main: #FFFFFF;
+                --text-sub: #A1A1AA; --border: #1F2937; --accent: #FDE047;
+            }
+        }
 
-        /* HEADER */
-        .glass-header { background: #000; padding: 40px 20px 30px; border-bottom: 1px solid var(--border); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.3s, color 0.3s; }
+        body { background: var(--bg); color: var(--text-main); overflow-x: hidden; padding-bottom: 120px; }
+
+        .glass-header { padding: 40px 20px 30px; border-bottom: 1px solid var(--border); }
         .user-pill { background: var(--accent); color: #000; border: none; padding: 8px 15px; border-radius: 12px; font-weight: 800; font-size: 0.8rem; }
         
-        /* CARDS */
         .viz-card { background: var(--card); margin: 15px; padding: 20px; border-radius: 25px; border: 1px solid var(--border); min-height: 250px; }
         .entry-card { background: var(--card); padding: 16px; border-radius: 18px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         
-        /* NAVEGAÇÃO */
-        .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 15px 0 30px; border-top: 1px solid var(--border); z-index: 1000; }
-        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-weight: 700; font-size: 0.8rem; transition: 0.3s; }
+        .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--bg); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
+        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-weight: 700; font-size: 0.8rem; }
         .nav-btn.active { color: var(--accent); }
 
-        .floating-btn { position: fixed; bottom: 100px; right: 20px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); border: none; font-size: 30px; font-weight: 800; z-index: 999; }
+        .floating-btn { position: fixed; bottom: 110px; right: 20px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); border: none; font-size: 30px; font-weight: 800; z-index: 999; color: #000; }
         
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; align-items: flex-end; }
-        .modal-sheet { background: #000; width: 100%; border-radius: 30px 30px 0 0; padding: 30px; border-top: 1px solid var(--border); }
-        .input-grid input, .input-grid select { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 12px; border: 1px solid var(--border); background: #0A0A0A; color: #fff; outline: none; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: flex-end; }
+        .modal-sheet { background: var(--bg); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; border-top: 1px solid var(--border); }
+        .input-grid input, .input-grid select { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); color: var(--text-main); outline: none; }
         
-        .tab-content { display: none; padding-bottom: 120px; animation: fadeIn 0.4s ease; } 
+        .tab-content { display: none; animation: fadeIn 0.3s ease; } 
         .tab-content.active { display: block; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div id="app-lock">
-        <div style="font-size: 3.5rem; margin-bottom: 15px;">🔒</div>
-        <h2 style="font-weight: 800;">FinançasPRO</h2>
-        <p style="color: var(--text-sub); font-size: 0.9rem;">Toque para validar identidade</p>
-        <button onclick="desbloquearApp()" class="lock-btn">DESBLOQUEAR</button>
-    </div>
+    <header class="glass-header">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <div style="font-weight:800; font-size:1.1rem;">Finanças<span style="color:var(--accent)">PRO</span></div>
+            <button id="btnAuth" class="user-pill" onclick="loginGoogle()">ENTRAR</button>
+        </div>
+        <p style="color:var(--text-sub); text-transform:uppercase; font-size:0.7rem; letter-spacing:1px;">Saldo Atual</p>
+        <h1 id="saldo" style="font-size:2.5rem; font-weight:800; margin-top:5px;">R$ 0,00</h1>
+    </header>
 
-    <div id="main-content">
-        <header class="glass-header">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <div style="font-weight:800; font-size:1.1rem;">Finanças<span style="color:var(--accent)">PRO</span></div>
-                <button id="btnAuth" class="user-pill" onclick="loginGoogle()">ENTRAR</button>
-            </div>
-            <p style="color:var(--text-sub); text-transform:uppercase; font-size:0.7rem; letter-spacing:1px;">Saldo Estimado</p>
-            <h1 id="saldo" style="font-size:2.5rem; font-weight:800; margin-top:5px;">R$ 0,00</h1>
-        </header>
+    <section id="aba-dashboard" class="tab-content active">
+        <div class="viz-card"><canvas id="graficoPizza"></canvas></div>
+    </section>
 
-        <section id="aba-dashboard" class="tab-content active">
-            <div class="viz-card">
-                <p style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 15px;">DISTRIBUIÇÃO DE GASTOS</p>
-                <canvas id="graficoPizza"></canvas>
-            </div>
-        </section>
+    <section id="aba-aportes" class="tab-content">
+        <div class="viz-card"><canvas id="graficoBarras"></canvas></div>
+        <div id="lista-invest" style="padding: 0 20px;"></div>
+    </section>
 
-        <section id="aba-aportes" class="tab-content">
-            <div class="viz-card">
-                <p style="font-size: 0.8rem; color: var(--accent); margin-bottom: 15px;">CRESCIMENTO DE INVESTIMENTOS</p>
-                <canvas id="graficoBarras"></canvas>
-            </div>
-            <div id="lista-invest" style="padding: 0 20px;"></div>
-        </section>
+    <section id="aba-extrato" class="tab-content">
+        <div style="padding: 20px;">
+            <select id="filtroMes" class="input-grid" onchange="carregarDados()">
+                <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
+                <option value="março">Março</option><option value="abril">Abril</option>
+                <option value="maio" selected>Maio</option><option value="junho">Junho</option>
+                <option value="julho">Julho</option><option value="agosto">Agosto</option>
+                <option value="setembro">Setembro</option><option value="outubro">Outubro</option>
+                <option value="novembro">Novembro</option><option value="dezembro">Dezembro</option>
+            </select>
+        </div>
+        <div id="lista" style="padding: 0 20px;"></div>
+    </section>
 
-        <section id="aba-extrato" class="tab-content">
-            <div style="padding: 20px;">
-                <select id="filtroMes" class="input-grid" onchange="carregarDados()">
-                    <option value="janeiro">Janeiro</option>
-                    <option value="fevereiro">Fevereiro</option>
-                    <option value="março">Março</option>
-                    <option value="abril">Abril</option>
-                    <option value="maio" selected>Maio</option>
-                    <option value="junho">Junho</option>
-                    <option value="julho">Julho</option>
-                    <option value="agosto">Agosto</option>
-                    <option value="setembro">Setembro</option>
-                    <option value="outubro">Outubro</option>
-                    <option value="novembro">Novembro</option>
-                    <option value="dezembro">Dezembro</option>
+    <nav class="bottom-tab-bar">
+        <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active">📊 Resumo</button>
+        <button onclick="switchTab('aba-aportes', this)" class="nav-btn">📈 Aportes</button>
+        <button onclick="switchTab('aba-extrato', this)" class="nav-btn">📜 Extrato</button>
+    </nav>
+
+    <button onclick="abrirModal()" class="floating-btn">+</button>
+
+    <div id="modal" class="modal-overlay">
+        <div class="modal-sheet">
+            <h3 style="margin-bottom:20px;">Novo Lançamento</h3>
+            <div class="input-grid">
+                <input type="text" id="desc" placeholder="Descrição">
+                <input type="number" id="valor" placeholder="Valor R$">
+                <input type="date" id="data-reg">
+                <select id="tipo">
+                    <option value="entrada">Receita (+)</option>
+                    <option value="fixo">Essencial (-)</option>
+                    <option value="lazer">Lazer (-)</option>
+                    <option value="investimento">Investimento (-)</option>
                 </select>
             </div>
-            <div id="lista" style="padding: 0 20px;"></div>
-        </section>
-
-        <nav class="bottom-tab-bar">
-            <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active">📊 Resumo</button>
-            <button onclick="switchTab('aba-aportes', this)" class="nav-btn">📈 Aportes</button>
-            <button onclick="switchTab('aba-extrato', this)" class="nav-btn">📜 Extrato</button>
-        </nav>
-
-        <button onclick="abrirModal()" class="floating-btn">+</button>
-
-        <div id="modal" class="modal-overlay">
-            <div class="modal-sheet">
-                <h3 style="margin-bottom:20px;">Lançamento</h3>
-                <div class="input-grid">
-                    <input type="text" id="desc" placeholder="Nome do gasto/ganho">
-                    <input type="number" id="valor" placeholder="R$ 0,00">
-                    <input type="date" id="data-reg">
-                    <select id="tipo">
-                        <option value="entrada">Receita (+)</option>
-                        <option value="fixo">Essencial (-)</option>
-                        <option value="lazer">Lazer (-)</option>
-                        <option value="investimento">Investimento (-)</option>
-                    </select>
-                </div>
-                <button onclick="salvarRegistro()" style="width:100%; padding:18px; background:var(--accent); border:none; border-radius:15px; font-weight:800; margin-top:10px;">SALVAR</button>
-                <button onclick="fecharModal()" style="width:100%; background:none; border:none; color:var(--text-sub); padding:15px;">CANCELAR</button>
-            </div>
+            <button onclick="salvarRegistro()" style="width:100%; padding:18px; background:var(--accent); border:none; border-radius:15px; font-weight:800; color:#000;">SALVAR</button>
+            <button onclick="fecharModal()" style="width:100%; background:none; border:none; color:var(--text-sub); padding:15px;">CANCELAR</button>
         </div>
     </div>
 
@@ -152,110 +137,79 @@
             }
         });
 
-        window.loginGoogle = () => {
-            const provider = new GoogleAuthProvider();
-            signInWithPopup(window.auth, provider).catch(e => console.error("Login Error", e));
-        };
+        window.loginGoogle = () => signInWithPopup(window.auth, new GoogleAuthProvider());
+
+        // REGISTER SERVICE WORKER (PWA)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
     </script>
     
     <script>
-        let chartPizza;
-        let chartBarras;
-
-        // BIOMETRIA CORRIGIDA - USO DE FEEDBACK NATIVO SEM CHAVE DE ACESSO
-        function desbloquearApp() {
-            if (navigator.vibrate) navigator.vibrate(50); // Feedback tátil
-            document.getElementById('app-lock').style.display = 'none';
-        }
+        let chartP; let chartB;
 
         async function carregarDados() {
             const user = window.auth.currentUser; if (!user) return;
             const mes = document.getElementById('filtroMes').value;
-            const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mes);
-            const snap = await window.f_getDoc(ref);
+            const snap = await window.f_getDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", mes));
             
-            let saldoTotal = 0, fixo = 0, lazer = 0, invest = 0, html = "", investHtml = "";
+            let saldo = 0, fixo = 0, lazer = 0, invest = 0, html = "", invHtml = "";
             let trans = snap.exists() ? snap.data().transacoes : [];
             
             trans.forEach(t => {
                 const v = parseFloat(t.valor);
-                if (t.tipo === 'entrada') {
-                    saldoTotal += v;
-                } else {
-                    saldoTotal -= v;
+                if (t.tipo === 'entrada') saldo += v;
+                else {
+                    saldo -= v;
                     if(t.tipo === 'fixo') fixo += v;
                     else if(t.tipo === 'lazer') lazer += v;
-                    else if(t.tipo === 'investimento') {
-                        invest += v;
-                        investHtml += `<div class="entry-card"><span>${t.descricao}</span><b style="color:var(--accent)">R$ ${v.toFixed(2)}</b></div>`;
-                    }
+                    else { invest += v; invHtml += `<div class="entry-card"><span>${t.descricao}</span><b>R$ ${v.toFixed(2)}</b></div>`; }
                 }
                 html += `<div class="entry-card"><div><b>${t.descricao}</b><br><small>${t.data}</small></div><b style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">R$ ${v.toFixed(2)}</b></div>`;
             });
 
-            document.getElementById('saldo').innerText = `R$ ${saldoTotal.toFixed(2)}`;
-            document.getElementById('lista').innerHTML = html || '<p style="text-align:center; opacity:0.3; padding-top:20px;">Nenhum registro</p>';
-            document.getElementById('lista-invest').innerHTML = investHtml;
-            
-            atualizarGraficos(fixo, lazer, invest);
+            document.getElementById('saldo').innerText = `R$ ${saldo.toFixed(2)}`;
+            document.getElementById('lista').innerHTML = html;
+            document.getElementById('lista-invest').innerHTML = invHtml;
+            renderCharts(fixo, lazer, invest);
         }
 
-        function atualizarGraficos(f, l, i) {
-            // PIZZA (RESUMO)
+        function renderCharts(f, l, i) {
+            const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const textColor = isDark ? '#FFFFFF' : '#000000';
+
             const ctxP = document.getElementById('graficoPizza').getContext('2d');
-            if (chartPizza) chartPizza.destroy();
-            chartPizza = new Chart(ctxP, {
+            if(chartP) chartP.destroy();
+            chartP = new Chart(ctxP, {
                 type: 'doughnut',
-                data: {
-                    labels: ['Fixo', 'Lazer', 'Invest'],
-                    datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }]
-                },
-                options: { cutout: '78%', plugins: { legend: { position: 'bottom', labels: { color: '#A1A1AA', padding: 20 } } } }
+                data: { labels: ['Fixo', 'Lazer', 'Invest'], datasets: [{ data: [f, l, i], backgroundColor: ['#DC2626', '#F97316', '#EAB308'], borderWidth: 0 }] },
+                options: { plugins: { legend: { labels: { color: textColor } } } }
             });
 
-            // BARRAS (APORTES)
             const ctxB = document.getElementById('graficoBarras').getContext('2d');
-            if (chartBarras) chartBarras.destroy();
-            chartBarras = new Chart(ctxB, {
+            if(chartB) chartB.destroy();
+            chartB = new Chart(ctxB, {
                 type: 'bar',
-                data: {
-                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-                    datasets: [{
-                        label: 'Aportes Mensais',
-                        data: [0, 0, 0, 0, i, 0, 0, 0, 0, 0, 0, 0], // Inserindo dado do mês atual como exemplo
-                        backgroundColor: '#FDE047',
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: { beginAtZero: true, grid: { display: false }, ticks: { color: '#666' } },
-                        x: { grid: { display: false }, ticks: { color: '#666' } }
-                    },
-                    plugins: { legend: { display: false } }
-                }
+                data: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], datasets: [{ label: 'Investimentos', data: [0,0,0,0,i,0,0,0,0,0,0,0], backgroundColor: '#EAB308' }] },
+                options: { scales: { y: { ticks: { color: textColor } }, x: { ticks: { color: textColor } } } }
             });
         }
 
         async function salvarRegistro() {
             const user = window.auth.currentUser;
-            const desc = document.getElementById('desc').value;
-            const valor = document.getElementById('valor').value;
-            const data = document.getElementById('data-reg').value;
-            const tipo = document.getElementById('tipo').value;
-            if (!data || !valor) return alert("Preencha data e valor!");
+            const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value, t = document.getElementById('tipo').value;
+            if (!dt || !v) return;
 
             const meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
-            const mesNome = meses[new Date(data).getUTCMonth()];
+            const mesAlvo = meses[new Date(dt).getUTCMonth()];
 
-            const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mesNome);
+            const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mesAlvo);
             const snap = await window.f_getDoc(ref);
             let lista = snap.exists() ? snap.data().transacoes : [];
-            lista.push({ descricao: desc, valor: valor, tipo: tipo, data: data });
+            lista.push({ descricao: d, valor: v, tipo: t, data: dt });
             
             await window.f_setDoc(ref, { transacoes: lista });
-            fecharModal();
-            carregarDados();
+            fecharModal(); carregarDados();
         }
 
         function switchTab(id, btn) {
@@ -263,8 +217,6 @@
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             btn.classList.add('active');
-            // Força o redimensionamento dos gráficos ao trocar de aba
-            window.dispatchEvent(new Event('resize'));
         }
 
         function abrirModal() { document.getElementById('modal').style.display = 'flex'; }
