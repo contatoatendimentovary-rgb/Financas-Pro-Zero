@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#0F172A">
+    <meta name="theme-color" content="#6366F1">
     <link rel="manifest" href="manifest.json">
     <title>FinançasPRO // Premium</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -64,11 +64,11 @@
                     <div class="progress-container"><div id="bar-fixo" class="bar g-green"></div></div>
                 </div>
                 <div class="meta-item">
-                    <div class="meta-info"><span>Estilo de Vida (30%)</span><b id="txt-lazer">0 / 0</b></div>
+                    <div class="meta-info"><span>Desejos (30%)</span><b id="txt-lazer">0 / 0</b></div>
                     <div class="progress-container"><div id="bar-lazer" class="bar g-orange"></div></div>
                 </div>
                 <div class="meta-item">
-                    <div class="meta-info"><span>Investimentos (20%)</span><b id="txt-invest">0 / 0</b></div>
+                    <div class="meta-info"><span>Investimento (20%)</span><b id="txt-invest">0 / 0</b></div>
                     <div class="progress-container"><div id="bar-invest" class="bar g-blue"></div></div>
                 </div>
             </div>
@@ -90,13 +90,13 @@
                     <input type="text" id="desc" placeholder="Descrição">
                     <input type="number" id="valor" placeholder="R$ 0,00">
                     <select id="tipo">
-                        <option value="entrada">Receita</option>
+                        <option value="entrada">Receita (+)</option>
                         <option value="fixo">Essencial (50%)</option>
-                        <option value="lazer">Estilo de Vida (30%)</option>
+                        <option value="lazer">Lazer (30%)</option>
                         <option value="investimento">Investimento (20%)</option>
                     </select>
                 </div>
-                <button id="btnSalvar" class="btn-confirm">Confirmar</button>
+                <button id="btnSalvar" class="btn-confirm">Salvar</button>
                 <button id="btnFechar" class="btn-abort">Voltar</button>
             </div>
         </div>
@@ -120,25 +120,24 @@
         window.auth = getAuth(app);
         window.db = getFirestore(app);
         window.doc = doc; window.setDoc = setDoc; window.getDoc = getDoc;
-        const provider = new GoogleAuthProvider();
-
-        window.loginGoogle = () => signInWithPopup(window.auth, provider);
-        window.logout = () => signOut(window.auth).then(() => location.reload());
 
         onAuthStateChanged(window.auth, (user) => {
             if (user) {
                 document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0];
-                document.getElementById('btnAuth').onclick = window.logout;
                 window.carregarDados();
             } else {
                 document.getElementById('btnAuth').innerText = "Entrar";
-                document.getElementById('btnAuth').onclick = window.loginGoogle;
             }
         });
 
-        // REGISTRO DO INSTALADOR (PWA)
+        window.loginGoogle = () => signInWithPopup(window.auth, new GoogleAuthProvider());
+        window.logout = () => signOut(window.auth).then(() => location.reload());
+        document.getElementById('btnAuth').onclick = () => window.auth.currentUser ? window.logout() : window.loginGoogle();
+
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./service-worker.js');
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js').then(reg => console.log('SW ok')).catch(err => console.log('SW erro', err));
+            });
         }
     </script>
     <script src="script.js"></script>
