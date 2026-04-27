@@ -12,32 +12,24 @@
         body.light-mode { --bg: #F9FAFB; --card: #FFFFFF; --text: #111827; --text-sub: #6B7280; --border: #E5E7EB; --accent: #EAB308; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: var(--text); padding-bottom: 120px; transition: 0.3s; overflow-x: hidden; }
-        
         .glass-header { padding: 40px 20px 30px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; }
         .viz-card { background: var(--card); margin: 15px; padding: 22px; border-radius: 28px; border: 1px solid var(--border); }
-        
-        /* Regra 50/30/20 */
         .progress-box { margin-top: 20px; }
         .prog-label { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 800; margin-bottom: 6px; text-transform: uppercase; }
         .bar-bg { background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 12px; }
         .bar-fill { height: 100%; transition: 0.5s; }
-
         .invest-summary { display: flex; justify-content: space-between; margin: 0 15px 15px; gap: 10px; }
         .invest-stat { background: var(--card); flex: 1; padding: 15px; border-radius: 20px; border: 1px solid var(--border); text-align: center; }
         .invest-stat span { display: block; font-size: 0.65rem; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 5px; }
-
         .entry-card { background: var(--card); padding: 16px; border-radius: 18px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .btn-del { color: var(--red); background: none; border: none; font-weight: 800; padding: 10px; margin-left: 10px; font-size: 1.1rem; }
-
         .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--bg); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
         .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-weight: 700; font-size: 0.75rem; gap: 4px; }
         .nav-btn.active { color: var(--accent); }
-        
         .floating-btn { position: fixed; bottom: 110px; right: 20px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); border: none; font-size: 30px; font-weight: 800; z-index: 999; color: #000; box-shadow: 0 8px 20px rgba(253, 224, 71, 0.3); }
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: flex-end; }
         .modal-sheet { background: var(--bg); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; border-top: 1px solid var(--border); animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
         .input-grid input, .input-grid select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 14px; border: 1px solid var(--border); background: var(--card); color: var(--text); outline: none; font-size: 1rem; }
         .btn-save { width: 100%; padding: 18px; background: var(--accent); border: none; border-radius: 16px; font-weight: 800; color: #000; font-size: 1rem; }
         .tab-content { display: none; } .tab-content.active { display: block; }
@@ -286,7 +278,7 @@
                     const valorLimpo = (match[1] || match[2]).replace(/\./g, '').replace(',', '.');
                     document.getElementById('valor').value = valorLimpo;
                 }
-                document.getElementById('desc').value = (texto.toLowerCase().includes('no ')) ? texto.split(/no /i)[1].split(/[:\s]/)[0] : "Compartilhado";
+                document.getElementById('desc').value = (texto.toLowerCase().includes('no ')) ? texto.split(/no /i)[1].split(/[:\s]/)[0] : "Inter";
                 const hoje = new Date();
                 document.getElementById('data-reg').value = new Date(hoje.getTime() - (hoje.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
                 abrirModal();
