@@ -12,29 +12,42 @@
         body.light-mode { --bg: #F9FAFB; --card: #FFFFFF; --text: #111827; --text-sub: #6B7280; --border: #E5E7EB; --accent: #EAB308; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: var(--text); padding-bottom: 120px; transition: 0.3s; overflow-x: hidden; }
+        
         .glass-header { padding: 40px 20px 30px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; }
         .viz-card { background: var(--card); margin: 15px; padding: 22px; border-radius: 28px; border: 1px solid var(--border); }
+        
+        /* Regra 50/30/20 */
+        .progress-box { margin-top: 20px; }
+        .prog-label { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 800; margin-bottom: 6px; text-transform: uppercase; }
+        .bar-bg { background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 12px; }
+        .bar-fill { height: 100%; transition: 0.5s; }
+
         .invest-summary { display: flex; justify-content: space-between; margin: 0 15px 15px; gap: 10px; }
         .invest-stat { background: var(--card); flex: 1; padding: 15px; border-radius: 20px; border: 1px solid var(--border); text-align: center; }
         .invest-stat span { display: block; font-size: 0.65rem; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 5px; }
-        .invest-stat b { font-size: 1.1rem; }
+
         .entry-card { background: var(--card); padding: 16px; border-radius: 18px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .btn-del { color: var(--red); background: none; border: none; font-weight: 800; padding: 10px; margin-left: 10px; font-size: 1.1rem; }
+
         .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--bg); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
         .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-weight: 700; font-size: 0.75rem; gap: 4px; }
         .nav-btn.active { color: var(--accent); }
+        
         .floating-btn { position: fixed; bottom: 110px; right: 20px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); border: none; font-size: 30px; font-weight: 800; z-index: 999; color: #000; box-shadow: 0 8px 20px rgba(253, 224, 71, 0.3); }
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: flex-end; }
         .modal-sheet { background: var(--bg); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; border-top: 1px solid var(--border); animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
         .input-grid input, .input-grid select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 14px; border: 1px solid var(--border); background: var(--card); color: var(--text); outline: none; font-size: 1rem; }
         .btn-save { width: 100%; padding: 18px; background: var(--accent); border: none; border-radius: 16px; font-weight: 800; color: #000; font-size: 1rem; }
         .tab-content { display: none; } .tab-content.active { display: block; }
     </style>
 </head>
-<body>
+<body class="">
 
     <header class="glass-header">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <button onclick="toggleTheme()" style="background:var(--card); border:1px solid var(--border); padding:8px; border-radius:12px;">🌓</button>
             <div style="font-weight:800; font-size:1.1rem;">Finanças<span style="color:var(--accent)">PRO</span></div>
             <button id="btnAuth" style="background:var(--card); color:var(--text); border:1px solid var(--border); padding:8px 15px; border-radius:12px; font-weight:800; font-size:0.7rem;" onclick="loginGoogle()">ENTRAR</button>
         </div>
@@ -43,18 +56,31 @@
 
     <main>
         <section id="aba-dashboard" class="tab-content active">
-            <div class="viz-card"><canvas id="graficoPizza" style="max-height: 260px;"></canvas></div>
+            <div class="viz-card">
+                <canvas id="graficoPizza" style="max-height: 200px;"></canvas>
+                <div class="progress-box">
+                    <div class="prog-item">
+                        <div class="prog-label"><span>Essencial (50%)</span><span id="txt-fixo">0%</span></div>
+                        <div class="bar-bg"><div id="bar-fixo" class="bar-fill" style="background:#EF4444; width:0%"></div></div>
+                    </div>
+                    <div class="prog-item">
+                        <div class="prog-label"><span>Lazer (30%)</span><span id="txt-lazer">0%</span></div>
+                        <div class="bar-bg"><div id="bar-lazer" class="bar-fill" style="background:#F97316; width:0%"></div></div>
+                    </div>
+                    <div class="prog-item">
+                        <div class="prog-label"><span>Investimento (20%)</span><span id="txt-invest">0%</span></div>
+                        <div class="bar-bg"><div id="bar-invest" class="bar-fill" style="background:#FDE047; width:0%"></div></div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <section id="aba-aportes" class="tab-content">
             <div class="invest-summary">
-                <div class="invest-stat"><span>Total Anual</span><b id="total-anual-invest">R$ 0,00</b></div>
-                <div class="invest-stat"><span>Média Mensal</span><b id="media-invest">R$ 0,00</b></div>
+                <div class="invest-stat"><span>Anual</span><b id="total-anual-invest">R$ 0,00</b></div>
+                <div class="invest-stat"><span>Média</span><b id="media-invest">R$ 0,00</b></div>
             </div>
-            <div class="viz-card">
-                <h4 style="font-size:0.7rem; margin-bottom:15px; color:var(--text-sub); letter-spacing:1px;">VISÃO ANUAL DE APORTES</h4>
-                <canvas id="graficoBarrasAnual" style="max-height: 220px;"></canvas>
-            </div>
+            <div class="viz-card"><canvas id="graficoBarrasAnual" style="max-height: 200px;"></canvas></div>
             <div id="lista-investimentos" style="padding: 0 20px;"></div>
         </section>
 
@@ -85,8 +111,8 @@
         <div class="modal-sheet">
             <h3 style="margin-bottom:20px; font-weight:800;">Novo Registro</h3>
             <div class="input-grid">
-                <input type="text" id="desc" placeholder="Ex: iFood">
-                <input type="number" step="0.01" id="valor" placeholder="0,00">
+                <input type="text" id="desc" placeholder="Descrição">
+                <input type="number" step="0.01" id="valor" placeholder="R$ 0,00">
                 <input type="date" id="data-reg">
                 <select id="tipo">
                     <option value="lazer">Lazer (-)</option>
@@ -96,7 +122,7 @@
                 </select>
             </div>
             <button onclick="salvarRegistro()" class="btn-save">SALVAR</button>
-            <button onclick="fecharModal()" style="width:100%; background:none; border:none; color:var(--text-sub); padding:20px;">FECHAR</button>
+            <button onclick="fecharModal()" style="width:100%; background:none; border:none; color:var(--text-sub); padding:20px;">CANCELAR</button>
         </div>
     </div>
 
@@ -133,7 +159,122 @@
     </script>
     
     <script>
-        let chartP; let chartB;
+        let chartP, chartB;
+
+        async function carregarDados() {
+            const user = window.auth.currentUser; if (!user) return;
+            const mesSel = document.getElementById('filtroMes').value;
+            let investMeses = Array(12).fill(0), totalAnualI = 0, saldoM = 0, fixo = 0, lazer = 0, invest = 0, totalReceita = 0;
+            let htmlGeral = "", htmlInvest = "";
+
+            const promises = window.mesesNomes.map(m => window.f_getDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", m)));
+            const snapshots = await Promise.all(promises);
+
+            snapshots.forEach((snap, i) => {
+                const mesNome = window.mesesNomes[i];
+                if (snap.exists()) {
+                    const transacoes = snap.data().transacoes || [];
+                    transacoes.forEach((t, idx) => {
+                        const v = parseFloat(t.valor);
+                        if (t.tipo === 'investimento') { investMeses[i] += v; totalAnualI += v; }
+                        if (mesNome === mesSel) {
+                            if (t.tipo === 'entrada') { saldoM += v; totalReceita += v; }
+                            else { 
+                                saldoM -= v; 
+                                if(t.tipo === 'fixo') fixo += v; 
+                                else if(t.tipo === 'lazer') lazer += v; 
+                                else invest += v;
+                            }
+                            const card = cardHTML(t, idx, mesNome);
+                            htmlGeral += card; if(t.tipo === 'investimento') htmlInvest += card;
+                        }
+                    });
+                }
+            });
+
+            document.getElementById('saldo').innerText = `R$ ${saldoM.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('total-anual-invest').innerText = `R$ ${totalAnualI.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('media-invest').innerText = `R$ ${(totalAnualI/12).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('lista-geral').innerHTML = htmlGeral || 'Vazio';
+            document.getElementById('lista-investimentos').innerHTML = htmlInvest || 'Sem aportes.';
+            
+            renderPizza(fixo, lazer, invest);
+            renderBarras(investMeses);
+            atualizarRegra503020(fixo, lazer, invest, totalReceita);
+        }
+
+        function cardHTML(t, index, mes) {
+            return `<div class="entry-card">
+                <div><b>${t.descricao}</b><br><small>${t.data.split('-').reverse().join('/')}</small></div>
+                <div style="display:flex; align-items:center;">
+                    <b style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">R$ ${parseFloat(t.valor).toFixed(2)}</b>
+                    <button class="btn-del" onclick="apagarRegistro('${mes}', ${index})">×</button>
+                </div>
+            </div>`;
+        }
+
+        function atualizarRegra503020(f, l, i, receita) {
+            const total = receita || (f + l + i);
+            const pF = total ? Math.min((f / total) * 100, 100) : 0;
+            const pL = total ? Math.min((l / total) * 100, 100) : 0;
+            const pI = total ? Math.min((i / total) * 100, 100) : 0;
+
+            document.getElementById('bar-fixo').style.width = pF + '%';
+            document.getElementById('txt-fixo').innerText = pF.toFixed(0) + '% / 50%';
+            document.getElementById('bar-lazer').style.width = pL + '%';
+            document.getElementById('txt-lazer').innerText = pL.toFixed(0) + '% / 30%';
+            document.getElementById('bar-invest').style.width = pI + '%';
+            document.getElementById('txt-invest').innerText = pI.toFixed(0) + '% / 20%';
+        }
+
+        async function apagarRegistro(mes, index) {
+            if(!confirm("Deseja apagar este lançamento?")) return;
+            const user = window.auth.currentUser;
+            const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mes);
+            const snap = await window.f_getDoc(ref);
+            if(snap.exists()){
+                let lista = snap.data().transacoes;
+                lista.splice(index, 1);
+                await window.f_setDoc(ref, { transacoes: lista });
+                carregarDados();
+            }
+        }
+
+        function renderPizza(f, l, i) {
+            const ctx = document.getElementById('graficoPizza').getContext('2d');
+            if(chartP) chartP.destroy();
+            chartP = new Chart(ctx, { type: 'doughnut', data: { labels: ['Essencial', 'Lazer', 'Invest'], datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }] }, options: { cutout: '80%', plugins: { legend: { display: false } } } });
+        }
+
+        function renderBarras(dados) {
+            const ctx = document.getElementById('graficoBarrasAnual').getContext('2d');
+            if(chartB) chartB.destroy();
+            chartB = new Chart(ctx, { type: 'bar', data: { labels: ['J','F','M','A','M','J','J','A','S','O','N','D'], datasets: [{ data: dados, backgroundColor: '#FDE047', borderRadius: 4 }] }, options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } } });
+        }
+
+        async function salvarRegistro() {
+            const user = window.auth.currentUser;
+            const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value, t = document.getElementById('tipo').value;
+            if(!dt || !v) return;
+            const mesAlvo = window.mesesNomes[parseInt(dt.split('-')[1]) - 1];
+            const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mesAlvo);
+            const snap = await window.f_getDoc(ref);
+            let lista = snap.exists() ? snap.data().transacoes : [];
+            lista.push({ descricao: d || "Gasto", valor: v, tipo: t, data: dt });
+            await window.f_setDoc(ref, { transacoes: lista });
+            fecharModal(); carregarDados();
+        }
+
+        function switchTab(id, btn) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); btn.classList.add('active'); }
+        function toggleTheme() { document.body.classList.toggle('light-mode'); }
+        function abrirModal() { document.getElementById('modal').style.display = 'flex'; }
+        function fecharModal() { document.getElementById('modal').style.display = 'none'; }
+
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("./service-worker.js").then(reg => console.log("SW OK")).catch(err => console.log("SW Erro"));
+            });
+        }
 
         window.processarCompartilhamento = () => {
             const params = new URLSearchParams(window.location.search);
@@ -145,89 +286,13 @@
                     const valorLimpo = (match[1] || match[2]).replace(/\./g, '').replace(',', '.');
                     document.getElementById('valor').value = valorLimpo;
                 }
-                let nome = "Gasto Extra";
-                if(texto.toLowerCase().includes('no ')) nome = texto.split(/no /i)[1].split(/[:\s]/)[0];
-                document.getElementById('desc').value = nome.trim();
+                document.getElementById('desc').value = (texto.toLowerCase().includes('no ')) ? texto.split(/no /i)[1].split(/[:\s]/)[0] : "Compartilhado";
                 const hoje = new Date();
                 document.getElementById('data-reg').value = new Date(hoje.getTime() - (hoje.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
                 abrirModal();
                 window.history.replaceState({}, document.title, "/");
             }
         };
-
-        async function carregarDados() {
-            const user = window.auth.currentUser; if (!user) return;
-            const mesSelecionado = document.getElementById('filtroMes').value;
-            let investMeses = Array(12).fill(0), totalAnualInvest = 0, saldoMes = 0, fixo = 0, lazer = 0, invest = 0, htmlGeral = "", htmlInvest = "";
-
-            const promises = window.mesesNomes.map(m => window.f_getDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", m)));
-            const snapshots = await Promise.all(promises);
-
-            snapshots.forEach((snap, i) => {
-                const mesNome = window.mesesNomes[i];
-                if (snap.exists()) {
-                    const transacoes = snap.data().transacoes || [];
-                    transacoes.forEach(t => {
-                        const v = parseFloat(t.valor);
-                        if (t.tipo === 'investimento') { investMeses[i] += v; totalAnualInvest += v; }
-                        if (mesNome === mesSelecionado) {
-                            if (t.tipo === 'entrada') saldoMes += v;
-                            else { saldoMes -= v; if(t.tipo === 'fixo') fixo += v; else if(t.tipo === 'lazer') lazer += v; else if(t.tipo === 'investimento') invest += v; }
-                            htmlGeral += cardHTML(t); if(t.tipo === 'investimento') htmlInvest += cardHTML(t);
-                        }
-                    });
-                }
-            });
-
-            document.getElementById('saldo').innerText = `R$ ${saldoMes.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-            document.getElementById('total-anual-invest').innerText = `R$ ${totalAnualInvest.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-            document.getElementById('media-invest').innerText = `R$ ${(totalAnualInvest/12).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-            document.getElementById('lista-geral').innerHTML = htmlGeral || 'Vazio';
-            document.getElementById('lista-investimentos').innerHTML = htmlInvest || 'Sem investimentos.';
-            renderPizza(fixo, lazer, invest); renderBarras(investMeses);
-        }
-
-        function cardHTML(t) {
-            return `<div class="entry-card"><div><b>${t.descricao}</b><br><small>${t.data.split('-').reverse().join('/')}</small></div><b style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">R$ ${parseFloat(t.valor).toFixed(2)}</b></div>`;
-        }
-
-        function renderPizza(f, l, i) {
-            const ctx = document.getElementById('graficoPizza').getContext('2d');
-            if(chartP) chartP.destroy();
-            chartP = new Chart(ctx, { type: 'doughnut', data: { labels: ['Essencial', 'Lazer', 'Invest'], datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }] }, options: { cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: '#888' } } } } });
-        }
-
-        function renderBarras(dados) {
-            const ctx = document.getElementById('graficoBarrasAnual').getContext('2d');
-            if(chartB) chartB.destroy();
-            chartB = new Chart(ctx, { type: 'bar', data: { labels: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'], datasets: [{ data: dados, backgroundColor: '#FDE047', borderRadius: 6 }] }, options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#1F2937' }, ticks: { color: '#555' } }, x: { grid: { display: false }, ticks: { color: '#555' } } } } });
-        }
-
-        async function salvarRegistro() {
-            const user = window.auth.currentUser;
-            const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value, t = document.getElementById('tipo').value;
-            if(!dt || !v) return alert("Preencha Valor e Data!");
-            const mesAlvo = window.mesesNomes[parseInt(dt.split('-')[1]) - 1];
-            const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mesAlvo);
-            const snap = await window.f_getDoc(ref);
-            let lista = snap.exists() ? snap.data().transacoes : [];
-            lista.push({ descricao: d || "Gasto", valor: v, tipo: t, data: dt });
-            await window.f_setDoc(ref, { transacoes: lista });
-            fecharModal(); document.getElementById('filtroMes').value = mesAlvo; carregarDados();
-        }
-
-        function switchTab(id, btn) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); btn.classList.add('active'); }
-        function abrirModal() { document.getElementById('modal').style.display = 'flex'; }
-        function fecharModal() { document.getElementById('modal').style.display = 'none'; }
-
-        // REGISTRO DO SERVICE WORKER (CORRIGIDO PARA ./service-worker.js)
-        if ("serviceWorker" in navigator) {
-            window.addEventListener("load", () => {
-                navigator.serviceWorker.register("./service-worker.js")
-                    .then(reg => console.log("Service Worker ativo!", reg))
-                    .catch(err => console.log("Erro ao registrar Service Worker:", err));
-            });
-        }
     </script>
 </body>
 </html>
