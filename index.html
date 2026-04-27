@@ -21,24 +21,28 @@
         body { background: var(--bg); color: var(--text); padding-bottom: 120px; transition: 0.3s; overflow-x: hidden; }
 
         .glass-header { padding: 40px 20px 30px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; }
-        .action-bar { display: flex; gap: 12px; align-items: center; }
-        .icon-btn { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 12px; cursor: pointer; }
+        .viz-card { background: var(--card); margin: 15px; padding: 22px; border-radius: 28px; border: 1px solid var(--border); }
         
-        .viz-card { background: var(--card); margin: 15px; padding: 20px; border-radius: 25px; border: 1px solid var(--border); }
+        /* Melhoria Visual Aba Investimentos */
+        .invest-summary { display: flex; justify-content: space-between; margin: 0 15px 15px; gap: 10px; }
+        .invest-stat { background: var(--card); flex: 1; padding: 15px; border-radius: 20px; border: 1px solid var(--border); text-align: center; }
+        .invest-stat span { display: block; font-size: 0.65rem; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 5px; }
+        .invest-stat b { font-size: 1.1rem; }
+
         .entry-card { background: var(--card); padding: 16px; border-radius: 18px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
 
         .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--bg); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
         .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-weight: 700; font-size: 0.75rem; gap: 4px; }
         .nav-btn.active { color: var(--accent); }
         
-        .floating-btn { position: fixed; bottom: 110px; right: 20px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); border: none; font-size: 30px; font-weight: 800; z-index: 999; color: #000; box-shadow: 0 8px 15px rgba(0,0,0,0.4); }
+        .floating-btn { position: fixed; bottom: 110px; right: 20px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); border: none; font-size: 30px; font-weight: 800; z-index: 999; color: #000; box-shadow: 0 8px 20px rgba(253, 224, 71, 0.2); }
 
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: flex-end; }
         .modal-sheet { background: var(--bg); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; border-top: 1px solid var(--border); animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
         .input-grid input, .input-grid select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 14px; border: 1px solid var(--border); background: var(--card); color: var(--text); outline: none; font-size: 1rem; }
-        .btn-save { width: 100%; padding: 18px; background: var(--accent); border: none; border-radius: 16px; font-weight: 800; color: #000; font-size: 1rem; cursor: pointer; }
+        .btn-save { width: 100%; padding: 18px; background: var(--accent); border: none; border-radius: 16px; font-weight: 800; color: #000; font-size: 1rem; }
         
         .tab-content { display: none; } .tab-content.active { display: block; }
     </style>
@@ -48,10 +52,7 @@
     <header class="glass-header">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <div style="font-weight:800; font-size:1.1rem;">Finanças<span style="color:var(--accent)">PRO</span></div>
-            <div class="action-bar">
-                <button onclick="toggleTheme()" class="icon-btn">🌙</button>
-                <button id="btnAuth" style="background:var(--accent); color:#000; border:none; padding:8px 15px; border-radius:12px; font-weight:800; font-size:0.7rem;" onclick="loginGoogle()">ENTRAR</button>
-            </div>
+            <button id="btnAuth" style="background:var(--card); color:var(--text); border:1px solid var(--border); padding:8px 15px; border-radius:12px; font-weight:800; font-size:0.7rem;" onclick="loginGoogle()">ENTRAR</button>
         </div>
         <h1 id="saldo" style="font-size:2.6rem; font-weight:800;">R$ 0,00</h1>
     </header>
@@ -62,11 +63,15 @@
         </section>
 
         <section id="aba-aportes" class="tab-content">
-            <div class="viz-card">
-                <h4 style="font-size:0.75rem; margin-bottom:15px; color:var(--accent)">HISTÓRICO ANUAL</h4>
-                <canvas id="graficoBarras" style="max-height: 250px;"></canvas>
+            <div class="invest-summary">
+                <div class="invest-stat"><span>Total Anual</span><b id="total-anual-invest">R$ 0,00</b></div>
+                <div class="invest-stat"><span>Média Mensal</span><b id="media-invest">R$ 0,00</b></div>
             </div>
-            <div id="lista-invest" style="padding: 0 20px;"></div>
+            <div class="viz-card">
+                <h4 style="font-size:0.7rem; margin-bottom:15px; color:var(--text-sub); letter-spacing:1px;">CRESCIMENTO PATRIMONIAL</h4>
+                <canvas id="graficoBarrasAnual" style="max-height: 220px;"></canvas>
+            </div>
+            <div id="lista-investimentos" style="padding: 0 20px;"></div>
         </section>
 
         <section id="aba-extrato" class="tab-content">
@@ -80,7 +85,7 @@
                     <option value="novembro">Novembro</option><option value="dezembro">Dezembro</option>
                 </select>
             </div>
-            <div id="lista" style="padding: 0 20px;"></div>
+            <div id="lista-geral" style="padding: 0 20px;"></div>
         </section>
     </main>
 
@@ -106,15 +111,15 @@
                     <option value="investimento">Investimento (-)</option>
                 </select>
             </div>
-            <button onclick="salvarRegistro()" class="btn-save">SALVAR REGISTRO</button>
-            <button onclick="fecharModal()" style="width:100%; background:none; border:none; color:var(--text-sub); padding:20px; font-weight:700;">CANCELAR</button>
+            <button onclick="salvarRegistro()" class="btn-save">SALVAR</button>
+            <button onclick="fecharModal()" style="width:100%; background:none; border:none; color:var(--text-sub); padding:20px;">FECHAR</button>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -144,39 +149,23 @@
     </script>
     
     <script>
-        let chartP;
+        let chartP; let chartB;
 
-        // LÓGICA DE CAPTURA AUTOMÁTICA (SOLUÇÃO FINAL)
         window.processarCompartilhamento = () => {
             const params = new URLSearchParams(window.location.search);
             const texto = params.get('text');
-
             if (texto) {
-                // 1. Extração do Valor (Captura 0.000,00 ou 0,00)
                 const regexValor = /(?:R\$)\s?(\d{1,3}(?:\.\d{3})*,\d{2})|(\d{1,3}(?:\.\d{3})*,\d{2})/;
                 const match = texto.match(regexValor);
                 if (match) {
                     const valorLimpo = (match[1] || match[2]).replace(/\./g, '').replace(',', '.');
                     document.getElementById('valor').value = valorLimpo;
                 }
-
-                // 2. Extração do Estabelecimento
                 let nome = "Gasto Extra";
                 if(texto.toLowerCase().includes('no ')) nome = texto.split(/no /i)[1].split(/[:\s]/)[0];
-                else if(texto.toLowerCase().includes('em ')) nome = texto.split(/em /i)[1].split(/[:\s]/)[0];
                 document.getElementById('desc').value = nome.trim();
-                
-                // 3. Data Local (Ajuste de Fuso Horário)
                 const hoje = new Date();
                 document.getElementById('data-reg').value = new Date(hoje.getTime() - (hoje.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-
-                // 4. Inteligência de Categoria
-                if(/ifood|uber|netflix|spotify|restaurante/i.test(nome)) {
-                    document.getElementById('tipo').value = "lazer";
-                } else {
-                    document.getElementById('tipo').value = "fixo";
-                }
-
                 abrirModal();
                 window.history.replaceState({}, document.title, "/");
             }
@@ -184,56 +173,92 @@
 
         async function carregarDados() {
             const user = window.auth.currentUser; if (!user) return;
-            const mes = document.getElementById('filtroMes').value;
-            const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mes);
-            const snap = await window.f_getDoc(ref);
+            const mesAtual = document.getElementById('filtroMes').value;
             
-            let saldo = 0, fixo = 0, lazer = 0, invest = 0, html = "";
-            let trans = snap.exists() ? snap.data().transacoes : [];
+            let totalAnual = 0, investMeses = Array(12).fill(0);
+            let saldoGeral = 0, fixo = 0, lazer = 0, invest = 0, htmlGeral = "", htmlInvest = "";
 
-            trans.sort((a,b) => new Date(b.data) - new Date(a.data)).forEach(t => {
-                const v = parseFloat(t.valor);
-                if (t.tipo === 'entrada') saldo += v;
-                else {
-                    saldo -= v;
-                    if(t.tipo === 'fixo') fixo += v;
-                    else if(t.tipo === 'lazer') lazer += v;
-                    else invest += v;
+            // BUSCA TODOS OS MESES PARA O GRÁFICO DE BARRAS
+            for (let i = 0; i < 12; i++) {
+                const mesNome = window.mesesNomes[i];
+                const snap = await window.f_getDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", mesNome));
+                if (snap.exists()) {
+                    const transacoes = snap.data().transacoes || [];
+                    transacoes.forEach(t => {
+                        const v = parseFloat(t.valor);
+                        if (t.tipo === 'investimento') {
+                            investMeses[i] += v;
+                            totalAnual += v;
+                            if (mesNome === mesAtual) htmlInvest += cardHTML(t);
+                        }
+                        if (mesNome === mesAtual) {
+                            if (t.tipo === 'entrada') saldoGeral += v;
+                            else {
+                                saldoGeral -= v;
+                                if(t.tipo === 'fixo') fixo += v;
+                                else if(t.tipo === 'lazer') lazer += v;
+                                else invest += v;
+                            }
+                            htmlGeral += cardHTML(t);
+                        }
+                    });
                 }
-                html += `<div class="entry-card">
-                    <div><b>${t.descricao}</b><br><small>${t.data.split('-').reverse().join('/')}</small></div>
-                    <b style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">R$ ${v.toFixed(2)}</b>
-                </div>`;
-            });
+            }
 
-            document.getElementById('saldo').innerText = `R$ ${saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-            document.getElementById('lista').innerHTML = html || '<p style="text-align:center; opacity:0.3; padding:40px;">Sem registros este mês.</p>';
+            document.getElementById('saldo').innerText = `R$ ${saldoGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('total-anual-invest').innerText = `R$ ${totalAnual.toFixed(2)}`;
+            document.getElementById('media-invest').innerText = `R$ ${(totalAnual/12).toFixed(2)}`;
+            document.getElementById('lista-geral').innerHTML = htmlGeral || 'Vazio';
+            document.getElementById('lista-investimentos').innerHTML = htmlInvest || 'Sem investimentos este mês.';
             
-            const ctxP = document.getElementById('graficoPizza').getContext('2d');
+            renderPizza(fixo, lazer, invest);
+            renderBarras(investMeses);
+        }
+
+        function cardHTML(t) {
+            return `<div class="entry-card">
+                <div><b>${t.descricao}</b><br><small>${t.data}</small></div>
+                <b style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">R$ ${parseFloat(t.valor).toFixed(2)}</b>
+            </div>`;
+        }
+
+        function renderPizza(f, l, i) {
+            const ctx = document.getElementById('graficoPizza').getContext('2d');
             if(chartP) chartP.destroy();
-            chartP = new Chart(ctxP, {
+            chartP = new Chart(ctx, {
                 type: 'doughnut',
-                data: { labels: ['Fixo', 'Lazer', 'Invest'], datasets: [{ data: [fixo, lazer, invest], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }] },
-                options: { cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: '#888', font: { weight: 'bold' } } } } }
+                data: { labels: ['Fixo', 'Lazer', 'Invest'], datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }] },
+                options: { cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: '#888' } } } }
+            });
+        }
+
+        function renderBarras(dados) {
+            const ctx = document.getElementById('graficoBarrasAnual').getContext('2d');
+            if(chartB) chartB.destroy();
+            chartB = new Chart(ctx, {
+                type: 'bar',
+                data: { 
+                    labels: ['J','F','M','A','M','J','J','A','S','O','N','D'],
+                    datasets: [{ data: dados, backgroundColor: '#FDE047', borderRadius: 8 }]
+                },
+                options: { 
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { display: false }, ticks: { color: '#555' } }, x: { grid: { display: false }, ticks: { color: '#555' } } }
+                }
             });
         }
 
         async function salvarRegistro() {
             const user = window.auth.currentUser;
             const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value, t = document.getElementById('tipo').value;
-            if(!dt || !v) return alert("Por favor, insira o valor e a data.");
-            
+            if(!dt || !v) return;
             const mesAlvo = window.mesesNomes[new Date(dt).getUTCMonth()];
             const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mesAlvo);
             const snap = await window.f_getDoc(ref);
             let lista = snap.exists() ? snap.data().transacoes : [];
-            
             lista.push({ descricao: d || "Gasto", valor: v, tipo: t, data: dt });
             await window.f_setDoc(ref, { transacoes: lista });
-            
-            fecharModal(); 
-            document.getElementById('filtroMes').value = mesAlvo;
-            carregarDados();
+            fecharModal(); carregarDados();
         }
 
         function toggleTheme() { document.body.classList.toggle('light-mode'); }
@@ -244,11 +269,7 @@
             btn.classList.add('active');
         }
         function abrirModal() { document.getElementById('modal').style.display = 'flex'; }
-        function fecharModal() { 
-            document.getElementById('modal').style.display = 'none';
-            document.getElementById('desc').value = '';
-            document.getElementById('valor').value = '';
-        }
+        function fecharModal() { document.getElementById('modal').style.display = 'none'; }
     </script>
 </body>
 </html>
