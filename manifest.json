@@ -1,7 +1,8 @@
 {
   "name": "FinançasPRO",
   "short_name": "FinançasPRO",
-  "start_url": "/",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#EAB308",
@@ -9,11 +10,12 @@
     {
       "src": "https://cdn-icons-png.flaticon.com/512/552/552791.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
   "share_target": {
-    "action": "/",
+    "action": "./index.html",
     "method": "GET",
     "params": {
       "text": "text"
