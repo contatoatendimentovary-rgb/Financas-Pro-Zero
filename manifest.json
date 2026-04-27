@@ -1,17 +1,22 @@
 {
-  "name": "FinançasPRO Premium",
+  "name": "FinançasPRO",
   "short_name": "FinançasPRO",
-  "start_url": "index.html",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
-  "theme_color": "#000000",
-  "description": "Gestão Financeira com Biometria",
+  "theme_color": "#EAB308",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2489/2489756.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/552/552791.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
-  ]
+  ],
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": {
+      "text": "text"
+    }
+  }
 }
