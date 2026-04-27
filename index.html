@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FinançasPRO // Final</title>
+    <title>FinançasPRO</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#EAB308">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -18,29 +18,27 @@
             --text-sub: #6B7280; --border: #E5E7EB; --accent: #EAB308;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 120px; transition: 0.3s; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 120px; transition: 0.3s; overflow-x: hidden; }
 
         .glass-header { padding: 40px 20px 30px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; }
         .action-bar { display: flex; gap: 12px; align-items: center; }
-        
-        .icon-btn { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 12px; cursor: pointer; font-size: 1.1rem; }
-        .logout-btn { background: none; border: none; color: var(--red); font-weight: 800; font-size: 0.75rem; padding: 5px; cursor: pointer; text-transform: uppercase; }
+        .icon-btn { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 12px; cursor: pointer; }
         
         .viz-card { background: var(--card); margin: 15px; padding: 20px; border-radius: 25px; border: 1px solid var(--border); }
         .entry-card { background: var(--card); padding: 16px; border-radius: 18px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        
-        .btn-delete { color: var(--red); background: none; border: none; padding: 5px; font-size: 1.1rem; cursor: pointer; }
-        .btn-export { width: 100%; padding: 14px; background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 15px; font-weight: 800; margin-bottom: 20px; font-size: 0.8rem; }
 
         .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--bg); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
         .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-weight: 700; font-size: 0.75rem; gap: 4px; }
         .nav-btn.active { color: var(--accent); }
-
-        .floating-btn { position: fixed; bottom: 110px; right: 20px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); border: none; font-size: 30px; font-weight: 800; z-index: 999; color: #000; box-shadow: 0 8px 15px rgba(0,0,0,0.3); }
         
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: flex-end; }
-        .modal-sheet { background: var(--bg); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; border-top: 1px solid var(--border); }
-        .input-grid input, .input-grid select { width: 100%; padding: 15px; margin-bottom: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); color: var(--text); outline: none; }
+        .floating-btn { position: fixed; bottom: 110px; right: 20px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); border: none; font-size: 30px; font-weight: 800; z-index: 999; color: #000; box-shadow: 0 8px 15px rgba(0,0,0,0.4); }
+
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: flex-end; }
+        .modal-sheet { background: var(--bg); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; border-top: 1px solid var(--border); animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .input-grid input, .input-grid select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 14px; border: 1px solid var(--border); background: var(--card); color: var(--text); outline: none; font-size: 1rem; }
+        .btn-save { width: 100%; padding: 18px; background: var(--accent); border: none; border-radius: 16px; font-weight: 800; color: #000; font-size: 1rem; cursor: pointer; }
         
         .tab-content { display: none; } .tab-content.active { display: block; }
     </style>
@@ -51,68 +49,65 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <div style="font-weight:800; font-size:1.1rem;">Finanças<span style="color:var(--accent)">PRO</span></div>
             <div class="action-bar">
-                <button onclick="toggleTheme()" class="icon-btn" id="theme-icon">🌙</button>
+                <button onclick="toggleTheme()" class="icon-btn">🌙</button>
                 <button id="btnAuth" style="background:var(--accent); color:#000; border:none; padding:8px 15px; border-radius:12px; font-weight:800; font-size:0.7rem;" onclick="loginGoogle()">ENTRAR</button>
-                <button onclick="logout()" class="logout-btn">Sair</button>
             </div>
         </div>
         <h1 id="saldo" style="font-size:2.6rem; font-weight:800;">R$ 0,00</h1>
     </header>
 
-    <section id="aba-dashboard" class="tab-content active">
-        <div class="viz-card">
-             <h4 style="font-size:0.75rem; margin-bottom:15px; opacity:0.6">DISTRIBUIÇÃO MENSAL</h4>
-             <canvas id="graficoPizza" style="max-height: 260px;"></canvas>
-        </div>
-    </section>
+    <main>
+        <section id="aba-dashboard" class="tab-content active">
+            <div class="viz-card"><canvas id="graficoPizza" style="max-height: 260px;"></canvas></div>
+        </section>
 
-    <section id="aba-aportes" class="tab-content">
-        <div class="viz-card">
-            <h4 style="font-size:0.75rem; margin-bottom:15px; color:var(--accent)">VISÃO ANUAL DE INVESTIMENTOS</h4>
-            <canvas id="graficoBarras" style="max-height: 250px;"></canvas>
-        </div>
-        <div id="lista-invest" style="padding: 0 20px;"></div>
-    </section>
+        <section id="aba-aportes" class="tab-content">
+            <div class="viz-card">
+                <h4 style="font-size:0.75rem; margin-bottom:15px; color:var(--accent)">HISTÓRICO ANUAL</h4>
+                <canvas id="graficoBarras" style="max-height: 250px;"></canvas>
+            </div>
+            <div id="lista-invest" style="padding: 0 20px;"></div>
+        </section>
 
-    <section id="aba-extrato" class="tab-content">
-        <div style="padding: 10px 20px;">
-            <button onclick="exportarExcel()" class="btn-export">📄 EXPORTAR MÊS (EXCEL/CSV)</button>
-            <select id="filtroMes" class="input-grid" onchange="carregarDados()">
-                <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
-                <option value="março">Março</option><option value="abril">Abril</option>
-                <option value="maio">Maio</option><option value="junho">Junho</option>
-                <option value="julho">Julho</option><option value="agosto">Agosto</option>
-                <option value="setembro">Setembro</option><option value="outubro">Outubro</option>
-                <option value="novembro">Novembro</option><option value="dezembro">Dezembro</option>
-            </select>
-        </div>
-        <div id="lista" style="padding: 0 20px;"></div>
-    </section>
+        <section id="aba-extrato" class="tab-content">
+            <div style="padding: 10px 20px;">
+                <select id="filtroMes" class="input-grid" onchange="carregarDados()">
+                    <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
+                    <option value="março">Março</option><option value="abril">Abril</option>
+                    <option value="maio">Maio</option><option value="junho">Junho</option>
+                    <option value="julho">Julho</option><option value="agosto">Agosto</option>
+                    <option value="setembro">Setembro</option><option value="outubro">Outubro</option>
+                    <option value="novembro">Novembro</option><option value="dezembro">Dezembro</option>
+                </select>
+            </div>
+            <div id="lista" style="padding: 0 20px;"></div>
+        </section>
+    </main>
 
     <nav class="bottom-tab-bar">
-        <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active"><span>📊</span> Resumo</button>
-        <button onclick="switchTab('aba-aportes', this)" class="nav-btn"><span>📈</span> Aportes</button>
-        <button onclick="switchTab('aba-extrato', this)" class="nav-btn"><span>📜</span> Extrato</button>
+        <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active">📊 Resumo</button>
+        <button onclick="switchTab('aba-aportes', this)" class="nav-btn">📈 Aportes</button>
+        <button onclick="switchTab('aba-extrato', this)" class="nav-btn">📜 Extrato</button>
     </nav>
 
     <button onclick="abrirModal()" class="floating-btn">+</button>
 
     <div id="modal" class="modal-overlay">
         <div class="modal-sheet">
-            <h3 style="margin-bottom:20px;">Novo Registro</h3>
+            <h3 style="margin-bottom:20px; font-weight:800;">Novo Registro</h3>
             <div class="input-grid">
-                <input type="text" id="desc" placeholder="Descrição">
-                <input type="number" id="valor" placeholder="R$ 0,00">
+                <input type="text" id="desc" placeholder="Ex: iFood">
+                <input type="number" step="0.01" id="valor" placeholder="0,00">
                 <input type="date" id="data-reg">
                 <select id="tipo">
-                    <option value="entrada">Receita (+)</option>
-                    <option value="fixo">Essencial (-)</option>
                     <option value="lazer">Lazer (-)</option>
+                    <option value="fixo">Essencial (-)</option>
+                    <option value="entrada">Receita (+)</option>
                     <option value="investimento">Investimento (-)</option>
                 </select>
             </div>
-            <button onclick="salvarRegistro()" style="width:100%; padding:18px; background:var(--accent); border:none; border-radius:15px; font-weight:800; color:#000">SALVAR</button>
-            <button onclick="fecharModal()" style="width:100%; background:none; border:none; color:var(--text-sub); padding:15px;">CANCELAR</button>
+            <button onclick="salvarRegistro()" class="btn-save">SALVAR REGISTRO</button>
+            <button onclick="fecharModal()" style="width:100%; background:none; border:none; color:var(--text-sub); padding:20px; font-weight:700;">CANCELAR</button>
         </div>
     </div>
 
@@ -135,160 +130,125 @@
         window.auth = getAuth(app);
         window.db = getFirestore(app);
         window.f_doc = doc; window.f_setDoc = setDoc; window.f_getDoc = getDoc;
-
         window.mesesNomes = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
-        document.getElementById('filtroMes').value = window.mesesNomes[new Date().getMonth()];
 
         onAuthStateChanged(window.auth, (user) => {
             if (user) {
                 document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0].toUpperCase();
                 window.carregarDados();
+                window.processarCompartilhamento();
             }
         });
 
         window.loginGoogle = () => signInWithPopup(window.auth, new GoogleAuthProvider());
-        window.logout = () => signOut(window.auth).then(() => location.reload());
     </script>
     
     <script>
-        let chartP; let chartB;
+        let chartP;
 
-        function toggleTheme() {
-            const isLight = document.body.classList.toggle('light-mode');
-            document.getElementById('theme-icon').innerText = isLight ? '☀️' : '🌙';
-            window.carregarDados();
-        }
+        // LÓGICA DE CAPTURA AUTOMÁTICA (SOLUÇÃO FINAL)
+        window.processarCompartilhamento = () => {
+            const params = new URLSearchParams(window.location.search);
+            const texto = params.get('text');
+
+            if (texto) {
+                // 1. Extração do Valor (Captura 0.000,00 ou 0,00)
+                const regexValor = /(?:R\$)\s?(\d{1,3}(?:\.\d{3})*,\d{2})|(\d{1,3}(?:\.\d{3})*,\d{2})/;
+                const match = texto.match(regexValor);
+                if (match) {
+                    const valorLimpo = (match[1] || match[2]).replace(/\./g, '').replace(',', '.');
+                    document.getElementById('valor').value = valorLimpo;
+                }
+
+                // 2. Extração do Estabelecimento
+                let nome = "Gasto Extra";
+                if(texto.toLowerCase().includes('no ')) nome = texto.split(/no /i)[1].split(/[:\s]/)[0];
+                else if(texto.toLowerCase().includes('em ')) nome = texto.split(/em /i)[1].split(/[:\s]/)[0];
+                document.getElementById('desc').value = nome.trim();
+                
+                // 3. Data Local (Ajuste de Fuso Horário)
+                const hoje = new Date();
+                document.getElementById('data-reg').value = new Date(hoje.getTime() - (hoje.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+
+                // 4. Inteligência de Categoria
+                if(/ifood|uber|netflix|spotify|restaurante/i.test(nome)) {
+                    document.getElementById('tipo').value = "lazer";
+                } else {
+                    document.getElementById('tipo').value = "fixo";
+                }
+
+                abrirModal();
+                window.history.replaceState({}, document.title, "/");
+            }
+        };
 
         async function carregarDados() {
             const user = window.auth.currentUser; if (!user) return;
             const mes = document.getElementById('filtroMes').value;
-            const snap = await window.f_getDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", mes));
+            const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mes);
+            const snap = await window.f_getDoc(ref);
             
-            let saldo = 0, fixo = 0, lazer = 0, investMes = 0, html = "", invHtml = "";
+            let saldo = 0, fixo = 0, lazer = 0, invest = 0, html = "";
             let trans = snap.exists() ? snap.data().transacoes : [];
-            window.dadosAtuais = trans; 
 
-            trans.forEach((t, idx) => {
+            trans.sort((a,b) => new Date(b.data) - new Date(a.data)).forEach(t => {
                 const v = parseFloat(t.valor);
                 if (t.tipo === 'entrada') saldo += v;
                 else {
                     saldo -= v;
                     if(t.tipo === 'fixo') fixo += v;
                     else if(t.tipo === 'lazer') lazer += v;
-                    else { 
-                        investMes += v; 
-                        invHtml += `<div class="entry-card"><span>${t.descricao}</span><b style="color:var(--accent)">R$ ${v.toFixed(2)}</b></div>`; 
-                    }
+                    else invest += v;
                 }
                 html += `<div class="entry-card">
-                    <div><b>${t.descricao}</b><br><small>${t.data}</small></div>
-                    <div style="display:flex; align-items:center; gap:12px">
-                        <b style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">R$ ${v.toFixed(2)}</b>
-                        <button class="btn-delete" onclick="excluirRegistro(${idx})">🗑️</button>
-                    </div>
+                    <div><b>${t.descricao}</b><br><small>${t.data.split('-').reverse().join('/')}</small></div>
+                    <b style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">R$ ${v.toFixed(2)}</b>
                 </div>`;
             });
 
             document.getElementById('saldo').innerText = `R$ ${saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-            document.getElementById('lista').innerHTML = html || '<p style="text-align:center; opacity:0.3; margin-top:30px;">Vazio.</p>';
-            document.getElementById('lista-invest').innerHTML = invHtml;
+            document.getElementById('lista').innerHTML = html || '<p style="text-align:center; opacity:0.3; padding:40px;">Sem registros este mês.</p>';
             
-            renderPizza(fixo, lazer, investMes);
-            carregarHistoricoAnual(); // Atualiza o gráfico de barras com todos os meses
-        }
-
-        function renderPizza(f, l, i) {
-            const txt = document.body.classList.contains('light-mode') ? '#111827' : '#FFFFFF';
             const ctxP = document.getElementById('graficoPizza').getContext('2d');
             if(chartP) chartP.destroy();
             chartP = new Chart(ctxP, {
                 type: 'doughnut',
-                data: { labels: ['Fixo', 'Lazer', 'Invest'], datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }] },
-                options: { cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: txt, font: {weight:'bold'} } } } }
+                data: { labels: ['Fixo', 'Lazer', 'Invest'], datasets: [{ data: [fixo, lazer, invest], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }] },
+                options: { cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: '#888', font: { weight: 'bold' } } } } }
             });
-        }
-
-        async function carregarHistoricoAnual() {
-            const user = window.auth.currentUser;
-            const investAnuais = new Array(12).fill(0);
-            const txt = document.body.classList.contains('light-mode') ? '#111827' : '#FFFFFF';
-
-            // Busca os dados de cada um dos 12 meses no Firebase
-            const promessas = window.mesesNomes.map(async (m, idx) => {
-                const s = await window.f_getDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", m));
-                if(s.exists()) {
-                    const trans = s.data().transacoes || [];
-                    investAnuais[idx] = trans.filter(t => t.tipo === 'investimento').reduce((acc, curr) => acc + parseFloat(curr.valor), 0);
-                }
-            });
-
-            await Promise.all(promessas);
-
-            const ctxB = document.getElementById('graficoBarras').getContext('2d');
-            if(chartB) chartB.destroy();
-            chartB = new Chart(ctxB, {
-                type: 'bar',
-                data: { 
-                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], 
-                    datasets: [{ label: 'Aportes', data: investAnuais, backgroundColor: '#FDE047', borderRadius: 5 }] 
-                },
-                options: { 
-                    scales: { 
-                        y: { ticks: { color: txt }, grid: { color: 'rgba(255,255,255,0.05)' } }, 
-                        x: { ticks: { color: txt }, grid: { display: false } } 
-                    }, 
-                    plugins: { legend: { display: false } } 
-                }
-            });
-        }
-
-        async function excluirRegistro(idx) {
-            if(!confirm("Deseja apagar?")) return;
-            const user = window.auth.currentUser;
-            const mes = document.getElementById('filtroMes').value;
-            let novaLista = [...window.dadosAtuais];
-            novaLista.splice(idx, 1);
-            await window.f_setDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", mes), { transacoes: novaLista });
-            window.carregarDados();
-        }
-
-        function exportarExcel() {
-            if(!window.dadosAtuais || window.dadosAtuais.length === 0) return alert("Sem dados.");
-            let csv = "Descricao;Valor;Data;Tipo\r\n";
-            window.dadosAtuais.forEach(t => { csv += `${t.descricao};${t.valor};${t.data};${t.tipo}\r\n`; });
-            const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = `Planilha_${document.getElementById('filtroMes').value}.csv`;
-            a.click();
         }
 
         async function salvarRegistro() {
             const user = window.auth.currentUser;
             const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value, t = document.getElementById('tipo').value;
-            if(!dt || !v) return alert("Preencha Valor e Data!");
+            if(!dt || !v) return alert("Por favor, insira o valor e a data.");
             
             const mesAlvo = window.mesesNomes[new Date(dt).getUTCMonth()];
             const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mesAlvo);
             const snap = await window.f_getDoc(ref);
-            
             let lista = snap.exists() ? snap.data().transacoes : [];
-            lista.push({ descricao: d || "Sem nome", valor: v, tipo: t, data: dt });
             
+            lista.push({ descricao: d || "Gasto", valor: v, tipo: t, data: dt });
             await window.f_setDoc(ref, { transacoes: lista });
+            
             fecharModal(); 
-            window.carregarDados();
+            document.getElementById('filtroMes').value = mesAlvo;
+            carregarDados();
         }
 
+        function toggleTheme() { document.body.classList.toggle('light-mode'); }
         function switchTab(id, btn) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             btn.classList.add('active');
-            window.dispatchEvent(new Event('resize'));
         }
         function abrirModal() { document.getElementById('modal').style.display = 'flex'; }
-        function fecharModal() { document.getElementById('modal').style.display = 'none'; }
+        function fecharModal() { 
+            document.getElementById('modal').style.display = 'none';
+            document.getElementById('desc').value = '';
+            document.getElementById('valor').value = '';
+        }
     </script>
 </body>
 </html>
