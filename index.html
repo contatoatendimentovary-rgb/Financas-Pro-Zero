@@ -9,155 +9,297 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #000000;
-            --card: #121212;
-            --text: #FFFFFF;
-            --text-sub: #71717A;
-            --border: #27272A;
-            --gold: #EAB308;
-            --gold-muted: #714D03;
-            --green: #22C55E;
-            --red: #EF4444;
+            --bg: #000000; --card: #121212; --text: #FFFFFF;
+            --text-sub: #A1A1AA; --border: #27272A; --accent: #FDE047;
+            --green: #22C55E; --red: #EF4444; --gray-bar: #262626;
         }
-
+        body.light-mode {
+            --bg: #F4F4F5; --card: #FFFFFF; --text: #09090B;
+            --text-sub: #71717A; --border: #E4E4E7; --accent: #EAB308;
+            --gray-bar: #E4E4E7;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
-        body { background: var(--bg); color: var(--text); padding-bottom: 110px; overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 110px; transition: 0.3s; overflow-x: hidden; }
 
-        /* Header Estilo Imagem */
-        .header { padding: 60px 24px 30px; text-align: center; }
-        .logo-row { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 30px; }
-        .logo-row b { font-size: 1.4rem; letter-spacing: -0.5px; }
-        .logo-row span { color: var(--gold); }
+        /* Header */
+        .header { padding: 50px 24px 20px; text-align: center; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid var(--border); }
+        .head-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .logo { font-weight: 800; font-size: 1.2rem; }
+        .logo span { color: var(--accent); }
+        .theme-btn { background: var(--card); border: 1px solid var(--border); padding: 8px; border-radius: 12px; cursor: pointer; color: var(--text); }
+        .balance-label { color: var(--text-sub); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .balance-val { font-size: 2.6rem; font-weight: 800; letter-spacing: -1px; }
 
-        .balance-label { color: var(--text-sub); font-size: 0.8rem; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-        .balance-value { font-size: 2.8rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 25px; }
-
-        /* Cards e Gráficos */
-        .container { padding: 0 20px; }
-        .viz-card { background: var(--card); border-radius: 24px; padding: 24px; border: 1px solid var(--border); margin-bottom: 20px; }
-        
-        /* Estilo das Barras de Progresso da Imagem */
-        .prog-group { margin-top: 25px; }
+        /* Estilo 50/30/20 (Dashboard) */
+        .viz-card { background: var(--card); margin: 20px 15px; padding: 25px; border-radius: 28px; border: 1px solid var(--border); }
         .prog-item { margin-bottom: 20px; }
-        .prog-info { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; margin-bottom: 10px; }
-        .prog-info span:first-child { color: var(--text); }
-        .prog-info span:last-child { color: var(--text-sub); }
-        
-        .bar-container { background: #262626; height: 12px; border-radius: 6px; overflow: hidden; }
-        .bar-fill { height: 100%; border-radius: 6px; transition: width 1s ease-out; }
+        .prog-info { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; margin-bottom: 8px; }
+        .bar-bg { background: var(--gray-bar); height: 12px; border-radius: 6px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 6px; transition: 1s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        /* Transações Estilo Lista */
-        .entry { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); }
-        .entry-icon { width: 45px; height: 45px; background: #1A1A1A; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-size: 1.2rem; }
-        .entry-details b { display: block; font-size: 1rem; }
-        .entry-details small { color: var(--text-sub); font-weight: 600; }
-        .entry-amount { font-weight: 800; font-size: 1.05rem; }
+        /* Lista de Lançamentos com Ícones */
+        .entry { background: var(--card); margin: 0 15px 10px; padding: 16px; border-radius: 20px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .entry-left { display: flex; align-items: center; gap: 15px; }
+        .entry-icon { width: 44px; height: 44px; border-radius: 14px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 1px solid var(--border); }
+        .entry-info b { display: block; font-size: 0.95rem; }
+        .entry-info small { color: var(--text-sub); font-weight: 600; }
+        .entry-right { text-align: right; font-weight: 800; display: flex; align-items: center; gap: 10px; }
 
-        /* Navegação Inferior Idêntica à Imagem */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 15px 10px 35px; border-top: 1px solid var(--border); z-index: 1000; }
-        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 0.65rem; font-weight: 700; cursor: pointer; }
-        .nav-btn.active { color: var(--gold); }
-        .nav-btn i { font-size: 1.4rem; }
+        /* Navegação */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--bg); display: flex; justify-content: space-around; padding: 15px 10px 35px; border-top: 1px solid var(--border); z-index: 1000; }
+        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 5px; font-weight: 700; font-size: 0.65rem; cursor: pointer; flex: 1; }
+        .nav-btn.active { color: var(--accent); }
+        .nav-btn span { font-size: 1.3rem; }
 
-        /* Botão Flutuante de Adicionar */
-        .fab { width: 50px; height: 50px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-size: 1.5rem; font-weight: 800; border: none; box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4); }
+        /* Botão FAB Dourado */
+        .fab { background: var(--accent); color: #000; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: none; box-shadow: 0 4px 15px rgba(253, 224, 71, 0.3); }
+
+        /* Modal */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: flex-end; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--bg); width: 100%; border-radius: 30px 30px 0 0; padding: 35px; border-top: 1px solid var(--border); animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .input-box { width: 100%; padding: 18px; border-radius: 16px; border: 1px solid var(--border); background: var(--card); color: var(--text); margin-bottom: 15px; outline: none; font-size: 1rem; }
+        .btn-save { width: 100%; padding: 20px; background: var(--accent); border: none; border-radius: 18px; font-weight: 800; font-size: 1rem; color: #000; cursor: pointer; }
 
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Modal Escuro */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: flex-end; }
-        .modal-body { width: 100%; background: #121212; border-radius: 30px 30px 0 0; padding: 40px 25px; border-top: 1px solid var(--border); }
-        .input { width: 100%; background: #1A1A1A; border: 1px solid var(--border); padding: 18px; border-radius: 15px; color: #fff; margin-bottom: 15px; outline: none; font-size: 1rem; }
-        .btn-add { width: 100%; background: var(--gold); color: #000; padding: 18px; border-radius: 15px; font-weight: 800; border: none; font-size: 1rem; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body>
 
     <header class="header">
-        <div class="logo-row">
-            <b>Finanças<span>PRO</span></b>
-            <button onclick="loginGoogle()" id="userBtn" style="background:none; border:none; color:var(--gold); font-size:1.2rem;">👤</button>
+        <div class="head-top">
+            <button onclick="toggleTheme()" class="theme-btn">🌓</button>
+            <div class="logo">Finanças<span>PRO</span></div>
+            <button id="btnAuth" style="background:var(--card); color:var(--text); border:1px solid var(--border); padding:8px 15px; border-radius:12px; font-weight:800; font-size:0.7rem;" onclick="loginGoogle()">ENTRAR</button>
         </div>
-        <div class="balance-label">Balance</div>
-        <div class="balance-value" id="totalBalance">R$ 0,00</div>
+        <div class="balance-label">Saldo em Carteira</div>
+        <div class="balance-val" id="saldo">R$ 0,00</div>
     </header>
 
-    <div class="container">
-        <section id="dash" class="tab-content active">
-            <div class="viz-card" style="text-align: center;">
-                <canvas id="chartPizza" style="max-height: 200px; margin: 0 auto;"></canvas>
-            </div>
-            
-            <div class="prog-group">
-                <div class="prog-item">
-                    <div class="prog-info"><span>Fixos (50%)</span><span id="val-fixo">R$ 0,00</span></div>
-                    <div class="bar-container"><div id="bar-fixo" class="bar-fill" style="background: var(--gold); width: 0%"></div></div>
-                </div>
-                <div class="prog-item">
-                    <div class="prog-info"><span>Lazer (30%)</span><span id="val-lazer">R$ 0,00</span></div>
-                    <div class="bar-container"><div id="bar-lazer" class="bar-fill" style="background: #22C55E; width: 0%"></div></div>
-                </div>
-                <div class="prog-item">
-                    <div class="prog-info"><span>Investir (20%)</span><span id="val-invest">R$ 0,00</span></div>
-                    <div class="bar-container"><div id="bar-invest" class="bar-fill" style="background: #525252; width: 0%"></div></div>
-                </div>
-            </div>
-        </section>
-
-        <section id="extrato" class="tab-content">
-            <div id="lista-transacoes"></div>
-        </section>
-
-        <section id="invest" class="tab-content">
+    <main>
+        <section id="aba-dashboard" class="tab-content active">
             <div class="viz-card">
-                <canvas id="chartBarras" style="max-height: 220px;"></canvas>
+                <canvas id="graficoPizza" style="max-height: 200px; margin-bottom: 20px;"></canvas>
+                <div class="prog-item">
+                    <div class="prog-info"><span>Essencial (50%)</span><span id="txt-fixo">0%</span></div>
+                    <div class="bar-bg"><div id="bar-fixo" class="bar-fill" style="background: var(--accent); width: 0%"></div></div>
+                </div>
+                <div class="prog-item">
+                    <div class="prog-info"><span>Lazer (30%)</span><span id="txt-lazer">0%</span></div>
+                    <div class="bar-bg"><div id="bar-lazer" class="bar-fill" style="background: var(--green); width: 0%"></div></div>
+                </div>
+                <div class="prog-item">
+                    <div class="prog-info"><span>Investimento (20%)</span><span id="txt-invest">0%</span></div>
+                    <div class="bar-bg"><div id="bar-invest" class="bar-fill" style="background: #525252; width: 0%"></div></div>
+                </div>
             </div>
         </section>
-    </div>
+
+        <section id="aba-invest" class="tab-content">
+            <div class="viz-card"><canvas id="graficoBarras" style="max-height: 200px;"></canvas></div>
+            <div id="lista-invest"></div>
+        </section>
+
+        <section id="aba-extrato" class="tab-content">
+            <div style="padding: 0 15px 15px;">
+                <select id="filtroMes" class="input-box" style="margin-bottom:0" onchange="carregarDados()">
+                    <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
+                    <option value="março">Março</option><option value="abril">Abril</option>
+                    <option value="maio">Maio</option><option value="junho">Junho</option>
+                    <option value="julho">Julho</option><option value="agosto">Agosto</option>
+                    <option value="setembro">Setembro</option><option value="outubro">Outubro</option>
+                    <option value="novembro">Novembro</option><option value="dezembro">Dezembro</option>
+                </select>
+            </div>
+            <div id="lista-geral"></div>
+        </section>
+    </main>
 
     <nav class="nav-bar">
-        <button class="nav-btn active" onclick="showTab('dash', this)"><i>📊</i>Dashboard</button>
-        <button class="nav-btn" onclick="showTab('invest', this)"><i>📈</i>Investimentos</button>
-        <button class="nav-btn" onclick="showTab('extrato', this)"><i>📜</i>Extrato</button>
-        <button class="nav-btn" onclick="openModal()"><div class="fab">+</div>Lançar</button>
+        <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active"><span>📊</span>Dashboard</button>
+        <button onclick="switchTab('aba-invest', this)" class="nav-btn"><span>📈</span>Aportes</button>
+        <button onclick="switchTab('aba-extrato', this)" class="nav-btn"><span>📜</span>Extrato</button>
+        <button onclick="abrirModal()" class="nav-btn"><div class="fab">+</div>Lançar</button>
     </nav>
 
-    <div id="modal" class="modal" onclick="if(event.target==this) closeModal()">
-        <div class="modal-body">
-            <input type="text" id="desc" class="input" placeholder="Descrição">
-            <input type="number" id="valor" class="input" placeholder="Valor R$">
-            <select id="tipo" class="input">
-                <option value="fixo">Essencial (Fixo)</option>
-                <option value="lazer">Lazer</option>
-                <option value="investimento">Investimento</option>
-                <option value="entrada">Receita (Entrada)</option>
+    <div id="modal" class="modal" onclick="if(event.target==this) fecharModal()">
+        <div class="modal-content">
+            <input type="text" id="desc" class="input-box" placeholder="Onde foi?">
+            <input type="number" step="0.01" id="valor" class="input-box" placeholder="Valor R$ 0,00">
+            <input type="date" id="data-reg" class="input-box">
+            <select id="tipo" class="input-box">
+                <option value="fixo">Essencial (50%)</option>
+                <option value="lazer">Lazer (30%)</option>
+                <option value="investimento">Investimento (20%)</option>
+                <option value="entrada">Receita (+)</option>
             </select>
-            <input type="date" id="data" class="input">
-            <button class="btn-add" onclick="saveData()">SALVAR LANÇAMENTO</button>
+            <button onclick="salvarRegistro()" class="btn-save">CONCLUIR</button>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module">
-        // Cole aqui sua configuração do Firebase anterior (initializeApp, auth, db)
-        // Mantenha as funções carregarDados(), saveData(), etc.
-        // Apenas certifique-se de que os IDs dos elementos batem com o novo HTML.
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE",
+            authDomain: "financaspro-1e0e8.firebaseapp.com",
+            projectId: "financaspro-1e0e8",
+            storageBucket: "financaspro-1e0e8.firebasestorage.app",
+            messagingSenderId: "659521706556",
+            appId: "1:659521706556:web:86f2174c4c8a89335ac139"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        window.auth = getAuth(app);
+        window.db = getFirestore(app);
+        window.f_doc = doc; window.f_setDoc = setDoc; window.f_getDoc = getDoc;
+        window.mesesNomes = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+
+        onAuthStateChanged(window.auth, (user) => {
+            if (user) {
+                document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0].toUpperCase();
+                document.getElementById('filtroMes').value = window.mesesNomes[new Date().getMonth()];
+                carregarDados();
+                processarCompartilhamento();
+            }
+        });
+
+        window.loginGoogle = () => signInWithPopup(window.auth, new GoogleAuthProvider());
     </script>
 
     <script>
-        function showTab(id, btn) {
+        let chartP, chartB;
+
+        function getIcon(tipo, desc) {
+            const d = desc.toLowerCase();
+            if (tipo === 'entrada') return '💰';
+            if (tipo === 'investimento') return '📈';
+            if (d.includes('comida') || d.includes('ifood') || d.includes('restaurante')) return '🍴';
+            if (d.includes('transporte') || d.includes('uber') || d.includes('gasolina')) return '🚗';
+            if (d.includes('mercado')) return '🛒';
+            if (d.includes('aluguel') || d.includes('casa')) return '🏠';
+            return '🏷️';
+        }
+
+        async function carregarDados() {
+            const user = window.auth.currentUser; if (!user) return;
+            const mesSel = document.getElementById('filtroMes').value;
+            let investMeses = Array(12).fill(0), saldoM = 0, fixo = 0, lazer = 0, invest = 0, receita = 0;
+            let htmlGeral = "", htmlInvest = "";
+
+            const promises = window.mesesNomes.map(m => window.f_getDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", m)));
+            const snaps = await Promise.all(promises);
+
+            snaps.forEach((snap, i) => {
+                const mesNome = window.mesesNomes[i];
+                if (snap.exists()) {
+                    const trans = snap.data().transacoes || [];
+                    trans.forEach((t, idx) => {
+                        const v = parseFloat(t.valor);
+                        if (t.tipo === 'investimento') investMeses[i] += v;
+                        if (mesNome === mesSel) {
+                            if (t.tipo === 'entrada') { saldoM += v; receita += v; }
+                            else { 
+                                saldoM -= v;
+                                if(t.tipo === 'fixo') fixo += v;
+                                else if(t.tipo === 'lazer') lazer += v;
+                                else if(t.tipo === 'investimento') invest += v;
+                            }
+                            const card = `<div class="entry">
+                                <div class="entry-left">
+                                    <div class="entry-icon">${getIcon(t.tipo, t.descricao)}</div>
+                                    <div class="entry-info"><b>${t.descricao}</b><small>${t.data.split('-').reverse().join('/')}</small></div>
+                                </div>
+                                <div class="entry-right">
+                                    <span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">${t.tipo==='entrada'?'+':'-'} R$ ${v.toFixed(2)}</span>
+                                    <button style="background:none;border:none;color:var(--red);font-size:1.2rem;cursor:pointer" onclick="apagar('${mesNome}', ${idx})">×</button>
+                                </div>
+                            </div>`;
+                            htmlGeral += card; if(t.tipo === 'investimento') htmlInvest += card;
+                        }
+                    });
+                }
+            });
+
+            document.getElementById('saldo').innerText = `R$ ${saldoM.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('lista-geral').innerHTML = htmlGeral || '<p style="text-align:center;color:var(--text-sub)">Vazio</p>';
+            document.getElementById('lista-invest').innerHTML = htmlInvest || '<p style="text-align:center;color:var(--text-sub)">Sem aportes</p>';
+            
+            renderPizza(fixo, lazer, invest);
+            renderBarras(investMeses);
+            atualizarRegra(fixo, lazer, invest, receita);
+        }
+
+        function atualizarRegra(f, l, i, rec) {
+            const total = rec || (f + l + i || 1);
+            document.getElementById('bar-fixo').style.width = Math.min((f/total)*100, 100) + '%';
+            document.getElementById('txt-fixo').innerText = ((f/total)*100).toFixed(0) + '%';
+            document.getElementById('bar-lazer').style.width = Math.min((l/total)*100, 100) + '%';
+            document.getElementById('txt-lazer').innerText = ((l/total)*100).toFixed(0) + '%';
+            document.getElementById('bar-invest').style.width = Math.min((i/total)*100, 100) + '%';
+            document.getElementById('txt-invest').innerText = ((i/total)*100).toFixed(0) + '%';
+        }
+
+        function renderPizza(f, l, i) {
+            const ctx = document.getElementById('graficoPizza').getContext('2d');
+            if(chartP) chartP.destroy();
+            chartP = new Chart(ctx, { type: 'doughnut', data: { datasets: [{ data: [f, l, i], backgroundColor: ['#FDE047', '#22C55E', '#525252'], borderWidth: 0 }] }, options: { cutout: '80%', plugins: { legend: { display: false } } } });
+        }
+
+        function renderBarras(dados) {
+            const ctx = document.getElementById('graficoBarras').getContext('2d');
+            if(chartB) chartB.destroy();
+            chartB = new Chart(ctx, { type: 'bar', data: { labels: ['J','F','M','A','M','J','J','A','S','O','N','D'], datasets: [{ data: dados, backgroundColor: '#FDE047', borderRadius: 6 }] }, options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } } });
+        }
+
+        async function salvarRegistro() {
+            const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value, t = document.getElementById('tipo').value;
+            if(!v || !dt) return alert("Preencha valor e data!");
+            const mes = window.mesesNomes[parseInt(dt.split('-')[1]) - 1];
+            const ref = window.f_doc(window.db, "usuarios", window.auth.currentUser.uid, "meses", mes);
+            const snap = await window.f_getDoc(ref);
+            let lista = snap.exists() ? snap.data().transacoes : [];
+            lista.push({ descricao: d || "Lançamento", valor: v, tipo: t, data: dt });
+            await window.f_setDoc(ref, { transacoes: lista });
+            fecharModal(); carregarDados();
+        }
+
+        async function apagar(mes, idx) {
+            if(!confirm("Apagar?")) return;
+            const ref = window.f_doc(window.db, "usuarios", window.auth.currentUser.uid, "meses", mes);
+            const snap = await window.f_getDoc(ref);
+            let lista = snap.data().transacoes;
+            lista.splice(idx, 1);
+            await window.f_setDoc(ref, { transacoes: lista });
+            carregarDados();
+        }
+
+        function switchTab(id, btn) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             btn.classList.add('active');
         }
 
-        function openModal() { document.getElementById('modal').style.display = 'flex'; }
-        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+        function abrirModal() { document.getElementById('modal').style.display = 'flex'; }
+        function fecharModal() { document.getElementById('modal').style.display = 'none'; }
+        function toggleTheme() { document.body.classList.toggle('light-mode'); }
+
+        function processarCompartilhamento() {
+            const texto = new URLSearchParams(window.location.search).get('text');
+            if (texto) {
+                const match = texto.match(/R\$\s?(\d+,\d{2})/);
+                if (match) document.getElementById('valor').value = match[1].replace(',', '.');
+                document.getElementById('desc').value = texto.includes('Inter') ? "Banco Inter" : "Lançamento";
+                document.getElementById('data-reg').value = new Date().toISOString().split('T')[0];
+                abrirModal();
+                window.history.replaceState({}, "", "/");
+            }
+        }
     </script>
 </body>
 </html>
-
