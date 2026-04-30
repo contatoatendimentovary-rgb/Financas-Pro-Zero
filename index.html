@@ -18,69 +18,59 @@
             --text-sub: #94A3B8; --border: #334155; --accent: #6366F1;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: var(--text-main); padding-bottom: 110px; overflow-x: hidden; transition: background 0.3s; }
+        body { background: var(--bg); color: var(--text-main); padding-bottom: 110px; transition: 0.3s; }
         
-        .glass-header { background: var(--header-bg); padding: 50px 20px 40px; border-radius: 0 0 30px 30px; border-bottom: 1px solid var(--border); text-align: center; transition: 0.3s; }
+        /* Header */
+        .glass-header { background: var(--header-bg); padding: 50px 20px 40px; border-radius: 0 0 30px 30px; border-bottom: 1px solid var(--border); text-align: center; }
         .header-content { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .user-pill { background: var(--accent); color: white; border: none; padding: 6px 15px; border-radius: 20px; font-weight: 800; font-size: 0.7rem; }
+        .brand { font-weight: 800; font-size: 1.1rem; } .brand span { color: var(--accent); }
+        .user-pill { background: var(--accent); color: white; border: none; padding: 6px 15px; border-radius: 20px; font-weight: 800; font-size: 0.7rem; cursor: pointer; }
         
-        .main-balance { position: relative; }
-        .main-balance h1 { font-size: 2.6rem; font-weight: 800; letter-spacing: -1.5px; margin: 5px 0; transition: color 0.3s; }
-        .sparkline-box { height: 40px; width: 120px; margin: 0 auto; opacity: 0.8; }
-        .run-rate-alert { display: none; background: rgba(239, 68, 68, 0.15); color: var(--red); font-size: 0.7rem; font-weight: 800; padding: 4px 10px; border-radius: 12px; width: max-content; margin: 10px auto 0; }
-        
+        .main-balance h1 { font-size: 2.6rem; font-weight: 800; letter-spacing: -1.5px; }
+        .sparkline-box { height: 40px; width: 120px; margin: 0 auto; }
+
+        /* Stats */
         .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; margin-top: -25px; }
-        .stat-card { background: var(--card); padding: 15px; border-radius: 22px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: 0.3s; }
-        .stat-card small { font-weight: 700; color: var(--text-sub); font-size: 0.65rem; text-transform: uppercase; }
-        .stat-card b { display: block; font-size: 1.15rem; margin-top: 3px; }
+        .stat-card { background: var(--card); padding: 15px; border-radius: 22px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .stat-card b { display: block; font-size: 1.1rem; margin-top: 3px; }
 
-        .viz-card { background: var(--card); margin: 20px; padding: 20px; border-radius: 24px; border: 1px solid var(--border); transition: 0.3s; }
+        /* Tabs & Cards */
+        .viz-card { background: var(--card); margin: 20px; padding: 20px; border-radius: 24px; border: 1px solid var(--border); }
+        .tab-content { display: none; } .tab-content.active { display: block; }
         
-        /* SWIPE TO DELETE CSS */
-        .swipe-wrapper { overflow-x: auto; scroll-snap-type: x mandatory; display: flex; scrollbar-width: none; border-radius: 18px; margin: 0 20px 10px; border: 1px solid var(--border); background: var(--red); }
-        .swipe-wrapper::-webkit-scrollbar { display: none; }
-        .entry-card { flex: 1 0 100%; scroll-snap-align: start; padding: 16px; background: var(--card); display: flex; justify-content: space-between; align-items: center; border: none; margin: 0; border-radius: 18px; transition: 0.3s; }
-        .delete-action { flex: 0 0 75px; scroll-snap-align: end; background: var(--red); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border-radius: 0 18px 18px 0; cursor: pointer; }
-        
-        .badge-dia { background: var(--accent); color: white; font-size: 0.65rem; padding: 3px 8px; border-radius: 8px; font-weight: 800; margin-right: 8px; }
+        /* Lista com Botão de Apagar */
+        .entry-card { background: var(--card); padding: 16px; border-radius: 18px; margin: 0 20px 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .btn-del { background: #fee2e2; color: #ef4444; border: none; padding: 6px 10px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; cursor: pointer; }
 
-        .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--header-bg); display: flex; justify-content: space-around; padding: 12px 0 30px; border-top: 1px solid var(--border); z-index: 1000; transition: 0.3s; }
-        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; font-weight: 700; flex: 1; transition: 0.2s; }
-        .nav-btn.active { color: var(--accent); transform: translateY(-3px); }
-        .nav-btn span { font-size: 1.4rem; margin-bottom: 4px; transition: 0.2s; }
+        /* Navigation */
+        .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--header-bg); display: flex; justify-content: space-around; padding: 12px 0 30px; border-top: 1px solid var(--border); z-index: 1000; }
+        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; font-weight: 700; flex: 1; cursor: pointer; }
+        .nav-btn.active { color: var(--accent); }
+        .nav-btn span { font-size: 1.4rem; margin-bottom: 4px; }
 
-        .floating-btn { position: fixed; bottom: 95px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 28px; box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4); z-index: 999; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
-        .floating-btn:active { transform: scale(0.9); }
+        .floating-btn { position: fixed; bottom: 95px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 28px; z-index: 999; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
+        /* Modal */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: flex-end; backdrop-filter: blur(5px); }
-        .modal-sheet { background: var(--card); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        
-        .input-grid input, .input-grid select { width: 100%; padding: 15px; margin-bottom: 12px; border-radius: 14px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); font-size: 1rem; transition: 0.3s; outline: none; }
-        .input-grid input:focus { border-color: var(--accent); }
+        .modal-sheet { background: var(--card); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; }
+        .input-grid input, .input-grid select { width: 100%; padding: 15px; margin-bottom: 12px; border-radius: 14px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); font-size: 1rem; outline: none; }
 
-        .tab-content { display: none; animation: fadeSlide 0.4s ease; } .tab-content.active { display: block; }
-        @keyframes fadeSlide { from { opacity: 0; transform: translateX(15px); } to { opacity: 1; transform: translateX(0); } }
-        
         .progress-container { background: var(--bg); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 8px; }
-        .bar { height: 100%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
-
-        .btn-export { width: 100%; background: var(--card); border: 1px solid var(--border); color: var(--text-main); padding: 12px; border-radius: 12px; font-weight: 700; margin-bottom: 15px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .bar { height: 100%; transition: 1s ease; }
     </style>
 </head>
 <body class="dark-mode">
 
     <header class="glass-header">
         <div class="header-content">
-            <button onclick="toggleTheme()" style="background:none; border:none; font-size:1.4rem; cursor:pointer;">🌓</button>
-            <div class="brand" style="font-weight: 800; font-size: 1.1rem;">Finanças<span>PRO</span></div>
-            <button id="btnAuth" class="user-pill" onclick="loginGoogle()">ENTRAR</button>
+            <button onclick="window.toggleTheme()" style="background:none; border:none; font-size:1.4rem; cursor:pointer;">🌓</button>
+            <div class="brand">Finanças<span>PRO</span></div>
+            <button id="btnAuth" class="user-pill" onclick="window.loginGoogle()">ENTRAR</button>
         </div>
         <div class="main-balance">
-            <small style="color: var(--text-sub); font-weight: 700; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px;">Saldo Disponível</small>
+            <small style="color: var(--text-sub); font-weight: 700; text-transform: uppercase; font-size: 0.65rem;">Saldo Disponível</small>
             <h1 id="saldo">R$ 0,00</h1>
             <div class="sparkline-box"><canvas id="sparklineChart"></canvas></div>
-            <div id="alerta-ritmo" class="run-rate-alert">⚠️ Ritmo de queima acelerado</div>
         </div>
     </header>
 
@@ -97,18 +87,18 @@
 
     <main>
         <section id="aba-dashboard" class="tab-content active">
-            <div class="viz-card"><canvas id="graficoPizza" style="max-height: 200px;"></canvas></div>
+            <div class="viz-card"><canvas id="graficoPizza" style="max-height: 180px;"></canvas></div>
             <div id="metas-container" style="padding: 0 20px;"></div>
         </section>
 
         <section id="aba-invest" class="tab-content">
-            <div class="viz-card"><canvas id="graficoBarras" style="max-height: 200px;"></canvas></div>
+            <div class="viz-card"><canvas id="graficoBarras" style="max-height: 180px;"></canvas></div>
             <div id="lista-invest"></div>
         </section>
 
         <section id="aba-extrato" class="tab-content">
-            <div style="padding: 20px 20px 5px;">
-                <select id="filtroMes" class="input-grid" onchange="carregarDados()">
+            <div style="padding: 20px;">
+                <select id="filtroMes" class="input-grid" onchange="window.carregarDados()" style="margin-bottom: 10px;">
                     <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
                     <option value="março">Março</option><option value="abril">Abril</option>
                     <option value="maio">Maio</option><option value="junho">Junho</option>
@@ -116,25 +106,25 @@
                     <option value="setembro">Setembro</option><option value="outubro">Outubro</option>
                     <option value="novembro">Novembro</option><option value="dezembro">Dezembro</option>
                 </select>
-                <button class="btn-export" onclick="exportarCSV()">📥 Exportar para Planilha (.csv)</button>
+                <button onclick="window.exportarCSV()" style="width:100%; padding:10px; background:none; border:1px solid var(--border); color:var(--text-main); border-radius:10px; font-weight:700; cursor:pointer;">📥 Exportar Planilha</button>
             </div>
             <div id="lista-geral"></div>
         </section>
     </main>
 
-    <button class="floating-btn" onclick="abrirModal()">+</button>
+    <button class="floating-btn" onclick="window.abrirModal()">+</button>
 
     <nav class="bottom-tab-bar">
-        <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active"><span>📊</span>Dashboard</button>
-        <button onclick="switchTab('aba-invest', this)" class="nav-btn"><span>📈</span>Aportes</button>
-        <button onclick="switchTab('aba-extrato', this)" class="nav-btn"><span>📜</span>Extrato</button>
+        <button onclick="window.switchTab('aba-dashboard', this)" class="nav-btn active"><span>📊</span>DASH</button>
+        <button onclick="window.switchTab('aba-invest', this)" class="nav-btn"><span>📈</span>APORTES</button>
+        <button onclick="window.switchTab('aba-extrato', this)" class="nav-btn"><span>📜</span>EXTRATO</button>
     </nav>
 
-    <div id="modal" class="modal-overlay" onclick="if(event.target==this) fecharModal()">
+    <div id="modal" class="modal-overlay" onclick="if(event.target==this) window.fecharModal()">
         <div class="modal-sheet">
             <div class="input-grid">
-                <input type="text" id="desc" placeholder="Descrição do lançamento">
-                <input type="number" step="0.01" id="valor" placeholder="Valor R$ 0,00">
+                <input type="text" id="desc" placeholder="O que foi?">
+                <input type="number" step="0.01" id="valor" placeholder="Valor 0.00">
                 <input type="date" id="data-reg">
                 <select id="tipo">
                     <option value="fixo">Essencial (50%)</option>
@@ -142,7 +132,7 @@
                     <option value="investimento">Investimento (20%)</option>
                     <option value="entrada">Receita (+)</option>
                 </select>
-                <button onclick="salvarRegistro()" style="width:100%; padding:16px; background:var(--accent); color:white; border:none; border-radius:14px; font-weight:800; font-size:1.1rem; cursor:pointer;">SALVAR</button>
+                <button onclick="window.salvarRegistro()" style="width:100%; padding:16px; background:var(--accent); color:white; border:none; border-radius:14px; font-weight:800; cursor:pointer;">SALVAR</button>
             </div>
         </div>
     </div>
@@ -154,136 +144,142 @@
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE", authDomain: "financaspro-1e0e8.firebaseapp.com", projectId: "financaspro-1e0e8", storageBucket: "financaspro-1e0e8.firebasestorage.app", messagingSenderId: "659521706556", appId: "1:659521706556:web:86f2174c4c8a89335ac139" };
-        const app = initializeApp(firebaseConfig); window.auth = getAuth(app); window.db = getFirestore(app);
-        window.f_doc = doc; window.f_setDoc = setDoc; window.f_getDoc = getDoc;
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- FUNÇÕES GLOBAIS ---
         window.mesesNomes = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+        window.chartP = null; window.chartB = null; window.spark = null;
+        window.transacoesCache = [];
 
-        onAuthStateChanged(window.auth, (user) => {
-            if (user) {
-                document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0].toUpperCase();
-                document.getElementById('filtroMes').value = window.mesesNomes[new Date().getMonth()];
-                carregarDados();
-            }
-        });
-        window.loginGoogle = () => signInWithPopup(window.auth, new GoogleAuthProvider());
-    </script>
+        window.loginGoogle = () => signInWithPopup(auth, new GoogleAuthProvider());
 
-    <script>
-        let chartP, chartB, sparkline;
-        window.transacoesExportacao = [];
+        window.switchTab = (id, btn) => {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+        };
 
-        function fmt(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+        window.abrirModal = () => {
+            document.getElementById('data-reg').value = new Date().toISOString().split('T')[0];
+            document.getElementById('modal').style.display = 'flex';
+        };
 
-        async function carregarDados() {
-            const user = window.auth.currentUser; if (!user) return;
+        window.fecharModal = () => document.getElementById('modal').style.display = 'none';
+
+        window.toggleTheme = () => document.body.classList.toggle('dark-mode');
+
+        const fmt = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+        window.carregarDados = async () => {
+            if (!auth.currentUser) return;
             const mesSel = document.getElementById('filtroMes').value;
-            let investAnual = Array(12).fill(0), saldoM = 0, f = 0, l = 0, i = 0, rec = 0;
-            let htmlGeral = "", htmlInvest = "";
-            let historicoSaldo = [0]; 
+            let investAnual = Array(12).fill(0), saldo = 0, f = 0, l = 0, i = 0, rec = 0;
+            let htmlGeral = "", htmlInvest = "", sparkData = [0];
 
-            const promises = window.mesesNomes.map(m => window.f_getDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", m)));
+            const promises = window.mesesNomes.map(m => getDoc(doc(db, "usuarios", auth.currentUser.uid, "meses", m)));
             const snaps = await Promise.all(promises);
 
             snaps.forEach((snap, idx) => {
-                const mesNome = window.mesesNomes[idx];
                 if (snap.exists()) {
-                    let trans = snap.data().transacoes || [];
-                    trans.sort((a,b) => new Date(b.data) - new Date(a.data));
+                    const trans = snap.data().transacoes || [];
+                    const mesNome = window.mesesNomes[idx];
                     
-                    if(mesNome === mesSel) window.transacoesExportacao = trans;
-
-                    // Reverter para calcular saldo cumulativo cronológico (para o sparkline)
-                    let transCronologicas = [...trans].reverse();
+                    if(mesNome === mesSel) window.transacoesCache = trans;
 
                     trans.forEach((t, tIdx) => {
                         const v = parseFloat(t.valor);
                         if (t.tipo === 'investimento') investAnual[idx] += v;
-                        
-                        if (mesNome === mesSel) {
-                            if (t.tipo === 'entrada') { saldoM += v; rec += v; }
-                            else { saldoM -= v; if(t.tipo === 'fixo') f += v; else if(t.tipo === 'lazer') l += v; else i += v; }
 
-                            const swipeCard = `
-                            <div class="swipe-wrapper">
-                                <div class="entry-card">
-                                    <div><span class="badge-dia">${t.data.split('-')[2]}</span><b>${t.descricao}</b></div>
-                                    <span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}; font-weight:800">${fmt(v)}</span>
+                        if (mesNome === mesSel) {
+                            if (t.tipo === 'entrada') { saldo += v; rec += v; }
+                            else { saldo -= v; if(t.tipo==='fixo') f+=v; else if(t.tipo==='lazer') l+=v; else i+=v; }
+
+                            const itemHtml = `
+                            <div class="entry-card">
+                                <div><b>${t.descricao}</b><br><small style="color:var(--text-sub)">${t.data.split('-')[2]}/${t.data.split('-')[1]}</small></div>
+                                <div style="text-align:right">
+                                    <span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}; font-weight:800">${fmt(v)}</span><br>
+                                    <button class="btn-del" onclick="window.apagar('${mesNome}', ${tIdx})">Apagar</button>
                                 </div>
-                                <div class="delete-action" onclick="apagar('${mesNome}', ${tIdx})">🗑️</div>
                             </div>`;
-                            htmlGeral += swipeCard; if(t.tipo === 'investimento') htmlInvest += swipeCard;
+                            htmlGeral += itemHtml;
+                            if(t.tipo === 'investimento') htmlInvest += itemHtml;
                         }
                     });
-
-                    // Construir Sparkline (Ação do Preço da Carteira)
-                    if(mesNome === mesSel) {
-                        let saldoAcumulado = 0;
-                        transCronologicas.forEach(tc => {
-                            saldoAcumulado += (tc.tipo === 'entrada' ? parseFloat(tc.valor) : -parseFloat(tc.valor));
-                            historicoSaldo.push(saldoAcumulado);
-                        });
-                    }
                 }
             });
 
-            // Inteligência de Run Rate (Dia Atual vs Gasto)
-            const diaHoje = new Date().getDate(); 
-            const limiteSeguro = (rec * 0.8) / 30; // Considerando mês de 30 dias
-            const ritmoAtual = (f + l) / diaHoje;
-            document.getElementById('alerta-ritmo').style.display = (ritmoAtual > limiteSeguro && rec > 0) ? 'block' : 'none';
-
-            // UI Updates
-            const h1Saldo = document.getElementById('saldo');
-            h1Saldo.innerText = fmt(saldoM);
-            h1Saldo.style.color = saldoM >= 0 ? "var(--text-main)" : "var(--red)";
-            
+            document.getElementById('saldo').innerText = fmt(saldo);
             document.getElementById('resumo-receita').innerText = fmt(rec);
-            document.getElementById('resumo-despesa').innerText = fmt(f + l + i);
-            document.getElementById('lista-geral').innerHTML = htmlGeral || '<p style="text-align:center; opacity:0.5; padding:20px">Vazio</p>';
-            document.getElementById('lista-invest').innerHTML = htmlInvest || '<p style="text-align:center; opacity:0.5; padding:20px">Sem aportes</p>';
+            document.getElementById('resumo-despesa').innerText = fmt(f+l+i);
+            document.getElementById('lista-geral').innerHTML = htmlGeral || '<p style="text-align:center; padding:20px; opacity:0.5">Nenhum registro</p>';
+            document.getElementById('lista-invest').innerHTML = htmlInvest || '<p style="text-align:center; padding:20px; opacity:0.5">Sem aportes</p>';
             
-            renderPizza(f, l, i); renderBarras(investAnual); renderSparkline(historicoSaldo); renderMetas(f, l, i, rec);
-        }
-
-        function renderSparkline(dados) {
-            const ctx = document.getElementById('sparklineChart').getContext('2d');
-            if(sparkline) sparkline.destroy();
-            sparkline = new Chart(ctx, {
-                type: 'line',
-                data: { labels: dados.map((_, i) => i), datasets: [{ data: dados, borderColor: '#10B981', borderWidth: 2, tension: 0.4, pointRadius: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: false }, y: { display: false } }, layout: { padding: 0 } }
-            });
-        }
-
-        function renderPizza(f, l, i) {
-            const ctx = document.getElementById('graficoPizza').getContext('2d');
-            if(chartP) chartP.destroy();
-            chartP = new Chart(ctx, { type: 'doughnut', data: { labels:['Fixo','Lazer','Invest'], datasets:[{ data:[f||1, l, i], backgroundColor:['#EF4444','#F59E0B','#4F46E5'], borderWidth:0 }] }, options: { cutout:'85%', plugins:{ legend:{ display:false } } } });
-        }
-
-        function renderBarras(dados) {
-            const ctx = document.getElementById('graficoBarras').getContext('2d');
-            if(chartB) chartB.destroy();
-            chartB = new Chart(ctx, { type: 'bar', data: { labels: ['J','F','M','A','M','J','J','A','S','O','N','D'], datasets: [{ data: dados, backgroundColor: '#4F46E5', borderRadius: 5 }] }, options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } } });
-        }
-
-        function renderMetas(f, l, i, rec) {
-            const base = rec > 0 ? rec : (f+l+i || 1); const calc = (v) => ((v/base)*100).toFixed(0);
-            document.getElementById('metas-container').innerHTML = `
-                <div style="margin-bottom:15px; background:var(--card); padding:10px 15px; border-radius:12px; border:1px solid var(--border);"><div style="display:flex; justify-content:space-between"><small style="font-weight:700">Essencial</small><small style="font-weight:800">${calc(f)}%</small></div><div class="progress-container"><div class="bar" style="width:${Math.min(calc(f), 100)}%; background:var(--red)"></div></div></div>
-                <div style="margin-bottom:15px; background:var(--card); padding:10px 15px; border-radius:12px; border:1px solid var(--border);"><div style="display:flex; justify-content:space-between"><small style="font-weight:700">Lazer</small><small style="font-weight:800">${calc(l)}%</small></div><div class="progress-container"><div class="bar" style="width:${Math.min(calc(l), 100)}%; background:var(--orange)"></div></div></div>
-                <div style="background:var(--card); padding:10px 15px; border-radius:12px; border:1px solid var(--border);"><div style="display:flex; justify-content:space-between"><small style="font-weight:700">Investimento</small><small style="font-weight:800">${calc(i)}%</small></div><div class="progress-container"><div class="bar" style="width:${Math.min(calc(i), 100)}%; background:var(--accent)"></div></div></div>`;
-        }
-
-        window.exportarCSV = () => {
-            if(window.transacoesExportacao.length === 0) return alert("Sem dados para exportar.");
-            let csv = "Data,Descricao,Categoria,Valor\n";
-            window.transacoesExportacao.forEach(t => { csv += `${t.data},${t.descricao},${t.tipo},${t.valor}\n`; });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob); link.download = `FinancasPRO_${document.getElementById('filtroMes').value}.csv`;
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            renderCharts(f, l, i, investAnual, rec);
         };
 
-        async function salvarRegistro() {
-     
+        function renderCharts(f, l, i, barras, rec) {
+            // Pizza
+            const ctxP = document.getElementById('graficoPizza').getContext('2d');
+            if(window.chartP) window.chartP.destroy();
+            window.chartP = new Chart(ctxP, { type:'doughnut', data:{ labels:['Fixo','Lazer','Invest'], datasets:[{ data:[f||1, l, i], backgroundColor:['#EF4444','#F59E0B','#4F46E5'], borderWidth:0 }] }, options:{ cutout:'80%', plugins:{ legend:{ display:false } } } });
+
+            // Barras
+            const ctxB = document.getElementById('graficoBarras').getContext('2d');
+            if(window.chartB) window.chartB.destroy();
+            window.chartB = new Chart(ctxB, { type:'bar', data:{ labels:['J','F','M','A','M','J','J','A','S','O','N','D'], datasets:[{ data:barras, backgroundColor:'#4F46E5', borderRadius:5 }] }, options:{ plugins:{ legend:{display:false} }, scales:{ y:{display:false}, x:{grid:{display:false}} } } });
+
+            // Metas Progress
+            const base = rec || (f+l+i) || 1;
+            const pct = (v) => Math.min(((v/base)*100), 100).toFixed(0);
+            document.getElementById('metas-container').innerHTML = `
+                <small>Essencial (${pct(f)}%)</small><div class="progress-container"><div class="bar" style="width:${pct(f)}%; background:var(--red)"></div></div>
+                <small>Lazer (${pct(l)}%)</small><div class="progress-container"><div class="bar" style="width:${pct(l)}%; background:var(--orange)"></div></div>
+                <small>Investimento (${pct(i)}%)</small><div class="progress-container"><div class="bar" style="width:${pct(i)}%; background:var(--accent)"></div></div>
+            `;
+        }
+
+        window.salvarRegistro = async () => {
+            const v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value;
+            if(!v || !dt) return alert("Preencha valor e data!");
+            const mes = window.mesesNomes[parseInt(dt.split('-')[1]) - 1];
+            const ref = doc(db, "usuarios", auth.currentUser.uid, "meses", mes);
+            const snap = await getDoc(ref);
+            let lista = snap.exists() ? snap.data().transacoes : [];
+            lista.push({ descricao: document.getElementById('desc').value || "Gasto", valor: parseFloat(v), tipo: document.getElementById('tipo').value, data: dt });
+            await setDoc(ref, { transacoes: lista });
+            window.fecharModal(); window.carregarDados();
+        };
+
+        window.apagar = async (mes, idx) => {
+            if(!confirm("Remover este item?")) return;
+            const ref = doc(db, "usuarios", auth.currentUser.uid, "meses", mes);
+            const snap = await getDoc(ref);
+            let lista = snap.data().transacoes;
+            lista.splice(idx, 1);
+            await setDoc(ref, { transacoes: lista });
+            window.carregarDados();
+        };
+
+        window.exportarCSV = () => {
+            let csv = "Data,Descricao,Tipo,Valor\n";
+            window.transacoesCache.forEach(t => csv += `${t.data},${t.descricao},${t.tipo},${t.valor}\n`);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = 'extrato.csv'; a.click();
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0];
+                document.getElementById('filtroMes').value = window.mesesNomes[new Date().getMonth()];
+                window.carregarDados();
+            }
+        });
+    </script>
+</body>
+</html>
+
