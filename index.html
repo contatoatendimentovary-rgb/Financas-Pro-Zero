@@ -13,9 +13,9 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: var(--text); padding-bottom: 120px; transition: 0.3s; overflow-x: hidden; }
         
-        /* Loader Corrigido - Não bloqueia cliques */
-        #loader { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; font-weight: 800; color: var(--accent); pointer-events: none; transition: opacity 0.5s; }
-        .hidden { opacity: 0 !important; display: none !important; }
+        /* Loader Corrigido - Some em 2s para não travar a tela */
+        #loader { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; font-weight: 800; color: var(--accent); transition: opacity 0.5s; }
+        .hidden { opacity: 0 !important; pointer-events: none !important; }
 
         .glass-header { padding: 40px 20px 30px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; }
         .viz-card { background: var(--card); margin: 15px; padding: 22px; border-radius: 28px; border: 1px solid var(--border); }
@@ -32,9 +32,8 @@
         .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-weight: 700; font-size: 0.75rem; gap: 4px; cursor: pointer; }
         .nav-btn.active { color: var(--accent); }
         
-        /* Botões Flutuantes */
-        .floating-btn { position: fixed; bottom: 110px; right: 20px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); border: none; font-size: 30px; font-weight: 800; z-index: 999; color: #000; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .ia-btn { position: fixed; bottom: 110px; left: 20px; width: 60px; height: 60px; border-radius: 20px; background: #2563eb; border: none; font-size: 24px; z-index: 999; color: #fff; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .floating-btn { position: fixed; bottom: 110px; right: 20px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); border: none; font-size: 30px; font-weight: 800; z-index: 999; color: #000; cursor: pointer; }
+        .ia-btn { position: fixed; bottom: 110px; left: 20px; width: 60px; height: 60px; border-radius: 20px; background: #2563eb; border: none; font-size: 24px; z-index: 999; color: #fff; cursor: pointer; }
 
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: flex-end; }
         .modal-sheet { background: var(--bg); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; border-top: 1px solid var(--border); }
@@ -44,16 +43,15 @@
         
         .tab-content { display: none; } .tab-content.active { display: block; }
 
-        /* Modal Finan IA */
         #chat-content { height: 300px; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 15px; }
-        .msg { padding: 10px 15px; border-radius: 12px; max-width: 85%; font-size: 0.9rem; }
+        .msg { padding: 10px 15px; border-radius: 12px; max-width: 85%; font-size: 0.9rem; line-height: 1.4; }
         .msg.ia { background: #1e293b; color: #fff; align-self: flex-start; }
         .msg.user { background: var(--accent); color: #000; align-self: flex-end; font-weight: 600; }
     </style>
 </head>
 <body>
 
-    <div id="loader">CARREGANDO...</div>
+    <div id="loader">Carregando Finan Pro...</div>
 
     <header class="glass-header">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
@@ -75,7 +73,6 @@
                 </div>
             </div>
         </section>
-
         <section id="aba-aportes" class="tab-content"><div id="lista-investimentos" style="padding: 20px;"></div></section>
         <section id="aba-extrato" class="tab-content"><div id="lista-geral" style="padding: 20px;"></div></section>
     </main>
@@ -88,6 +85,20 @@
 
     <button onclick="window.abrirIA()" class="ia-btn">🤖</button>
     <button onclick="window.abrirModal()" class="floating-btn">+</button>
+
+    <div id="modalIA" class="modal-overlay">
+        <div class="modal-sheet">
+            <h3 style="margin-bottom:15px; font-weight:800;">Falar com <span style="color:#2563eb">Finan</span></h3>
+            <div id="chat-content">
+                <div class="msg ia">Olá Henrique! Sou o Finan. Como posso ajudar você hoje?</div>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="ia-input" placeholder="Diga algo..." style="flex:1; background:#111; border:1px solid #333; color:white; padding:15px; border-radius:12px; outline:none;">
+                <button onclick="window.perguntarIA()" style="background:#2563eb; color:white; border:none; padding:15px; border-radius:12px; font-weight:bold;">ENVIAR</button>
+            </div>
+            <button onclick="window.fecharIA()" style="width:100%; border:none; background:none; color:#888; padding:15px;">FECHAR</button>
+        </div>
+    </div>
 
     <div id="modal" class="modal-overlay">
         <div class="modal-sheet">
@@ -103,20 +114,6 @@
             </div>
             <button onclick="window.salvarRegistro()" class="btn-save">SALVAR</button>
             <button onclick="window.fecharModal()" style="width:100%; border:none; background:none; color:#888; padding:15px;">FECHAR</button>
-        </div>
-    </div>
-
-    <div id="modalIA" class="modal-overlay">
-        <div class="modal-sheet">
-            <h3 style="margin-bottom:15px; font-weight:800;">Falar com <span style="color:#2563eb">Finan</span></h3>
-            <div id="chat-content">
-                <div class="msg ia">Olá Henrique! Sou o Finan. Como posso te ajudar com seus trades ou sua gestão hoje?</div>
-            </div>
-            <div style="display:flex; gap:10px;">
-                <input type="text" id="ia-input" placeholder="Diga algo..." style="flex:1; background:#111; border:1px solid #333; color:white; padding:15px; border-radius:12px; outline:none;">
-                <button onclick="window.perguntarIA()" style="background:#2563eb; color:white; border:none; padding:15px; border-radius:12px; font-weight:bold;">ENVIAR</button>
-            </div>
-            <button onclick="window.fecharIA()" style="width:100%; border:none; background:none; color:#888; padding:15px;">FECHAR</button>
         </div>
     </div>
 
@@ -143,6 +140,9 @@
         window.f_doc = doc; window.f_setDoc = setDoc; window.f_getDoc = getDoc;
         window.mesesNomes = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
 
+        // Garantia de que o loader suma em 2 segundos para não travar
+        setTimeout(() => document.getElementById('loader').classList.add('hidden'), 2000);
+
         setPersistence(auth, browserLocalPersistence).then(() => {
             getRedirectResult(auth).catch(e => console.log("Erro Auth:", e));
         });
@@ -158,7 +158,7 @@
         });
 
         window.gerenciarAuth = () => {
-            if (auth.currentUser) { signOut(auth); }
+            if (auth.currentUser) { if(confirm("Sair?")) signOut(auth); }
             else { signInWithRedirect(auth, new GoogleAuthProvider()); }
         };
     </script>
@@ -177,22 +177,23 @@
             const user = window.auth.currentUser; if (!user) return;
             let saldoM = 0, fixo = 0, lazer = 0, invest = 0;
             const mesAtual = window.mesesNomes[new Date().getMonth()];
-            const snap = await window.f_getDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", mesAtual));
-            
-            if (snap.exists()) {
-                snap.data().transacoes.forEach(t => {
-                    const v = parseFloat(t.valor);
-                    if (t.tipo === 'entrada') saldoM += v;
-                    else {
-                        saldoM -= v;
-                        if(t.tipo === 'fixo') fixo += v;
-                        else if(t.tipo === 'lazer') lazer += v;
-                        else invest += v;
-                    }
-                });
-            }
-            document.getElementById('saldo').innerText = saldoM.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
-            renderPizza(fixo, lazer, invest);
+            try {
+                const snap = await window.f_getDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", mesAtual));
+                if (snap.exists()) {
+                    snap.data().transacoes.forEach(t => {
+                        const v = parseFloat(t.valor);
+                        if (t.tipo === 'entrada') saldoM += v;
+                        else {
+                            saldoM -= v;
+                            if(t.tipo === 'fixo') fixo += v;
+                            else if(t.tipo === 'lazer') lazer += v;
+                            else invest += v;
+                        }
+                    });
+                }
+                document.getElementById('saldo').innerText = saldoM.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+                renderPizza(fixo, lazer, invest);
+            } catch (e) { console.error("Erro Firestore:", e); }
         };
 
         function renderPizza(f, l, i) {
@@ -204,7 +205,7 @@
         window.salvarRegistro = async () => {
             const user = window.auth.currentUser;
             const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value, t = document.getElementById('tipo').value;
-            if(!v || !dt) return alert("Dados incompletos");
+            if(!v || !dt) return alert("Preencha Valor e Data");
             const mesAlvo = window.mesesNomes[parseInt(dt.split('-')[1]) - 1];
             const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mesAlvo);
             const snap = await window.f_getDoc(ref);
@@ -220,14 +221,20 @@
             if(!prompt) return;
             chat.innerHTML += `<div class="msg user">${prompt}</div>`;
             document.getElementById('ia-input').value = "";
+            chat.scrollTop = chat.scrollHeight;
+
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AQ.Ab8RN6I0HBcnj_r4GU5euHnkGszaF6janYmUoxfyF_lKvbQteg`, {
-                    method: "POST", headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt + " (Responda como Finan, o assistente do Henrique)" }] }] })
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: `O Henrique é gestor comercial e trader. Responda brevemente como Finan: ${prompt}` }] }] })
                 });
-                const data = await res.json();
-                chat.innerHTML += `<div class="msg ia">${data.candidates[0].content.parts[0].text}</div>`;
-            } catch (e) { chat.innerHTML += `<div class="msg ia">Erro na conexão.</div>`; }
+                const data = await response.json();
+                const aiText = data.candidates[0].content.parts[0].text;
+                chat.innerHTML += `<div class="msg ia">${aiText}</div>`;
+            } catch (e) { 
+                chat.innerHTML += `<div class="msg ia">Desculpe Henrique, tive um erro na rede. Tente de novo!</div>`; 
+            }
             chat.scrollTop = chat.scrollHeight;
         };
 
@@ -239,4 +246,3 @@
     </script>
 </body>
 </html>
-
