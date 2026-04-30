@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finan Pro - Groq Edition</title>
+    <title>Finan Pro - Groq Cloud</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -23,46 +23,56 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: var(--text-main); padding-bottom: 110px; transition: 0.3s; overflow-x: hidden; }
+        
         .glass-header { background: var(--header-bg); padding: 50px 20px 40px; border-radius: 0 0 30px 30px; border-bottom: 1px solid var(--border); text-align: center; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .theme-toggle { background: var(--card); border: 1px solid var(--border); color: var(--text-main); padding: 8px 12px; border-radius: 12px; cursor: pointer; }
         .user-pill { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 800; cursor: pointer; font-size: 0.8rem; }
         .main-balance h1 { font-size: 2.8rem; font-weight: 800; letter-spacing: -1px; margin: 5px 0; }
+        
         .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; margin-top: -25px; position: relative; z-index: 10; }
         .stat-card { background: var(--card); padding: 18px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        
         .viz-card { background: var(--card); margin: 20px; padding: 22px; border-radius: 28px; border: 1px solid var(--border); }
         .tab-content { display: none; } .tab-content.active { display: block; }
+        
         .entry-card { background: var(--card); padding: 16px; border-radius: 20px; margin: 0 20px 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        
         .ai-popup { display: none; position: fixed; bottom: 100px; left: 15px; right: 15px; background: var(--card); border: 1px solid var(--accent); border-radius: 28px; padding: 22px; z-index: 3000; flex-direction: column; max-height: 70vh; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         .chat-area { flex: 1; overflow-y: auto; margin: 15px 0; font-size: 0.9rem; min-height: 200px; }
         .chat-bubble { margin-bottom: 10px; padding: 12px; border-radius: 16px; max-width: 85%; line-height: 1.4; }
         .ai-bubble { background: rgba(16, 185, 129, 0.1); color: var(--text-main); border-bottom-left-radius: 4px; }
         .user-bubble { background: var(--accent); color: white; margin-left: auto; border-bottom-right-radius: 4px; }
+        
         .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--header-bg); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
         .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; flex: 1; cursor: pointer; }
         .nav-btn.active { color: var(--accent); }
         .nav-btn span { font-size: 1.4rem; margin-bottom: 4px; }
+        
         .floating-btn { position: fixed; bottom: 115px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--ai-gradient); color: white; border: none; font-size: 24px; z-index: 999; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); z-index: 4000; align-items: flex-end; backdrop-filter: blur(4px); }
         .modal-sheet { background: var(--card); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; border-top: 2px solid var(--accent); }
         .input-grid input, .input-grid select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 15px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); outline: none; }
+        
         .progress-container { background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; margin: 6px 0 12px; }
         .bar { height: 100%; transition: 0.8s; }
     </style>
 </head>
 <body>
 
+    <!-- MODAL IA -->
     <div id="ai-modal" class="ai-popup">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <b style="color:var(--green); font-size: 0.8rem;">⚡ GROQ IA CONSULTOR</b>
+            <b style="color:var(--green); font-size: 0.8rem;">⚡ CONSULTOR GROQ PRO</b>
             <button onclick="fecharAI()" style="background:none; border:none; font-size:1.5rem; color:var(--text-sub);">&times;</button>
         </div>
         <div class="chat-area" id="chat-historico">
-            <div class="chat-bubble ai-bubble">Olá Henrique! Sou sua IA via GroqCloud. Vamos analisar seus dados de Gestão Comercial?</div>
+            <div class="chat-bubble ai-bubble">Olá Henrique! Analisando seu saldo via GroqCloud. Em que posso ajudar?</div>
         </div>
         <div style="display:flex; gap:8px;">
-            <input type="text" id="ai-input" placeholder="Dúvida financeira..." style="flex:1; padding:12px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text-main);">
-            <button onclick="perguntarIA()" style="background:var(--accent); color:white; border:none; padding:0 15px; border-radius:12px; font-weight:bold;">IR</button>
+            <input type="text" id="ai-input" placeholder="Perguntar..." style="flex:1; padding:12px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text-main);">
+            <button onclick="perguntarIA()" style="background:var(--accent); color:white; border:none; padding:0 15px; border-radius:12px; font-weight:bold;">OK</button>
         </div>
     </div>
 
@@ -72,7 +82,7 @@
             <div style="font-weight: 800; color: var(--accent);">Finan Pro</div>
             <button id="btnAuth" class="user-pill" onclick="loginGoogle()">ENTRAR</button>
         </div>
-        <div class="main-balance"><h1 id="saldo">R$ 0,00</h1><small style="color: var(--text-sub); font-weight: 700;">SALDO ATUAL</small></div>
+        <div class="main-balance"><h1 id="saldo">R$ 0,00</h1><small style="color: var(--text-sub); font-weight: 700;">SALDO TOTAL</small></div>
     </header>
 
     <div class="stats-row">
@@ -85,8 +95,18 @@
             <div class="viz-card"><canvas id="graficoPizza" style="max-height: 180px;"></canvas></div>
             <div id="metas-container" style="padding: 0 20px;"></div>
         </section>
+        
         <section id="aba-extrato" class="tab-content">
-            <div style="padding: 20px;"><select id="filtroMes" class="input-grid" onchange="carregarDados()"><option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option><option value="março">Março</option><option value="abril">Abril</option><option value="maio">Maio</option><option value="junho">Junho</option><option value="julho">Julho</option><option value="agosto">Agosto</option><option value="setembro">Setembro</option><option value="outubro">Outubro</option><option value="novembro">Novembro</option><option value="dezembro">Dezembro</option></select></div>
+            <div style="padding: 20px;">
+                <select id="filtroMes" class="input-grid" onchange="carregarDados()">
+                    <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
+                    <option value="março">Março</option><option value="abril">Abril</option>
+                    <option value="maio">Maio</option><option value="junho">Junho</option>
+                    <option value="julho">Julho</option><option value="agosto">Agosto</option>
+                    <option value="setembro">Setembro</option><option value="outubro">Outubro</option>
+                    <option value="novembro">Novembro</option><option value="dezembro">Dezembro</option>
+                </select>
+            </div>
             <div id="lista-geral"></div>
         </section>
     </main>
@@ -106,19 +126,32 @@
                 <input type="text" id="desc" placeholder="Descrição">
                 <input type="number" id="valor" placeholder="Valor R$">
                 <input type="date" id="data-reg">
-                <select id="tipo"><option value="fixo">Essencial</option><option value="lazer">Lazer</option><option value="investimento">Reserva</option><option value="entrada">Receita</option></select>
+                <select id="tipo">
+                    <option value="fixo">Essencial (50%)</option>
+                    <option value="lazer">Lazer (30%)</option>
+                    <option value="investimento">Reserva (20%)</option>
+                    <option value="entrada">Receita (+)</option>
+                </select>
                 <button onclick="salvarRegistro()" style="width:100%; padding:18px; background:var(--accent); color:white; border:none; border-radius:16px; font-weight:bold;">SALVAR</button>
             </div>
         </div>
     </div>
 
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE", authDomain: "financaspro-1e0e8.firebaseapp.com", projectId: "financaspro-1e0e8", storageBucket: "financaspro-1e0e8.firebasestorage.app", messagingSenderId: "659521706556", appId: "1:659521706556:web:86f2174c4c8a89335ac139" };
+        // CONFIGURAÇÕES FIREBASE
+        const firebaseConfig = { 
+            apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE", 
+            authDomain: "financaspro-1e0e8.firebaseapp.com", 
+            projectId: "financaspro-1e0e8", 
+            storageBucket: "financaspro-1e0e8.firebasestorage.app", 
+            messagingSenderId: "659521706556", 
+            appId: "1:659521706556:web:86f2174c4c8a89335ac139" 
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
         
-        // CONFIGURAÇÃO GROQ
+        // CHAVE SOLICITADA
         const GROQ_API_KEY = "AIzaSyABN1kT-ycsJkhVT0OtqRoK8r2Z1iwrD5I"; 
 
         let chartP = null;
@@ -151,7 +184,7 @@
             document.getElementById('saldo').innerText = s.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
             document.getElementById('resumo-receita').innerText = r.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
             document.getElementById('resumo-despesa').innerText = (f+l+i).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-            document.getElementById('lista-geral').innerHTML = html || "<p style='text-align:center;padding:40px;opacity:0.5'>Vazio.</p>";
+            document.getElementById('lista-geral').innerHTML = html || "<p style='text-align:center;padding:40px;opacity:0.5'>Sem registros.</p>";
             renderCharts(f, l, i);
         }
 
@@ -167,7 +200,7 @@
             fecharModal(); carregarDados();
         }
 
-        // INTEGRAÇÃO GROQCLOUD - LLAMA 3.1 8B INSTANT
+        // IA VIA GROQCLOUD - LLAMA 3.1 8B (VERSÃO ESTÁVEL)
         async function perguntarIA() {
             const input = document.getElementById('ai-input');
             const chat = document.getElementById('chat-historico');
@@ -179,7 +212,7 @@
             chat.scrollTop = chat.scrollHeight;
 
             try {
-                const systemPrompt = `Você é o consultor do app Finan Pro. Henrique é estudante de Gestão Comercial. Dados: Saldo R$${dadosFinanceiros.saldo}, Gastos: Essencial R$${dadosFinanceiros.f}, Lazer R$${dadosFinanceiros.l}, Reserva R$${dadosFinanceiros.i}. Responda de forma curta e prática.`;
+                const promptSystem = `Você é o assistente financeiro do app Finan Pro. Henrique é estudante de Gestão Comercial. Responda de forma breve. Saldo: R$${dadosFinanceiros.saldo}. Gastos: Fixo R$${dadosFinanceiros.f}, Lazer R$${dadosFinanceiros.l}, Reserva R$${dadosFinanceiros.i}.`;
                 
                 const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: 'POST',
@@ -190,10 +223,9 @@
                     body: JSON.stringify({ 
                         model: "llama-3.1-8b-instant",
                         messages: [
-                            { role: "system", content: systemPrompt },
+                            { role: "system", content: promptSystem },
                             { role: "user", content: textoUser }
-                        ],
-                        temperature: 0.7
+                        ]
                     })
                 });
 
@@ -203,7 +235,7 @@
                 const botResposta = data.choices[0].message.content;
                 chat.innerHTML += `<div class="chat-bubble ai-bubble">${botResposta}</div>`;
             } catch (e) {
-                chat.innerHTML += `<div class="chat-bubble ai-bubble" style="color:var(--red)">Erro Groq: ${e.message}</div>`;
+                chat.innerHTML += `<div class="chat-bubble ai-bubble" style="color:var(--red)">Erro: Chave GROQ inválida ou limite atingido.</div>`;
             }
             chat.scrollTop = chat.scrollHeight;
         }
