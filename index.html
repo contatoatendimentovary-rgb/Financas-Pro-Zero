@@ -317,12 +317,4 @@
                 });
                 const data = await res.json();
                 out.innerText = data.candidates[0].content.parts[0].text;
-            } catch (e) { out.innerText = "Erro ao conectar com a IA."; }
-        };
-
-        function toggleTheme() { document.body.classList.toggle('light-mode'); }
-        function abrirModal() { document.getElementById('modal').style.display = 'flex'; }
-        function fecharModal() { document.getElementById('modal').style.display = 'none'; }
-    </script>
-</body>
-</html>
+            } catch (e) { out
