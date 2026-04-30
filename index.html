@@ -19,7 +19,7 @@
             --bg: #0a0a0a;
             --card: #161616;
             --text: #ffffff;
-            --accent: #00e676; /* Verde Trader */
+            --accent: #00e676;
             --essential: #f44336;
             --lifestyle: #ffeb3b;
             --invest: #2979ff;
@@ -57,20 +57,14 @@
             box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
 
-        /* Dashboard e Barras */
         .balance { font-size: 2.2rem; font-weight: 800; color: var(--accent); margin: 5px 0; }
         
         .progress-container {
-            height: 10px;
-            display: flex;
-            border-radius: 5px;
-            overflow: hidden;
-            background: #333;
-            margin: 15px 0;
+            height: 10px; display: flex; border-radius: 5px;
+            overflow: hidden; background: #333; margin: 15px 0;
         }
         .progress-bar { height: 100%; transition: width 0.5s ease; }
 
-        /* Estilos de Input e Botões */
         input, select {
             width: 100%; padding: 14px; margin: 8px 0; border-radius: 12px;
             border: 1px solid #333; background: #222; color: white; box-sizing: border-box;
@@ -82,9 +76,8 @@
             cursor: pointer; margin-top: 10px;
         }
 
-        /* Chat IA */
         .chat-box {
-            height: 200px; overflow-y: auto; background: #000;
+            height: 180px; overflow-y: auto; background: #000;
             padding: 10px; border-radius: 12px; border: 1px solid #222;
             font-size: 0.9rem; margin-bottom: 10px;
         }
@@ -92,29 +85,33 @@
         .msg-ai { color: #ccc; margin-bottom: 12px; border-bottom: 1px solid #222; padding-bottom: 5px; }
 
         .hidden { display: none !important; }
+        .loading-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 1000; }
     </style>
 </head>
 <body>
 
+<div id="loader" class="loading-overlay">Carregando Finan Pro...</div>
+
 <header>
     <div id="auth-status"><span class="material-icons">account_circle</span></div>
     <strong>FINAN PRO</strong>
-    <button onclick="auth.signOut()" style="background:none; border:none; color:white;">
+    <button onclick="logout()" style="background:none; border:none; color:white;">
         <span class="material-icons">logout</span>
     </button>
 </header>
 
 <div class="container">
-    <div id="login-screen" class="card">
-        <h2 style="text-align:center">Olá, Henrique</h2>
+    <div id="login-screen" class="card hidden">
+        <h2 style="text-align:center">Acesso</h2>
+        <p style="text-align:center; color: #888;">Entre com sua conta Google para gerenciar suas finanças.</p>
         <button class="btn-main" style="background:white" onclick="loginGoogle()">
-            Entrar com Google
+            LOGAR COM GOOGLE
         </button>
     </div>
 
     <div id="main-app" class="hidden">
         <div class="card" style="text-align: center;">
-            <small style="color: #888;">SALDO TOTAL ATUAL</small>
+            <small style="color: #888;">SALDO EM CONTA</small>
             <div class="balance" id="display-saldo">R$ 0,00</div>
             
             <div class="progress-container">
@@ -123,12 +120,12 @@
                 <div id="b-inv" class="progress-bar" style="background: var(--invest);"></div>
             </div>
             <div style="display:flex; justify-content:space-around; font-size:0.7rem;">
-                <span>🔴 50%</span><span>🟡 30%</span><span>🔵 20%</span>
+                <span>🔴 Essencial</span><span>🟡 Lazer</span><span>🔵 Invest</span>
             </div>
         </div>
 
         <div class="card">
-            <h3>Lançamento Rápido</h3>
+            <h3>Novo Lançamento</h3>
             <input type="text" id="desc" placeholder="Descrição">
             <input type="number" id="valor" placeholder="Valor R$" step="0.01">
             <select id="cat">
@@ -136,14 +133,14 @@
                 <option value="30">Desejos (30%)</option>
                 <option value="20">Investimento (20%)</option>
             </select>
-            <button class="btn-main" onclick="salvarOperacao()">Adicionar</button>
+            <button class="btn-main" onclick="salvarOperacao()">ADICIONAR</button>
         </div>
 
         <div class="card">
-            <h3>Assistente de Gestão</h3>
+            <h3>Consultor IA</h3>
             <div id="chat-box" class="chat-box"></div>
             <div style="display:flex; gap:10px;">
-                <input type="text" id="ia-prompt" placeholder="Perguntar sobre margem ou mercado...">
+                <input type="text" id="ia-prompt" placeholder="Sua dúvida...">
                 <button onclick="perguntarIA()" style="width:50px; background:var(--accent); border-radius:12px; border:none;">
                     <span class="material-icons" style="vertical-align:middle">send</span>
                 </button>
@@ -153,14 +150,14 @@
 </div>
 
 <script>
-    // --- CONFIGURAÇÃO FIREBASE ---
+    // --- CONFIGURAÇÃO FIREBASE (INSIRA SEUS DADOS AQUI) ---
     const firebaseConfig = {
         apiKey: "SUA_API_KEY",
-        authDomain: "SEU_DOMINIO.firebaseapp.com",
+        authDomain: "SEU_PROJETO.firebaseapp.com",
         projectId: "SEU_PROJETO_ID",
         storageBucket: "SEU_PROJETO.appspot.com",
-        messagingSenderId: "ID_SENDER",
-        appId: "SEU_APP_ID"
+        messagingSenderId: "ID",
+        appId: "ID_APP"
     };
 
     const GEMINI_KEY = "AQ.Ab8RN6I0HBcnj_r4GU5euHnkGszaF6janYmUoxfyF_lKvbQteg";
@@ -169,13 +166,25 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // --- AUTH ---
+    // Configura a persistência para garantir que o login dure
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+    // --- LÓGICA DE LOGIN (REVISADA) ---
     function loginGoogle() {
         const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider);
+        // Usamos Redirect em vez de Popup para evitar bloqueios em PWA/Mobile
+        auth.signInWithRedirect(provider);
     }
 
+    // Captura o resultado do redirect ao carregar a página
+    auth.getRedirectResult().catch(error => {
+        if(error.code !== "auth/redirect-cancelled-by-user") {
+            alert("Erro na autenticação: " + error.message);
+        }
+    });
+
     auth.onAuthStateChanged(user => {
+        document.getElementById('loader').classList.add('hidden');
         if (user) {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
@@ -188,7 +197,11 @@
         }
     });
 
-    // --- DADOS ---
+    function logout() {
+        if(confirm("Deseja sair?")) auth.signOut();
+    }
+
+    // --- DADOS E IA (MESMA LÓGICA ROBUSTA) ---
     function salvarOperacao() {
         const user = auth.currentUser;
         const desc = document.getElementById('desc').value;
@@ -220,15 +233,15 @@
 
                 document.getElementById('display-saldo').innerText = total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
                 
-                if(total > 0) {
-                    document.getElementById('b-ess').style.width = (e/total*100) + "%";
-                    document.getElementById('b-des').style.width = (d/total*100) + "%";
-                    document.getElementById('b-inv').style.width = (i/total*100) + "%";
+                if(total !== 0) {
+                    const absTotal = Math.abs(total);
+                    document.getElementById('b-ess').style.width = (Math.abs(e)/absTotal*100) + "%";
+                    document.getElementById('b-des').style.width = (Math.abs(d)/absTotal*100) + "%";
+                    document.getElementById('b-inv').style.width = (Math.abs(i)/absTotal*100) + "%";
                 }
             });
     }
 
-    // --- IA GEMINI ---
     async function perguntarIA() {
         const prompt = document.getElementById('ia-prompt').value;
         const box = document.getElementById('chat-box');
@@ -237,21 +250,20 @@
         box.innerHTML += `<div class="msg-user"><b>Você:</b> ${prompt}</div>`;
         document.getElementById('ia-prompt').value = "";
 
-        const context = `Contexto: Usuário Henrique, estudante de Gestão Comercial e Trader. 
-                         Saldo atual: ${document.getElementById('display-saldo').innerText}. 
-                         Pergunta: ${prompt}`;
+        const context = `Contexto: Usuário Henrique, Gestão Comercial/Trader. Saldo: ${document.getElementById('display-saldo').innerText}. Pergunta: ${prompt}`;
 
         try {
             const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {
                 method: "POST",
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ contents: [{ parts: [{ text: context }] }] })
             });
             const data = await res.json();
             const text = data.candidates[0].content.parts[0].text;
-            box.innerHTML += `<div class="msg-ai"><b>Finan Pro:</b> ${text}</div>`;
+            box.innerHTML += `<div class="msg-ai"><b>IA:</b> ${text}</div>`;
             box.scrollTop = box.scrollHeight;
         } catch (e) {
-            box.innerHTML += `<div class="msg-ai">Erro ao conectar com a IA.</div>`;
+            box.innerHTML += `<div class="msg-ai">Erro na IA.</div>`;
         }
     }
 </script>
