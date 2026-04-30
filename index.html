@@ -1,283 +1,278 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Finan Pro IA</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Finan Pro | Gestão Inteligente</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #0B0F1A;
+            --card-bg: #161B2C;
+            --accent: #7C3AED;
+            --text-primary: #FFFFFF;
+            --text-secondary: #94A3B8;
+            --green: #10B981;
+            --red: #EF4444;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+        }
 
-<style>
-:root {
-    --bg: #020617;
-    --card: #0F172A;
-    --text-main: #E2E8F0;
-    --text-sub: #64748B;
-    --border: #1E293B;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        body { background: var(--bg); color: var(--text-primary); padding-bottom: 90px; transition: 0.3s; }
 
-    --green: #22C55E;
-    --red: #EF4444;
-}
+        /* Header Estilizado */
+        .header { padding: 40px 24px 60px; background: radial-gradient(circle at top right, #2D1B69 0%, var(--bg) 70%); border-bottom: 1px solid var(--border); text-align: center; }
+        .nav-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .logo { font-weight: 800; letter-spacing: -1px; font-size: 1.2rem; color: var(--accent); }
+        .user-btn { background: var(--glass); border: 1px solid var(--border); color: white; padding: 8px 16px; border-radius: 100px; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
 
-body {
-    margin:0;
-    background:var(--bg);
-    color:var(--text-main);
-    font-family: Arial;
-}
+        .balance-main { margin-top: 10px; }
+        .balance-main small { color: var(--text-secondary); font-weight: 500; text-transform: uppercase; letter-spacing: 1px; font-size: 0.7rem; }
+        .balance-main h1 { font-size: 3rem; font-weight: 800; margin: 8px 0; letter-spacing: -2px; }
 
-/* HEADER */
-header {
-    padding:30px;
-    text-align:center;
-}
+        /* Cards de Resumo */
+        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 24px; margin-top: -30px; }
+        .card-stat { background: var(--card-bg); padding: 20px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .card-stat span { font-size: 0.65rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 5px; }
+        .card-stat b { font-size: 1.1rem; }
 
-#saldo {
-    font-size:2.5rem;
-    color:var(--green);
-}
+        /* Dash e Gráficos */
+        .section-title { padding: 30px 24px 15px; font-size: 0.9rem; font-weight: 700; color: var(--text-secondary); }
+        .chart-container { background: var(--card-bg); margin: 0 24px; padding: 25px; border-radius: 28px; border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; }
+        
+        /* Lista de Transações */
+        .transaction-list { padding: 0 24px; }
+        .t-item { background: var(--glass); border: 1px solid var(--border); padding: 16px; border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .t-info b { display: block; font-size: 0.95rem; margin-bottom: 2px; }
+        .t-info small { color: var(--text-secondary); font-size: 0.75rem; }
+        .t-amount { font-weight: 700; font-size: 1rem; }
 
-/* CARD */
-.card {
-    background:var(--card);
-    margin:15px;
-    padding:20px;
-    border-radius:15px;
-    border:1px solid var(--border);
-}
+        /* Floating AI Button */
+        .ai-fab { position: fixed; bottom: 100px; right: 24px; width: 56px; height: 56px; border-radius: 20px; background: linear-gradient(135deg, #7C3AED, #DB2777); border: none; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4); z-index: 999; }
 
-/* BOTÃO */
-button {
-    background:var(--green);
-    border:none;
-    padding:12px;
-    border-radius:10px;
-    color:#000;
-    font-weight:bold;
-    cursor:pointer;
-}
+        /* IA Chat Modal */
+        .ai-panel { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 2000; flex-direction: column; }
+        .ai-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .ai-chat-box { flex: 1; overflow-y: auto; padding: 20px; }
+        .msg { margin-bottom: 15px; padding: 14px 18px; border-radius: 20px; max-width: 80%; line-height: 1.5; font-size: 0.95rem; }
+        .msg-bot { background: var(--card-bg); border-bottom-left-radius: 4px; border: 1px solid var(--border); }
+        .msg-user { background: var(--accent); color: white; margin-left: auto; border-bottom-right-radius: 4px; }
+        .ai-input-area { padding: 20px; border-top: 1px solid var(--border); display: flex; gap: 10px; background: var(--card-bg); }
+        .ai-input-area input { flex: 1; background: var(--bg); border: 1px solid var(--border); padding: 15px; border-radius: 15px; color: white; outline: none; }
 
-/* INPUT */
-input, select {
-    width:100%;
-    padding:10px;
-    border-radius:10px;
-    border:1px solid var(--border);
-    background:#000;
-    color:#fff;
-}
+        /* Tab Bar */
+        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 80px; background: rgba(22, 27, 44, 0.95); backdrop-filter: blur(10px); display: flex; border-top: 1px solid var(--border); padding-bottom: 20px; }
+        .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.65rem; color: var(--text-secondary); border: none; background: none; cursor: pointer; }
+        .tab-item.active { color: var(--accent); }
+        .tab-item span { font-size: 1.5rem; margin-bottom: 4px; }
 
-/* LISTA */
-.entry {
-    display:flex;
-    justify-content:space-between;
-    padding:10px 0;
-    border-bottom:1px solid var(--border);
-}
-
-/* IA */
-#ai-box {
-    position:fixed;
-    bottom:0;
-    left:0;
-    right:0;
-    background:#000;
-    padding:10px;
-}
-
-#chat {
-    max-height:150px;
-    overflow:auto;
-}
-
-.msg-ai { color:#22C55E; margin:5px 0; }
-.msg-user { color:#fff; margin:5px 0; }
-
-</style>
+        /* Modal Novo Registro */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 3000; align-items: flex-end; }
+        .modal-content { background: var(--card-bg); width: 100%; border-radius: 32px 32px 0 0; padding: 32px; border-top: 1px solid var(--accent); }
+        .modal-content h2 { margin-bottom: 24px; font-size: 1.2rem; text-align: center; }
+        input, select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 16px; border: 1px solid var(--border); background: var(--bg); color: white; font-size: 1rem; }
+        .btn-save { width: 100%; padding: 18px; border-radius: 16px; background: var(--accent); color: white; border: none; font-weight: 700; font-size: 1rem; margin-top: 10px; }
+    </style>
 </head>
-
 <body>
 
-<header>
-    <h1>💰 Finan Pro IA</h1>
-    <div id="saldo">R$ 0</div>
-</header>
+    <div id="ai-panel" class="ai-panel">
+        <div class="ai-header">
+            <b>✨ FIN PRO Inteligente</b>
+            <button onclick="toggleAI()" style="background:none; border:none; color:white; font-size:1.5rem;">&times;</button>
+        </div>
+        <div class="ai-chat-box" id="ai-messages">
+            <div class="msg msg-bot">Olá Henrique! Sou o FIN PRO. Analisei suas finanças e estou pronto para te ajudar. O que deseja saber?</div>
+        </div>
+        <div class="ai-input-area">
+            <input type="text" id="ai-input" placeholder="Ex: Quanto gastei com lazer?">
+            <button onclick="askAI()" style="background:var(--accent); border:none; color:white; padding:10px 20px; border-radius:12px; font-weight:bold;">OK</button>
+        </div>
+    </div>
 
-<div class="card">
-    <h3>📊 Movimentos</h3>
-    <div id="lista"></div>
-</div>
+    <header class="header">
+        <div class="nav-top">
+            <div class="logo">FINAN PRO</div>
+            <button id="btnAuth" class="user-btn" onclick="login()">ENTRAR</button>
+        </div>
+        <div class="balance-main">
+            <small>Saldo Disponível</small>
+            <h1 id="main-balance">R$ 0,00</h1>
+        </div>
+    </header>
 
-<div class="card">
-    <h3>➕ Novo lançamento</h3>
+    <div class="summary-grid">
+        <div class="card-stat">
+            <span>RECEITAS</span>
+            <b id="tot-in" style="color: var(--green);">+ R$ 0,00</b>
+        </div>
+        <div class="card-stat">
+            <span>DESPESAS</span>
+            <b id="tot-out" style="color: var(--red);">- R$ 0,00</b>
+        </div>
+    </div>
 
-    <input id="desc" placeholder="Descrição"><br><br>
-    <input id="valor" type="number" placeholder="Valor"><br><br>
+    <main id="view-dash">
+        <div class="section-title">DISTRIBUIÇÃO MENSAL</div>
+        <div class="chart-container">
+            <canvas id="mainChart" style="max-height: 200px;"></canvas>
+            <div id="progress-bars" style="width: 100%; margin-top: 20px;"></div>
+        </div>
+    </main>
 
-    <select id="tipo">
-        <option value="entrada">💰 Receita</option>
-        <option value="fixo">🏠 Fixo</option>
-        <option value="lazer">🍔 Lazer</option>
-        <option value="investimento">📈 Investimento</option>
-    </select><br><br>
+    <main id="view-extrato" style="display:none;">
+        <div class="section-title">HISTÓRICO DE GASTOS</div>
+        <div class="transaction-list" id="list-items"></div>
+    </main>
 
-    <button onclick="salvar()">Salvar</button>
-</div>
+    <button class="ai-fab" onclick="toggleAI()">✨</button>
 
-<div id="ai-box">
-    <div id="chat"></div>
-    <input id="msg" placeholder="Ex: gastei 50 com pizza">
-    <button onclick="ia()">Enviar</button>
-</div>
+    <nav class="tab-bar">
+        <button class="tab-item active" onclick="switchView('dash', this)"><span>📊</span>DASH</button>
+        <button class="tab-item" onclick="openModal()"><span>➕</span>NOVO</button>
+        <button class="tab-item" onclick="switchView('extrato', this)"><span>📜</span>EXTRATO</button>
+    </nav>
 
-<script>
+    <div id="modal-reg" class="modal" onclick="if(event.target==this) closeModal()">
+        <div class="modal-content">
+            <h2>Novo Lançamento</h2>
+            <input type="text" id="reg-desc" placeholder="O que você comprou?">
+            <input type="number" id="reg-val" placeholder="Valor R$">
+            <select id="reg-tipo">
+                <option value="fixo">🏠 Essencial (50%)</option>
+                <option value="lazer">🍿 Lazer (30%)</option>
+                <option value="investimento">💰 Reserva (20%)</option>
+                <option value="entrada">💵 Receita (+)</option>
+            </select>
+            <input type="date" id="reg-date">
+            <button class="btn-save" onclick="saveData()">SALVAR REGISTRO</button>
+        </div>
+    </div>
 
-// 🔐 COLE SUA CHAVE AQUI
-const GROQ_KEY = "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";
+    <script>
+        // Configurações Iniciais
+        const groq_key = "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";
+        const firebaseConfig = { apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE", authDomain: "financaspro-1e0e8.firebaseapp.com", projectId: "financaspro-1e0e8", storageBucket: "financaspro-1e0e8.firebasestorage.app", messagingSenderId: "659521706556", appId: "1:659521706556:web:86f2174c4c8a89335ac139" };
+        
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-let dados = [];
+        let myChart = null;
+        let financeData = { in:0, f:0, l:0, i:0, balance:0 };
 
-// 🎨 EMOJIS
-function emoji(tipo){
-    return {
-        entrada:"💰",
-        fixo:"🏠",
-        lazer:"🍔",
-        investimento:"📈"
-    }[tipo];
-}
-
-// 📊 RENDER
-function render(){
-    let saldo = 0;
-    let html = "";
-
-    dados.forEach(t => {
-        if(t.tipo === "entrada") saldo += t.valor;
-        else saldo -= t.valor;
-
-        html += `
-        <div class="entry">
-            <span>${emoji(t.tipo)} ${t.desc}</span>
-            <span>
-                R$ ${t.valor}
-                <button onclick="del(${t.id})">🗑️</button>
-            </span>
-        </div>`;
-    });
-
-    document.getElementById("saldo").innerText = "R$ " + saldo;
-    document.getElementById("lista").innerHTML = html;
-
-    // ALERTAS
-    if(saldo < 0){
-        addAI("🚨 Você está no negativo. Corte custos URGENTE.");
-    }
-}
-
-// 💾 SALVAR
-function salvar(){
-    const desc = document.getElementById("desc").value;
-    const valor = parseFloat(document.getElementById("valor").value);
-    const tipo = document.getElementById("tipo").value;
-
-    if(!desc || !valor){
-        alert("Preencha os campos");
-        return;
-    }
-
-    dados.push({
-        id: Date.now(),
-        desc,
-        valor,
-        tipo
-    });
-
-    render();
-
-    // ALERTA INTELIGENTE
-    if(tipo === "lazer" && valor > 100){
-        addAI("⚠️ Gasto alto com lazer. Isso impacta sua evolução financeira.");
-    }
-
-    addAI(`✔️ Registrado: ${desc} R$${valor}`);
-}
-
-// 🗑️ DELETAR
-function del(id){
-    dados = dados.filter(t => t.id !== id);
-    render();
-}
-
-// 🤖 CHAT
-function addAI(msg){
-    document.getElementById("chat").innerHTML += `<div class="msg-ai">${msg}</div>`;
-}
-
-function addUser(msg){
-    document.getElementById("chat").innerHTML += `<div class="msg-user">${msg}</div>`;
-}
-
-// 🧠 IA
-async function ia(){
-    const texto = document.getElementById("msg").value;
-
-    if(!texto) return;
-
-    addUser(texto);
-    document.getElementById("msg").value = "";
-
-    // 💥 IA LANÇANDO DESPESA AUTOMÁTICA
-    if(texto.toLowerCase().includes("gastei") || texto.toLowerCase().includes("paguei")){
-        const valorMatch = texto.match(/\d+/);
-        if(valorMatch){
-            const valor = parseFloat(valorMatch[0]);
-            const desc = texto.replace(valorMatch[0], "").replace("gastei","").replace("paguei","");
-
-            dados.push({
-                id: Date.now(),
-                desc: desc.trim(),
-                valor,
-                tipo:"lazer"
-            });
-
-            render();
-            addAI("✔️ Lancei automaticamente pra você.");
-            return;
+        // Interface
+        function toggleAI() { const p = document.getElementById('ai-panel'); p.style.display = p.style.display === 'flex' ? 'none' : 'flex'; }
+        function openModal() { document.getElementById('reg-date').value = new Date().toISOString().split('T')[0]; document.getElementById('modal-reg').style.display = 'flex'; }
+        function closeModal() { document.getElementById('modal-reg').style.display = 'none'; }
+        function switchView(view, btn) {
+            document.querySelectorAll('main').forEach(m => m.style.display = 'none');
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            document.getElementById('view-' + view).style.display = 'block';
+            btn.classList.add('active');
         }
-    }
 
-    try {
-        const res = await fetch("https://api.groq.com/openai/v1/chat/completions",{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json",
-                "Authorization":"Bearer " + GROQ_KEY
-            },
-            body:JSON.stringify({
-                model:"llama-3.1-8b-instant",
-                messages:[
-                    {
-                        role:"system",
-                        content:`Você é um mentor financeiro rígido.
-- Dê bronca quando gastar mal
-- Alerte sobre riscos
-- Fale como gestor profissional`
-                    },
-                    { role:"user", content:texto }
-                ]
-            })
-        });
+        // Firebase Auth
+        async function login() { try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); } catch(e) { console.error(e); } }
 
-        const data = await res.json();
-        addAI(data.choices[0].message.content);
+        // Lógica de Dados
+        async function loadData() {
+            if (!auth.currentUser) return;
+            const mes = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"][new Date().getMonth()];
+            const snap = await db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mes).get();
+            
+            let sin = 0, sf = 0, sl = 0, si = 0, html = "";
+            if (snap.exists) {
+                (snap.data().transacoes || []).forEach(t => {
+                    const v = parseFloat(t.valor);
+                    if (t.tipo === 'entrada') sin += v;
+                    else { if(t.tipo==='fixo') sf+=v; else if(t.tipo==='lazer') sl+=v; else si+=v; }
+                    html += `<div class="t-item"><div class="t-info"><b>${t.descricao}</b><small>${t.tipo.toUpperCase()}</small></div><div class="t-amount" style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">${t.tipo==='entrada'?'+':'-'} ${v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</div></div>`;
+                });
+            }
+            
+            financeData = { in:sin, f:sf, l:sl, i:si, balance: sin - (sf+sl+si) };
+            updateUI(html);
+        }
 
-    } catch(e){
-        addAI("Erro ao conectar com IA.");
-    }
-}
+        function updateUI(html) {
+            document.getElementById('main-balance').innerText = financeData.balance.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            document.getElementById('tot-in').innerText = "+ " + financeData.in.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            document.getElementById('tot-out').innerText = "- " + (financeData.f+financeData.l+financeData.i).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            document.getElementById('list-items').innerHTML = html || "<p style='text-align:center; opacity:0.5; padding:50px;'>Nenhum registro encontrado.</p>";
+            renderChart(financeData.f, financeData.l, financeData.i);
+        }
 
-</script>
+        async function saveData() {
+            const desc = document.getElementById('reg-desc').value;
+            const val = document.getElementById('reg-val').value;
+            const tipo = document.getElementById('reg-tipo').value;
+            const data = document.getElementById('reg-date').value;
+            const mes = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"][parseInt(data.split('-')[1])-1];
 
+            const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mes);
+            const snap = await ref.get();
+            let lista = snap.exists ? snap.data().transacoes : [];
+            lista.push({ descricao: desc, valor: val, tipo: tipo, data: data });
+            await ref.set({ transacoes: lista });
+            closeModal(); loadData();
+        }
+
+        // IA FIN PRO (GROQ)
+        async function askAI() {
+            const input = document.getElementById('ai-input');
+            const chat = document.getElementById('ai-messages');
+            if(!input.value) return;
+
+            const userText = input.value;
+            chat.innerHTML += `<div class="msg msg-user">${userText}</div>`;
+            input.value = "";
+            chat.scrollTop = chat.scrollHeight;
+
+            try {
+                const prompt = `Usuário: Henrique. Saldo Atual: R$${financeData.balance}. Receitas: R$${financeData.in}. Gastos Fixos: R$${financeData.f}, Lazer: R$${financeData.l}, Reserva: R$${financeData.i}. Pergunta: ${userText}. Responda como FIN PRO, um assistente de finanças pessoal direto e motivador.`;
+                
+                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${groq_key}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ model: "llama3-8b-8192", messages: [{ role: "user", content: prompt }] })
+                });
+
+                const data = await response.json();
+                const reply = data.choices[0].message.content;
+                chat.innerHTML += `<div class="msg msg-bot">${reply}</div>`;
+            } catch (e) {
+                chat.innerHTML += `<div class="msg msg-bot" style="color:var(--red)">Ocorreu um erro na conexão com a FIN PRO.</div>`;
+            }
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function renderChart(f, l, i) {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            if(myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Fixo', 'Lazer', 'Reserva'],
+                    datasets: [{
+                        data: [f || 1, l || 0.1, i || 0.1],
+                        backgroundColor: ['#6366F1', '#F59E0B', '#10B981'],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: { cutout: '85%', plugins: { legend: { display: false } } }
+            });
+        }
+
+        auth.onAuthStateChanged(user => { if(user) { document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0]; loadData(); } });
+    </script>
 </body>
 </html>
