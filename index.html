@@ -3,114 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FinançasPRO</title>
+    <title>FinançasPRO Premium</title>
     <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#4F46E5">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #000000; --card: #121212; --text: #FFFFFF;
-            --text-sub: #A1A1AA; --border: #27272A; --accent: #FDE047;
-            --green: #22C55E; --red: #EF4444; --gray-bar: #262626;
+            --bg: #F8FAFC; --header-bg: #FFFFFF; --card: #FFFFFF; --text-main: #1E293B;
+            --text-sub: #64748B; --border: #E2E8F0; --accent: #4F46E5;
+            --green: #10B981; --orange: #F59E0B; --red: #EF4444;
         }
-        body.light-mode {
-            --bg: #F4F4F5; --card: #FFFFFF; --text: #09090B;
-            --text-sub: #71717A; --border: #E4E4E7; --accent: #EAB308;
-            --gray-bar: #E4E4E7;
+        body.dark-mode {
+            --bg: #0F172A; --header-bg: #1E293B; --card: #1E293B; --text-main: #F1F5F9;
+            --text-sub: #94A3B8; --border: #334155; --accent: #6366F1;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { 
-            background: var(--bg); color: var(--text); padding-bottom: 110px; 
-            transition: 0.3s; overflow-x: hidden; -webkit-overflow-scrolling: touch; 
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: 0.3s; }
+        body { background: var(--bg); color: var(--text-main); padding-bottom: 100px; -webkit-tap-highlight-color: transparent; }
+        
+        /* Header & Balance */
+        .glass-header { background: var(--header-bg); padding: 30px 20px 50px; border-radius: 0 0 30px 30px; border-bottom: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .header-content { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .brand { font-weight: 800; font-size: 1.2rem; } .brand span { color: var(--accent); }
+        .main-balance { text-align: center; }
+        .main-balance h1 { font-size: 2.4rem; font-weight: 800; letter-spacing: -1.5px; }
+        
+        /* Stats Cards */
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; margin-top: -30px; }
+        .stat-card { background: var(--card); padding: 15px; border-radius: 20px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 5px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .stat-card small { font-weight: 700; font-size: 0.7rem; text-transform: uppercase; color: var(--text-sub); }
+        .stat-card b { font-size: 1.1rem; }
+        .stat-card.incoming b { color: var(--green); }
+        .stat-card.outgoing b { color: var(--red); }
 
-        /* Feedback Tátil */
-        .nav-btn:active, .entry:active, .theme-btn:active, .btn-save:active { transform: scale(0.96); transition: 0.1s; }
-
-        /* Header */
-        .header { padding: 50px 24px 20px; text-align: center; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid var(--border); }
-        .head-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .logo { font-weight: 800; font-size: 1.2rem; }
-        .logo span { color: var(--accent); }
-        .theme-btn { background: var(--card); border: 1px solid var(--border); padding: 8px; border-radius: 12px; cursor: pointer; color: var(--text); }
-        .balance-label { color: var(--text-sub); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-        .balance-val { font-size: 2.6rem; font-weight: 800; letter-spacing: -1px; transition: color 0.3s; }
-
-        /* Dashboard */
-        .viz-card { background: var(--card); margin: 20px 15px; padding: 25px; border-radius: 28px; border: 1px solid var(--border); }
-        .prog-item { margin-bottom: 20px; }
-        .prog-info { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; margin-bottom: 8px; }
-        .bar-bg { background: var(--gray-bar); height: 12px; border-radius: 6px; overflow: hidden; }
-        .bar-fill { height: 100%; border-radius: 6px; transition: 1s cubic-bezier(0.4, 0, 0.2, 1); }
-
-        /* Lista de Lançamentos */
-        .entry { background: var(--card); margin: 0 15px 10px; padding: 16px; border-radius: 20px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-        .entry-left { display: flex; align-items: center; gap: 15px; }
-        .entry-icon { width: 44px; height: 44px; border-radius: 14px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 1px solid var(--border); }
-        .entry-info b { display: block; font-size: 0.95rem; }
-        .entry-info small { color: var(--text-sub); font-weight: 600; }
-        .entry-right { text-align: right; font-weight: 800; display: flex; align-items: center; gap: 10px; }
-
-        /* Navegação */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--bg); display: flex; justify-content: space-around; padding: 15px 10px 35px; border-top: 1px solid var(--border); z-index: 1000; }
-        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 5px; font-weight: 700; font-size: 0.65rem; cursor: pointer; flex: 1; }
+        /* General Layout */
+        .viz-card { background: var(--card); margin: 20px; padding: 20px; border-radius: 24px; border: 1px solid var(--border); }
+        .tab-content { display: none; } .tab-content.active { display: block; }
+        
+        /* Timeline/Entries */
+        .timeline-list { padding: 0 20px; }
+        .entry-card { background: var(--card); padding: 16px; border-radius: 18px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .badge-dia { background: var(--accent); color: white; font-size: 0.65rem; padding: 2px 8px; border-radius: 6px; margin-right: 8px; font-weight: 800; }
+        
+        /* Bottom Nav */
+        .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--header-bg); display: flex; justify-content: space-around; padding: 15px 0 30px; border-top: 1px solid var(--border); z-index: 1000; }
+        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; font-weight: 700; gap: 4px; flex: 1; cursor: pointer; }
         .nav-btn.active { color: var(--accent); }
-        .nav-btn span { font-size: 1.3rem; }
-        .fab { background: var(--accent); color: #000; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: none; box-shadow: 0 4px 15px rgba(253, 224, 71, 0.3); }
+        .nav-btn span { font-size: 1.4rem; }
+        .floating-btn { position: fixed; bottom: 90px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 28px; z-index: 999; box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4); display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-        /* Modal */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: flex-end; backdrop-filter: blur(5px); }
-        .modal-content { background: var(--bg); width: 100%; border-radius: 30px 30px 0 0; padding: 35px; border-top: 1px solid var(--border); animation: slideUp 0.3s ease; }
+        /* Modal Sheet */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: flex-end; backdrop-filter: blur(4px); }
+        .modal-sheet { background: var(--card); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .input-box { width: 100%; padding: 18px; border-radius: 16px; border: 1px solid var(--border); background: var(--card); color: var(--text); margin-bottom: 15px; outline: none; font-size: 1rem; }
-        .btn-save { width: 100%; padding: 20px; background: var(--accent); border: none; border-radius: 18px; font-weight: 800; font-size: 1rem; color: #000; cursor: pointer; }
-
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
-        .loading { animation: pulse 1.5s infinite; background: var(--gray-bar) !important; border: none; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        
+        /* Progress Bars */
+        .progress-container { background: var(--bg); height: 10px; border-radius: 5px; overflow: hidden; margin-top: 10px; }
+        .bar { height: 100%; border-radius: 5px; transition: 1s ease-in-out; }
+        
+        .loading { opacity: 0.5; pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <header class="header">
-        <div class="head-top">
-            <button onclick="toggleTheme()" class="theme-btn">🌓</button>
-            <div class="logo">Finanças<span>PRO</span></div>
-            <button id="btnAuth" style="background:var(--card); color:var(--text); border:1px solid var(--border); padding:8px 15px; border-radius:12px; font-weight:800; font-size:0.7rem;" onclick="loginGoogle()">ENTRAR</button>
+    <header class="glass-header">
+        <div class="header-content">
+            <button onclick="toggleTheme()" class="theme-switch">🌓</button>
+            <div class="brand">Finanças<span>PRO</span></div>
+            <button id="btnAuth" class="user-pill" onclick="loginGoogle()">ENTRAR</button>
         </div>
-        <div class="balance-label">Saldo em Carteira</div>
-        <div class="balance-val" id="saldo">R$ 0,00</div>
+        <div class="main-balance">
+            <small style="color: var(--text-sub); font-weight: 700; text-transform: uppercase;">Saldo Atual</small>
+            <h1 id="saldo">R$ 0,00</h1>
+        </div>
     </header>
+
+    <div class="stats-row">
+        <div class="stat-card incoming">
+            <small>Receitas</small>
+            <b id="resumo-receita">R$ 0</b>
+        </div>
+        <div class="stat-card outgoing">
+            <small>Despesas</small>
+            <b id="resumo-despesa">R$ 0</b>
+        </div>
+    </div>
 
     <main>
         <section id="aba-dashboard" class="tab-content active">
             <div class="viz-card">
-                <canvas id="graficoPizza" style="max-height: 200px; margin-bottom: 20px;"></canvas>
-                <div class="prog-item">
-                    <div class="prog-info"><span>Essencial (50%)</span><span id="txt-fixo">0%</span></div>
-                    <div class="bar-bg"><div id="bar-fixo" class="bar-fill" style="background: var(--accent); width: 0%"></div></div>
-                </div>
-                <div class="prog-item">
-                    <div class="prog-info"><span>Lazer (30%)</span><span id="txt-lazer">0%</span></div>
-                    <div class="bar-bg"><div id="bar-lazer" class="bar-fill" style="background: var(--green); width: 0%"></div></div>
-                </div>
-                <div class="prog-item">
-                    <div class="prog-info"><span>Investimento (20%)</span><span id="txt-invest">0%</span></div>
-                    <div class="bar-bg"><div id="bar-invest" class="bar-fill" style="background: #525252; width: 0%"></div></div>
-                </div>
+                <canvas id="graficoPizza" style="max-height: 220px;"></canvas>
             </div>
-        </section>
-
-        <section id="aba-invest" class="tab-content">
-            <div class="viz-card"><canvas id="graficoBarras" style="max-height: 200px;"></canvas></div>
-            <div id="lista-invest"></div>
+            <div class="meta-container" id="metas-rapidas">
+                </div>
         </section>
 
         <section id="aba-extrato" class="tab-content">
-            <div style="padding: 0 15px 15px;">
-                <select id="filtroMes" class="input-box" onchange="carregarDados()">
+            <div style="padding: 20px;">
+                <select id="filtroMes" class="input-grid" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); color: var(--text-main);" onchange="carregarDados()">
                     <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
                     <option value="março">Março</option><option value="abril">Abril</option>
                     <option value="maio">Maio</option><option value="junho">Junho</option>
@@ -119,29 +108,34 @@
                     <option value="novembro">Novembro</option><option value="dezembro">Dezembro</option>
                 </select>
             </div>
-            <div id="lista-geral"></div>
+            <div id="lista" class="timeline-list"></div>
         </section>
     </main>
 
-    <nav class="nav-bar">
+    <button class="floating-btn" onclick="abrirModal()">+</button>
+
+    <nav class="bottom-tab-bar">
         <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active"><span>📊</span>Dashboard</button>
-        <button onclick="switchTab('aba-invest', this)" class="nav-btn"><span>📈</span>Aportes</button>
         <button onclick="switchTab('aba-extrato', this)" class="nav-btn"><span>📜</span>Extrato</button>
-        <button onclick="abrirModal()" class="nav-btn"><div class="fab">+</div>Lançar</button>
+        <button onclick="window.location.reload()" class="nav-btn"><span>🔄</span>Sinc</button>
     </nav>
 
-    <div id="modal" class="modal" onclick="if(event.target==this) fecharModal()">
-        <div class="modal-content">
-            <input type="text" id="desc" class="input-box" placeholder="Onde foi?">
-            <input type="number" step="0.01" id="valor" class="input-box" placeholder="Valor R$ 0,00">
-            <input type="date" id="data-reg" class="input-box">
-            <select id="tipo" class="input-box">
-                <option value="fixo">Essencial (50%)</option>
-                <option value="lazer">Lazer (30%)</option>
-                <option value="investimento">Investimento (20%)</option>
-                <option value="entrada">Receita (+)</option>
-            </select>
-            <button onclick="salvarRegistro()" class="btn-save">CONCLUIR</button>
+    <div id="modal" class="modal-overlay" onclick="if(event.target==this) fecharModal()">
+        <div class="modal-sheet">
+            <h3 style="margin-bottom: 20px; text-align: center;">Novo Lançamento</h3>
+            <div class="input-grid">
+                <input type="text" id="desc" placeholder="Descrição (Ex: Aluguel)">
+                <input type="number" id="valor" placeholder="Valor R$ 0,00">
+                <input type="date" id="data-reg">
+                <select id="tipo">
+                    <option value="fixo">Essencial (50%)</option>
+                    <option value="lazer">Lazer (30%)</option>
+                    <option value="investimento">Investimento (20%)</option>
+                    <option value="entrada">Receita (+)</option>
+                </select>
+            </div>
+            <button class="btn-confirm" onclick="salvarRegistro()">CONFIRMAR</button>
+            <button class="btn-abort" onclick="fecharModal()">CANCELAR</button>
         </div>
     </div>
 
@@ -175,132 +169,105 @@
         });
 
         window.loginGoogle = () => signInWithPopup(window.auth, new GoogleAuthProvider());
-
-        // Registro do Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js').catch(err => console.log(err));
-            });
-        }
     </script>
 
     <script>
-        let chartP, chartB;
-
-        function getIcon(tipo, desc) {
-            const d = desc.toLowerCase();
-            if (tipo === 'entrada') return '💰';
-            if (tipo === 'investimento') return '📈';
-            if (d.includes('comida') || d.includes('ifood') || d.includes('restaurante')) return '🍴';
-            if (d.includes('uber') || d.includes('gasolina')) return '🚗';
-            if (d.includes('mercado')) return '🛒';
-            if (d.includes('aluguel') || d.includes('casa')) return '🏠';
-            return '🏷️';
-        }
+        let currentChart;
 
         async function carregarDados() {
             const user = window.auth.currentUser; if (!user) return;
             const mesSel = document.getElementById('filtroMes').value;
-            const listaGeral = document.getElementById('lista-geral');
-            listaGeral.innerHTML = '<div class="entry loading" style="height:80px"></div>';
+            const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mesSel);
+            const snap = await window.f_getDoc(ref);
 
-            let investMeses = Array(12).fill(0), saldoM = 0, fixo = 0, lazer = 0, invest = 0, receita = 0;
-            let htmlGeral = "", htmlInvest = "";
+            let r = 0, f = 0, l = 0, i = 0, html = "";
+            let trans = snap.exists() ? snap.data().transacoes : [];
 
-            const promises = window.mesesNomes.map(m => window.f_getDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", m)));
-            const snaps = await Promise.all(promises);
+            trans.sort((a, b) => new Date(b.data) - new Date(a.data));
 
-            snaps.forEach((snap, i) => {
-                const mesNome = window.mesesNomes[i];
-                if (snap.exists()) {
-                    const trans = snap.data().transacoes || [];
-                    trans.sort((a,b) => new Date(b.data) - new Date(a.data));
-                    trans.forEach((t, idx) => {
-                        const v = parseFloat(t.valor);
-                        if (t.tipo === 'investimento') investMeses[i] += v;
-                        if (mesNome === mesSel) {
-                            if (t.tipo === 'entrada') { saldoM += v; receita += v; }
-                            else { 
-                                saldoM -= v;
-                                if(t.tipo === 'fixo') fixo += v;
-                                else if(t.tipo === 'lazer') lazer += v;
-                                else if(t.tipo === 'investimento') invest += v;
-                            }
-                            const card = `<div class="entry">
-                                <div class="entry-left">
-                                    <div class="entry-icon">${getIcon(t.tipo, t.descricao)}</div>
-                                    <div class="entry-info"><b>${t.descricao}</b><small>${t.data.split('-').reverse().join('/')}</small></div>
-                                </div>
-                                <div class="entry-right">
-                                    <span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">${t.tipo==='entrada'?'+':'-'} R$ ${v.toFixed(2)}</span>
-                                    <button style="background:none;border:none;color:var(--red);font-size:1.2rem;" onclick="apagar('${mesNome}', ${idx})">×</button>
-                                </div>
-                            </div>`;
-                            htmlGeral += card; if(t.tipo === 'investimento') htmlInvest += card;
-                        }
-                    });
-                }
+            trans.forEach((t, idx) => {
+                const v = parseFloat(t.valor);
+                if (t.tipo === 'entrada') r += v;
+                else { if(t.tipo === 'fixo') f += v; else if(t.tipo === 'lazer') l += v; else i += v; }
+                
+                const dia = t.data.split('-')[2];
+                html += `
+                <div class="entry-card">
+                    <div>
+                        <span class="badge-dia">${dia}</span>
+                        <b>${t.descricao}</b><br>
+                        <small style="color:var(--text-sub)">${t.tipo}</small>
+                    </div>
+                    <div style="text-align:right">
+                        <span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}; font-weight:800">
+                            ${t.tipo==='entrada'?'+':'-'} R$ ${v.toFixed(2)}
+                        </span><br>
+                        <button class="btn-del" onclick="apagar('${mesSel}', ${idx})">Remover</button>
+                    </div>
+                </div>`;
             });
 
-            const sEl = document.getElementById('saldo');
-            sEl.innerText = `R$ ${saldoM.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-            sEl.style.color = saldoM >= 0 ? 'var(--text)' : 'var(--red)';
+            document.getElementById('saldo').innerText = `R$ ${(r - (f+l+i)).toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+            document.getElementById('resumo-receita').innerText = `R$ ${r.toFixed(0)}`;
+            document.getElementById('resumo-despesa').innerText = `R$ ${(f+l+i).toFixed(0)}`;
+            document.getElementById('lista').innerHTML = html || '<p style="text-align:center; padding:40px; opacity:0.5">Sem registros</p>';
             
-            listaGeral.innerHTML = htmlGeral || '<p style="text-align:center;color:var(--text-sub);padding:20px">Vazio</p>';
-            document.getElementById('lista-invest').innerHTML = htmlInvest || '<p style="text-align:center;color:var(--text-sub);padding:20px">Sem aportes</p>';
-            
-            renderPizza(fixo, lazer, invest);
-            renderBarras(investMeses);
-            atualizarRegra(fixo, lazer, invest, receita);
-        }
-
-        function atualizarRegra(f, l, i, rec) {
-            const total = rec > 0 ? rec : (f + l + i || 1);
-            const set = (id, v) => {
-                const p = ((v/total)*100).toFixed(0);
-                document.getElementById(`bar-${id}`).style.width = Math.min(p, 100) + '%';
-                document.getElementById(`txt-${id}`).innerText = p + '%';
-            };
-            set('fixo', f); set('lazer', l); set('invest', i);
+            renderPizza(f, l, i);
+            updateMetas(r, f, l, i);
         }
 
         function renderPizza(f, l, i) {
             const ctx = document.getElementById('graficoPizza').getContext('2d');
-            if(chartP) chartP.destroy();
-            chartP = new Chart(ctx, { type: 'doughnut', data: { datasets: [{ data: [f||1, l, i], backgroundColor: (f+l+i)>0?['#FDE047', '#22C55E', '#525252']:['#27272A'], borderWidth: 0 }] }, options: { cutout: '85%', plugins: { legend: { display: false } } } });
+            if (currentChart) currentChart.destroy();
+            currentChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Fixo', 'Lazer', 'Invest'],
+                    datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F59E0B', '#4F46E5'], borderWidth: 0 }]
+                },
+                options: { cutout: '85%', plugins: { legend: { display: false } } }
+            });
         }
 
-        function renderBarras(dados) {
-            const ctx = document.getElementById('graficoBarras').getContext('2d');
-            if(chartB) chartB.destroy();
-            chartB = new Chart(ctx, { type: 'bar', data: { labels: ['J','F','M','A','M','J','J','A','S','O','N','D'], datasets: [{ data: dados, backgroundColor: '#FDE047', borderRadius: 6 }] }, options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#A1A1AA', font: { weight: 'bold' } } } } } });
+        function updateMetas(r, f, l, i) {
+            const total = r || (f+l+i) || 1;
+            const metasHTML = `
+                <div class="meta-item">
+                    <div style="display:flex; justify-content:space-between"><small>Essencial</small> <small>${((f/total)*100).toFixed(0)}%</small></div>
+                    <div class="progress-container"><div class="bar g-orange" style="width:${(f/total)*100}%"></div></div>
+                </div>
+                <div class="meta-item">
+                    <div style="display:flex; justify-content:space-between"><small>Lazer</small> <small>${((l/total)*100).toFixed(0)}%</small></div>
+                    <div class="progress-container"><div class="bar g-green" style="width:${(l/total)*100}%"></div></div>
+                </div>
+            `;
+            document.getElementById('metas-rapidas').innerHTML = metasHTML;
         }
 
         async function salvarRegistro() {
-            const dInput = document.getElementById('desc'), vInput = document.getElementById('valor'), dtInput = document.getElementById('data-reg'), tInput = document.getElementById('tipo');
-            if(!vInput.value || !dtInput.value) return alert("Preencha valor e data!");
-            const mes = window.mesesNomes[parseInt(dtInput.value.split('-')[1]) - 1];
+            const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value, t = document.getElementById('tipo').value;
+            if(!v || !dt) return alert("Preencha os campos!");
+            const mes = window.mesesNomes[parseInt(dt.split('-')[1]) - 1];
             const ref = window.f_doc(window.db, "usuarios", window.auth.currentUser.uid, "meses", mes);
             const snap = await window.f_getDoc(ref);
-            let lista = snap.exists() ? snap.data().transacoes : [];
-            lista.push({ descricao: dInput.value || "Lançamento", valor: parseFloat(vInput.value), tipo: tInput.value, data: dtInput.value });
-            await window.f_setDoc(ref, { transacoes: lista });
-            dInput.value = ""; vInput.value = ""; fecharModal(); carregarDados();
+            let trans = snap.exists() ? snap.data().transacoes : [];
+            trans.push({ descricao: d || "Gasto", valor: parseFloat(v), tipo: t, data: dt });
+            await window.f_setDoc(ref, { transacoes: trans });
+            fecharModal(); carregarDados();
         }
 
         async function apagar(mes, idx) {
-            if(!confirm("Apagar?")) return;
+            if(!confirm("Remover?")) return;
             const ref = window.f_doc(window.db, "usuarios", window.auth.currentUser.uid, "meses", mes);
             const snap = await window.f_getDoc(ref);
-            let lista = snap.data().transacoes;
-            lista.splice(idx, 1);
-            await window.f_setDoc(ref, { transacoes: lista });
+            let trans = snap.data().transacoes; trans.splice(idx, 1);
+            await window.f_setDoc(ref, { transacoes: trans });
             carregarDados();
         }
 
         function switchTab(id, btn) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             btn.classList.add('active');
         }
@@ -310,8 +277,7 @@
             document.getElementById('modal').style.display = 'flex'; 
         }
         function fecharModal() { document.getElementById('modal').style.display = 'none'; }
-        function toggleTheme() { document.body.classList.toggle('light-mode'); }
+        function toggleTheme() { document.body.classList.toggle('dark-mode'); }
     </script>
 </body>
 </html>
-
