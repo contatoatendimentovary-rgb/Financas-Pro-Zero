@@ -3,81 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finan Pro - Gestão Inteligente</title>
-    <meta name="theme-color" content="#4F46E5">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Finan Pro - Gestão Comercial</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
     <style>
-        /* TEMA ESCURO (Padrão) */
         :root {
             --bg: #0F172A; --header-bg: #1E293B; --card: #1E293B; --text-main: #F1F5F9;
             --text-sub: #94A3B8; --border: #334155; --accent: #6366F1;
             --green: #10B981; --orange: #F59E0B; --red: #EF4444; 
             --ai-gradient: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
         }
-
-        /* TEMA CLARO */
         [data-theme="light"] {
             --bg: #F8FAFC; --header-bg: #FFFFFF; --card: #FFFFFF; --text-main: #0F172A;
             --text-sub: #64748B; --border: #E2E8F0;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text-main); padding-bottom: 110px; transition: background-color 0.3s, color 0.3s; overflow-x: hidden; }
-        
-        /* Header & Balance */
-        .glass-header { background: var(--header-bg); padding: 50px 20px 40px; border-radius: 0 0 30px 30px; border-bottom: 1px solid var(--border); text-align: center; transition: 0.3s; }
+        body { background: var(--bg); color: var(--text-main); padding-bottom: 110px; transition: 0.3s; }
+        .glass-header { background: var(--header-bg); padding: 50px 20px 40px; border-radius: 0 0 30px 30px; border-bottom: 1px solid var(--border); text-align: center; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .theme-toggle { background: var(--card); border: 1px solid var(--border); color: var(--text-main); padding: 8px 12px; border-radius: 12px; cursor: pointer; font-size: 1rem; }
-        .user-pill { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 800; font-size: 0.75rem; cursor: pointer; }
-        .main-balance h1 { font-size: 2.8rem; font-weight: 800; letter-spacing: -1.5px; margin: 8px 0; color: var(--text-main); }
-
-        /* Stats Cards */
+        .theme-toggle { background: var(--card); border: 1px solid var(--border); color: var(--text-main); padding: 8px 12px; border-radius: 12px; cursor: pointer; }
+        .user-pill { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 800; cursor: pointer; }
         .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; margin-top: -25px; position: relative; z-index: 10; }
-        .stat-card { background: var(--card); padding: 18px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.1); transition: 0.3s; }
-
-        /* AI Assistant Popup */
-        .ai-popup { display: none; position: fixed; bottom: 100px; left: 15px; right: 15px; background: var(--card); border: 1px solid var(--accent); border-radius: 28px; padding: 22px; z-index: 3000; flex-direction: column; max-height: 70vh; box-shadow: 0 -10px 40px rgba(0,0,0,0.5); }
-        .chat-area { flex: 1; overflow-y: auto; margin: 15px 0; font-size: 0.9rem; }
-        .chat-bubble { margin-bottom: 10px; padding: 12px; border-radius: 16px; max-width: 90%; line-height: 1.4; }
-        .ai-bubble { background: rgba(79, 70, 229, 0.15); border-bottom-left-radius: 4px; color: var(--text-main); }
-        .user-bubble { background: var(--accent); color: white; margin-left: auto; border-bottom-right-radius: 4px; }
-
-        /* Layout Elements */
-        .viz-card { background: var(--card); margin: 20px; padding: 22px; border-radius: 28px; border: 1px solid var(--border); transition: 0.3s; }
+        .stat-card { background: var(--card); padding: 18px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .ai-popup { display: none; position: fixed; bottom: 100px; left: 15px; right: 15px; background: var(--card); border: 1px solid var(--accent); border-radius: 28px; padding: 22px; z-index: 3000; flex-direction: column; max-height: 70vh; }
+        .chat-area { flex: 1; overflow-y: auto; margin: 15px 0; font-size: 0.9rem; min-height: 100px; }
+        .chat-bubble { margin-bottom: 10px; padding: 12px; border-radius: 16px; max-width: 90%; }
+        .ai-bubble { background: rgba(79, 70, 229, 0.15); color: var(--text-main); }
+        .user-bubble { background: var(--accent); color: white; margin-left: auto; }
+        .viz-card { background: var(--card); margin: 20px; padding: 22px; border-radius: 28px; border: 1px solid var(--border); }
         .tab-content { display: none; } .tab-content.active { display: block; }
-        .entry-card { background: var(--card); padding: 18px; border-radius: 22px; margin: 0 20px 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
-        
-        /* Navigation */
-        .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--header-bg); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; transition: 0.3s; }
-        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; flex: 1; cursor: pointer; transition: 0.2s; }
-        .nav-btn.active { color: var(--accent); font-weight: 800; transform: translateY(-5px); }
+        .entry-card { background: var(--card); padding: 18px; border-radius: 22px; margin: 0 20px 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--header-bg); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
+        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; flex: 1; cursor: pointer; }
+        .nav-btn.active { color: var(--accent); font-weight: 800; }
         .nav-btn span { font-size: 1.5rem; margin-bottom: 5px; }
-
-        .floating-btn { position: fixed; bottom: 115px; right: 20px; width: 64px; height: 64px; border-radius: 50%; background: var(--ai-gradient); color: white; border: none; font-size: 28px; z-index: 999; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4); }
-
-        /* Modals */
+        .floating-btn { position: fixed; bottom: 115px; right: 20px; width: 64px; height: 64px; border-radius: 50%; background: var(--ai-gradient); color: white; border: none; font-size: 28px; z-index: 999; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); z-index: 4000; align-items: flex-end; backdrop-filter: blur(5px); }
-        .modal-sheet { background: var(--card); width: 100%; border-radius: 35px 35px 0 0; padding: 35px; border-top: 2px solid var(--accent); transition: 0.3s; }
-        .input-grid input, .input-grid select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 16px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); font-size: 1rem; outline: none; }
-        
+        .modal-sheet { background: var(--card); width: 100%; border-radius: 35px 35px 0 0; padding: 35px; border-top: 2px solid var(--accent); }
+        .input-grid input, .input-grid select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 16px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); outline: none; }
         .progress-container { background: var(--border); height: 10px; border-radius: 5px; overflow: hidden; margin: 8px 0 15px; }
         .bar { height: 100%; transition: 1s ease-in-out; }
     </style>
 </head>
-
 <body>
 
     <div id="ai-modal" class="ai-popup">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <b style="font-size:0.9rem; color:var(--accent)">✨ GEMINI ASSISTENTE</b>
+            <b style="color:var(--accent)">✨ GEMINI ASSISTENTE</b>
             <button onclick="fecharAI()" style="background:none; border:none; font-size:1.8rem; color:var(--text-sub); cursor:pointer;">&times;</button>
         </div>
         <div class="chat-area" id="chat-historico">
-            <div class="chat-bubble ai-bubble">Olá! Sou o Gemini, integrado ao Finan Pro. Como posso ajudar com a gestão das finanças hoje?</div>
+            <div class="chat-bubble ai-bubble">Olá Henrique! Sou o Gemini. Estou pronto para analisar suas finanças.</div>
         </div>
         <div style="display:flex; gap:10px;">
-            <input type="text" id="ai-input" placeholder="Pergunte sobre gestão..." style="flex:1; padding:15px; border-radius:15px; border:1px solid var(--border); background:var(--bg); color:var(--text-main); outline:none;">
-            <button onclick="perguntarIA()" style="background:var(--accent); color:white; border:none; padding:0 20px; border-radius:15px; font-weight:800; cursor:pointer;">ENVIAR</button>
+            <input type="text" id="ai-input" placeholder="Sua pergunta..." style="flex:1; padding:15px; border-radius:15px; border:1px solid var(--border); background:var(--bg); color:var(--text-main);">
+            <button onclick="perguntarIA()" style="background:var(--accent); color:white; border:none; padding:0 20px; border-radius:15px; font-weight:bold;">ENVIAR</button>
         </div>
     </div>
 
@@ -87,36 +71,33 @@
             <div style="font-size: 1.2rem; font-weight: 800; color: var(--accent);">Finan Pro</div>
             <button id="btnAuth" class="user-pill" onclick="loginGoogle()">ENTRAR</button>
         </div>
-        <div class="main-balance">
-            <small style="color: var(--text-sub); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Saldo Disponível</small>
-            <h1 id="saldo">R$ 0,00</h1>
-        </div>
+        <h1 id="saldo" style="font-size: 2.8rem; margin: 10px 0;">R$ 0,00</h1>
+        <small style="color: var(--text-sub); text-transform: uppercase;">Saldo Disponível</small>
     </header>
 
     <div class="stats-row">
         <div class="stat-card">
-            <small style="color:var(--text-sub); font-weight:700; font-size:0.65rem;">RECEITAS</small>
-            <b id="resumo-receita" style="color: var(--green); font-size: 1.1rem; display: block; margin-top: 4px;">R$ 0,00</b>
+            <small style="color:var(--text-sub); font-weight:700;">RECEITAS</small>
+            <b id="resumo-receita" style="color: var(--green); display:block; margin-top:5px;">R$ 0,00</b>
         </div>
         <div class="stat-card">
-            <small style="color:var(--text-sub); font-weight:700; font-size:0.65rem;">DESPESAS</small>
-            <b id="resumo-despesa" style="color: var(--red); font-size: 1.1rem; display: block; margin-top: 4px;">R$ 0,00</b>
+            <small style="color:var(--text-sub); font-weight:700;">DESPESAS</small>
+            <b id="resumo-despesa" style="color: var(--red); display:block; margin-top:5px;">R$ 0,00</b>
         </div>
     </div>
 
     <main>
         <section id="aba-dashboard" class="tab-content active">
             <div class="viz-card">
-                <p style="font-size: 0.8rem; font-weight: 700; margin-bottom: 15px; color: var(--text-sub);">DISTRIBUIÇÃO (50/30/20)</p>
+                <p style="font-size: 0.8rem; color: var(--text-sub); margin-bottom:15px;">DISTRIBUIÇÃO 50/30/20</p>
                 <canvas id="graficoPizza" style="max-height: 180px;"></canvas>
             </div>
-            <div id="metas-container" style="padding: 0 20px;">
-                </div>
+            <div id="metas-container" style="padding: 0 20px;"></div>
         </section>
 
         <section id="aba-extrato" class="tab-content">
             <div style="padding: 20px;">
-                <select id="filtroMes" class="input-grid" onchange="carregarDados()" style="margin-bottom: 0;">
+                <select id="filtroMes" class="input-grid" onchange="carregarDados()">
                     <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
                     <option value="março">Março</option><option value="abril">Abril</option>
                     <option value="maio">Maio</option><option value="junho">Junho</option>
@@ -141,26 +122,28 @@
         <div class="modal-sheet">
             <h3 style="margin-bottom: 20px; text-align: center;">Novo Registro</h3>
             <div class="input-grid">
-                <input type="text" id="desc" placeholder="Ex: Venda Produto X, Aluguel...">
-                <input type="number" step="0.01" id="valor" placeholder="Valor R$ 0,00">
+                <input type="text" id="desc" placeholder="Descrição">
+                <input type="number" step="0.01" id="valor" placeholder="Valor R$">
                 <input type="date" id="data-reg">
                 <select id="tipo">
-                    <option value="fixo">Essencial / Custos Fixos (50%)</option>
-                    <option value="lazer">Estilo de Vida / Lazer (30%)</option>
-                    <option value="investimento">Reserva / Investimento (20%)</option>
-                    <option value="entrada">Receita / Faturamento (+)</option>
+                    <option value="fixo">Essencial (50%)</option>
+                    <option value="lazer">Lazer (30%)</option>
+                    <option value="investimento">Reserva (20%)</option>
+                    <option value="entrada">Receita (+)</option>
                 </select>
-                <button onclick="salvarRegistro()" style="width:100%; padding:18px; background:var(--accent); color:white; border:none; border-radius:16px; font-weight:800; cursor:pointer; margin-top: 10px;">SALVAR</button>
+                <button onclick="salvarRegistro()" style="width:100%; padding:18px; background:var(--accent); color:white; border:none; border-radius:16px; font-weight:bold;">SALVAR</button>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
     <script>
+        // FORÇAR LIMPEZA DE SERVICE WORKER (IMPORTANTE PARA DESTRAVAR)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                for (let registration of registrations) { registration.unregister(); }
+            });
+        }
+
         // FIREBASE CONFIG
         const firebaseConfig = { 
             apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE", 
@@ -170,44 +153,26 @@
             messagingSenderId: "659521706556", 
             appId: "1:659521706556:web:86f2174c4c8a89335ac139" 
         };
-        
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-
-        // GEMINI KEY
         const Gemini_Key = "AIzaSyAr3RLlLHop8BnGRUr-bMQV7mCSLIcsKgM"; 
 
-        const mesesNomes = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
         let chartP = null;
         let dadosFinanceiros = { rec:0, f:0, l:0, i:0, saldo:0 };
+        const meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
 
-        // ==========================
-        // FUNÇÕES DE INTERFACE (UI)
-        // ==========================
-        
+        // UI ACTIONS
         function toggleTheme() {
-            const body = document.body;
-            const btn = document.getElementById('btn-theme');
-            if (body.getAttribute('data-theme') === 'light') {
-                body.removeAttribute('data-theme');
-                btn.innerText = '☀️';
-            } else {
-                body.setAttribute('data-theme', 'light');
-                btn.innerText = '🌙';
-            }
-            if(chartP) chartP.update(); 
+            document.body.getAttribute('data-theme') === 'light' ? document.body.removeAttribute('data-theme') : document.body.setAttribute('data-theme', 'light');
         }
-
         function abrirAI() { document.getElementById('ai-modal').style.display = 'flex'; }
         function fecharAI() { document.getElementById('ai-modal').style.display = 'none'; }
         function fecharModal() { document.getElementById('modal').style.display = 'none'; }
-        
         function abrirModalLançamento() {
             document.getElementById('data-reg').value = new Date().toISOString().split('T')[0];
             document.getElementById('modal').style.display = 'flex';
         }
-
         function switchTab(id, btn) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -215,130 +180,90 @@
             btn.classList.add('active');
         }
 
-        const fmt = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-        // ==========================
-        // LÓGICA E BANCO DE DADOS
-        // ==========================
-
+        // LOGIC
         async function loginGoogle() {
-            if(window.location.protocol === 'file:') {
-                alert("O login do Google não funciona abrindo o arquivo duas vezes (file:///). O App ainda funcionará visualmente, mas sem salvar online. Para salvar, suba no Vercel.");
-            }
             try {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                await auth.signInWithPopup(provider);
-            } catch (error) {
-                console.error(error);
-                alert("Aviso de Login: " + error.message);
-            }
+                await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+            } catch (e) { alert("Dica: Use um navegador real ou hospede no Vercel para o login funcionar."); }
         }
 
         async function carregarDados() {
             if (!auth.currentUser) return;
-            try {
-                const mesSel = document.getElementById('filtroMes').value;
-                let saldoTotal = 0, f = 0, l = 0, i = 0, rec = 0;
-                let htmlGeral = "";
-
-                const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesSel);
-                const snap = await ref.get();
-
-                if (snap.exists) {
-                    const trans = snap.data().transacoes || [];
-                    trans.forEach((t, tIdx) => {
-                        const v = parseFloat(t.valor);
-                        if (t.tipo === 'entrada') { saldoTotal += v; rec += v; }
-                        else { saldoTotal -= v; if(t.tipo==='fixo') f+=v; else if(t.tipo==='lazer') l+=v; else i+=v; }
-                        
-                        htmlGeral += `<div class="entry-card"><div><b>${t.descricao}</b><br><small>${t.data.split('-').reverse().join('/')}</small></div><div style="text-align:right"><span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}; font-weight:800">${fmt(v)}</span><br><button onclick="apagarRegistro('${mesSel}', ${tIdx})" style="border:none; background:none; color:var(--red); font-size:0.6rem; cursor:pointer; font-weight:bold; margin-top:5px;">EXCLUIR</button></div></div>`;
-                    });
-                }
-
-                dadosFinanceiros = { rec, f, l, i, saldo: saldoTotal };
-                document.getElementById('saldo').innerText = fmt(saldoTotal);
-                document.getElementById('resumo-receita').innerText = fmt(rec);
-                document.getElementById('resumo-despesa').innerText = fmt(f+l+i);
-                document.getElementById('lista-geral').innerHTML = htmlGeral || '<p style="text-align:center; padding:30px; opacity:0.5">Sem lançamentos registrados.</p>';
-                
-                renderCharts(f, l, i);
-            } catch (error) {
-                console.error(error);
+            const mesSel = document.getElementById('filtroMes').value;
+            const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesSel);
+            const snap = await ref.get();
+            
+            let s = 0, f = 0, l = 0, i = 0, r = 0, html = "";
+            if (snap.exists) {
+                (snap.data().transacoes || []).forEach((t, idx) => {
+                    const v = parseFloat(t.valor);
+                    if (t.tipo === 'entrada') { s += v; r += v; }
+                    else { s -= v; if(t.tipo==='fixo') f+=v; else if(t.tipo==='lazer') l+=v; else i+=v; }
+                    html += `<div class="entry-card"><b>${t.descricao}</b> <span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">${v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span></div>`;
+                });
             }
+            dadosFinanceiros = { rec:r, f, l, i, saldo:s };
+            document.getElementById('saldo').innerText = s.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            document.getElementById('resumo-receita').innerText = r.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            document.getElementById('resumo-despesa').innerText = (f+l+i).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            document.getElementById('lista-geral').innerHTML = html || "<p style='text-align:center;padding:20px'>Vazio</p>";
+            renderCharts(f, l, i);
         }
 
         async function salvarRegistro() {
-            if (!auth.currentUser) return alert("Faça login no botão ENTRAR primeiro!");
+            if (!auth.currentUser) return alert("Faça login!");
             const v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value;
-            if(!v || !dt) return alert("Preencha valor e data!");
-            
-            try {
-                const mes = mesesNomes[parseInt(dt.split('-')[1]) - 1];
-                const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mes);
-                const snap = await ref.get();
-                let lista = snap.exists ? snap.data().transacoes : [];
-                
-                lista.push({ 
-                    descricao: document.getElementById('desc').value || "Não especificado", 
-                    valor: parseFloat(v), 
-                    tipo: document.getElementById('tipo').value, 
-                    data: dt 
-                });
-
-                await ref.set({ transacoes: lista });
-                fecharModal();
-                carregarDados();
-                
-                document.getElementById('desc').value = ""; document.getElementById('valor').value = "";
-            } catch (error) {
-                console.error(error);
-                alert("Erro ao salvar no banco. Verifique as regras do Firestore.");
-            }
+            const mes = meses[parseInt(dt.split('-')[1]) - 1];
+            const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mes);
+            const snap = await ref.get();
+            let lista = snap.exists ? snap.data().transacoes : [];
+            lista.push({ descricao: document.getElementById('desc').value, valor: v, tipo: document.getElementById('tipo').value, data: dt });
+            await ref.set({ transacoes: lista });
+            fecharModal(); carregarDados();
         }
 
-        async function apagarRegistro(mes, idx) {
-            if(!confirm("Deletar este registro?")) return;
-            try {
-                const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mes);
-                const snap = await ref.get();
-                let lista = snap.data().transacoes; 
-                lista.splice(idx, 1);
-                await ref.set({ transacoes: lista });
-                carregarDados();
-            } catch(e) {
-                console.error(e);
-            }
-        }
-
-        // ==========================
-        // IA GEMINI INTEGRADA
-        // ==========================
         async function perguntarIA() {
             const input = document.getElementById('ai-input');
-            const pergunta = input.value;
-            const historico = document.getElementById('chat-historico');
-            if(!pergunta) return;
-
-            historico.innerHTML += `<div class="chat-bubble user-bubble">${pergunta}</div>`;
+            const chat = document.getElementById('chat-historico');
+            if(!input.value) return;
+            const txt = input.value;
+            chat.innerHTML += `<div class="chat-bubble user-bubble">${txt}</div>`;
             input.value = "";
-            historico.scrollTop = historico.scrollHeight;
-
-            const prompt = `Você é um Assistente Financeiro Inteligente dentro de um app focado em Gestão Comercial.
-            Dados do usuário em tempo real: Receitas R$ ${dadosFinanceiros.rec}, Custos Fixos R$ ${dadosFinanceiros.f}, Estilo de Vida R$ ${dadosFinanceiros.l}, Investimentos R$ ${dadosFinanceiros.i}, Saldo Líquido R$ ${dadosFinanceiros.saldo}.
-            Baseando-se na regra 50/30/20, responda de forma direta, profissional e analítica a seguinte questão: ${pergunta}`;
-
             try {
+                const prompt = `Usuário Henrique. Saldo: ${dadosFinanceiros.saldo}, Receitas: ${dadosFinanceiros.rec}, Gastos: ${dadosFinanceiros.f+dadosFinanceiros.l+dadosFinanceiros.i}. Regra 50/30/20. Pergunta: ${txt}`;
                 const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${Gemini_Key}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
-                
-                if(!resp.ok) throw new Error("Falha na API da IA");
-                
                 const data = await resp.json();
-                const respostaIA = data.candidates[0].content.parts[0].text;
-                historico.innerHTML += `<div class="chat-bubble ai-bubble">${respostaIA}</div>`;
-                historico.scrollTop = historico.scrollHeight;
-            } catch (e) {
-                                                                      
+                chat.innerHTML += `<div class="chat-bubble ai-bubble">${data.candidates[0].content.parts[0].text}</div>`;
+                chat.scrollTop = chat.scrollHeight;
+            } catch (e) { chat.innerHTML += `<div class="chat-bubble ai-bubble">Erro na IA. Verifique sua chave.</div>`; }
+        }
+
+        function renderCharts(f, l, i) {
+            const ctx = document.getElementById('graficoPizza').getContext('2d');
+            if(chartP) chartP.destroy();
+            chartP = new Chart(ctx, { type:'doughnut', data:{ labels:['Fixo','Lazer','Reserva'], datasets:[{ data:[f||1, l||0.1, i||0.1], backgroundColor:['#EF4444','#F59E0B','#6366F1'], borderWidth:0 }] }, options:{ cutout:'75%', plugins:{legend:{display:false}} }});
+            
+            const base = (f+l+i) || 1;
+            const pct = (v) => ((v/base)*100).toFixed(0);
+            document.getElementById('metas-container').innerHTML = `
+                <small>Essencial (Meta 50%): ${pct(f)}%</small><div class="progress-container"><div class="bar" style="width:${pct(f)}%;background:var(--red)"></div></div>
+                <small>Lazer (Meta 30%): ${pct(l)}%</small><div class="progress-container"><div class="bar" style="width:${pct(l)}%;background:var(--orange)"></div></div>
+                <small>Investimento (Meta 20%): ${pct(i)}%</small><div class="progress-container"><div class="bar" style="width:${pct(i)}%;background:var(--accent)"></div></div>`;
+        }
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0].toUpperCase();
+                document.getElementById('filtroMes').value = meses[new Date().getMonth()];
+                carregarDados();
+            }
+        });
+        renderCharts(0,0,0);
+    </script>
+</body>
+</html>
+
