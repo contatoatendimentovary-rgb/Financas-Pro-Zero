@@ -20,19 +20,12 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { 
-            background: var(--bg); 
-            color: var(--text); 
-            padding-bottom: 110px; 
-            transition: background 0.3s, color 0.3s; 
-            overflow-x: hidden;
-            -webkit-overflow-scrolling: touch;
+            background: var(--bg); color: var(--text); padding-bottom: 110px; 
+            transition: 0.3s; overflow-x: hidden; -webkit-overflow-scrolling: touch; 
         }
 
         /* Feedback Tátil */
-        .nav-btn:active, .entry:active, .theme-btn:active, .btn-save:active {
-            transform: scale(0.96);
-            transition: transform 0.1s;
-        }
+        .nav-btn:active, .entry:active, .theme-btn:active, .btn-save:active { transform: scale(0.96); transition: 0.1s; }
 
         /* Header */
         .header { padding: 50px 24px 20px; text-align: center; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid var(--border); }
@@ -43,7 +36,7 @@
         .balance-label { color: var(--text-sub); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
         .balance-val { font-size: 2.6rem; font-weight: 800; letter-spacing: -1px; transition: color 0.3s; }
 
-        /* Dashboard Cards */
+        /* Dashboard */
         .viz-card { background: var(--card); margin: 20px 15px; padding: 25px; border-radius: 28px; border: 1px solid var(--border); }
         .prog-item { margin-bottom: 20px; }
         .prog-info { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; margin-bottom: 8px; }
@@ -63,8 +56,6 @@
         .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; gap: 5px; font-weight: 700; font-size: 0.65rem; cursor: pointer; flex: 1; }
         .nav-btn.active { color: var(--accent); }
         .nav-btn span { font-size: 1.3rem; }
-
-        /* Botão FAB */
         .fab { background: var(--accent); color: #000; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: none; box-shadow: 0 4px 15px rgba(253, 224, 71, 0.3); }
 
         /* Modal */
@@ -77,9 +68,8 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Skeleton Loading Effect */
-        .loading { animation: pulse 1.5s infinite; background: var(--gray-bar) !important; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .loading { animation: pulse 1.5s infinite; background: var(--gray-bar) !important; border: none; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
 </head>
 <body>
@@ -120,7 +110,7 @@
 
         <section id="aba-extrato" class="tab-content">
             <div style="padding: 0 15px 15px;">
-                <select id="filtroMes" class="input-box" style="margin-bottom:0" onchange="carregarDados()">
+                <select id="filtroMes" class="input-box" onchange="carregarDados()">
                     <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
                     <option value="março">Março</option><option value="abril">Abril</option>
                     <option value="maio">Maio</option><option value="junho">Junho</option>
@@ -181,11 +171,17 @@
                 document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0].toUpperCase();
                 document.getElementById('filtroMes').value = window.mesesNomes[new Date().getMonth()];
                 carregarDados();
-                processarCompartilhamento();
             }
         });
 
         window.loginGoogle = () => signInWithPopup(window.auth, new GoogleAuthProvider());
+
+        // Registro do Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js').catch(err => console.log(err));
+            });
+        }
     </script>
 
     <script>
@@ -196,7 +192,7 @@
             if (tipo === 'entrada') return '💰';
             if (tipo === 'investimento') return '📈';
             if (d.includes('comida') || d.includes('ifood') || d.includes('restaurante')) return '🍴';
-            if (d.includes('transporte') || d.includes('uber') || d.includes('gasolina')) return '🚗';
+            if (d.includes('uber') || d.includes('gasolina')) return '🚗';
             if (d.includes('mercado')) return '🛒';
             if (d.includes('aluguel') || d.includes('casa')) return '🏠';
             return '🏷️';
@@ -205,9 +201,8 @@
         async function carregarDados() {
             const user = window.auth.currentUser; if (!user) return;
             const mesSel = document.getElementById('filtroMes').value;
-            
-            // Início do carregamento visual
-            document.getElementById('lista-geral').innerHTML = '<div class="entry loading" style="height:80px"></div>';
+            const listaGeral = document.getElementById('lista-geral');
+            listaGeral.innerHTML = '<div class="entry loading" style="height:80px"></div>';
 
             let investMeses = Array(12).fill(0), saldoM = 0, fixo = 0, lazer = 0, invest = 0, receita = 0;
             let htmlGeral = "", htmlInvest = "";
@@ -219,6 +214,7 @@
                 const mesNome = window.mesesNomes[i];
                 if (snap.exists()) {
                     const trans = snap.data().transacoes || [];
+                    trans.sort((a,b) => new Date(b.data) - new Date(a.data));
                     trans.forEach((t, idx) => {
                         const v = parseFloat(t.valor);
                         if (t.tipo === 'investimento') investMeses[i] += v;
@@ -237,7 +233,7 @@
                                 </div>
                                 <div class="entry-right">
                                     <span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">${t.tipo==='entrada'?'+':'-'} R$ ${v.toFixed(2)}</span>
-                                    <button style="background:none;border:none;color:var(--red);font-size:1.2rem;cursor:pointer" onclick="apagar('${mesNome}', ${idx})">×</button>
+                                    <button style="background:none;border:none;color:var(--red);font-size:1.2rem;" onclick="apagar('${mesNome}', ${idx})">×</button>
                                 </div>
                             </div>`;
                             htmlGeral += card; if(t.tipo === 'investimento') htmlInvest += card;
@@ -246,12 +242,12 @@
                 }
             });
 
-            const saldoElement = document.getElementById('saldo');
-            saldoElement.innerText = `R$ ${saldoM.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-            saldoElement.style.color = saldoM >= 0 ? 'var(--text)' : 'var(--red)';
-
-            document.getElementById('lista-geral').innerHTML = htmlGeral || '<p style="text-align:center;color:var(--text-sub);padding:20px">Nenhum lançamento este mês.</p>';
-            document.getElementById('lista-invest').innerHTML = htmlInvest || '<p style="text-align:center;color:var(--text-sub);padding:20px">Sem aportes registrados.</p>';
+            const sEl = document.getElementById('saldo');
+            sEl.innerText = `R$ ${saldoM.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            sEl.style.color = saldoM >= 0 ? 'var(--text)' : 'var(--red)';
+            
+            listaGeral.innerHTML = htmlGeral || '<p style="text-align:center;color:var(--text-sub);padding:20px">Vazio</p>';
+            document.getElementById('lista-invest').innerHTML = htmlInvest || '<p style="text-align:center;color:var(--text-sub);padding:20px">Sem aportes</p>';
             
             renderPizza(fixo, lazer, invest);
             renderBarras(investMeses);
@@ -259,25 +255,19 @@
         }
 
         function atualizarRegra(f, l, i, rec) {
-            // Se não houver receita cadastrada, usa a soma dos gastos como base para evitar 0%
-            const totalRef = rec > 0 ? rec : (f + l + i || 1);
-            
-            const pF = (f / totalRef) * 100;
-            const pL = (l / totalRef) * 100;
-            const pI = (i / totalRef) * 100;
-
-            document.getElementById('bar-fixo').style.width = Math.min(pF, 100) + '%';
-            document.getElementById('txt-fixo').innerText = pF.toFixed(0) + '%';
-            document.getElementById('bar-lazer').style.width = Math.min(pL, 100) + '%';
-            document.getElementById('txt-lazer').innerText = pL.toFixed(0) + '%';
-            document.getElementById('bar-invest').style.width = Math.min(pI, 100) + '%';
-            document.getElementById('txt-invest').innerText = pI.toFixed(0) + '%';
+            const total = rec > 0 ? rec : (f + l + i || 1);
+            const set = (id, v) => {
+                const p = ((v/total)*100).toFixed(0);
+                document.getElementById(`bar-${id}`).style.width = Math.min(p, 100) + '%';
+                document.getElementById(`txt-${id}`).innerText = p + '%';
+            };
+            set('fixo', f); set('lazer', l); set('invest', i);
         }
 
         function renderPizza(f, l, i) {
             const ctx = document.getElementById('graficoPizza').getContext('2d');
             if(chartP) chartP.destroy();
-            chartP = new Chart(ctx, { type: 'doughnut', data: { datasets: [{ data: [f, l, i], backgroundColor: ['#FDE047', '#22C55E', '#525252'], borderWidth: 0 }] }, options: { cutout: '80%', plugins: { legend: { display: false } } } });
+            chartP = new Chart(ctx, { type: 'doughnut', data: { datasets: [{ data: [f||1, l, i], backgroundColor: (f+l+i)>0?['#FDE047', '#22C55E', '#525252']:['#27272A'], borderWidth: 0 }] }, options: { cutout: '85%', plugins: { legend: { display: false } } } });
         }
 
         function renderBarras(dados) {
@@ -287,34 +277,19 @@
         }
 
         async function salvarRegistro() {
-            const desc = document.getElementById('desc').value;
-            const val = document.getElementById('valor').value;
-            const dataReg = document.getElementById('data-reg').value;
-            const tipo = document.getElementById('tipo').value;
-
-            if(!val || !dataReg) return alert("Preencha o valor e a data!");
-
-            const mes = window.mesesNomes[parseInt(dataReg.split('-')[1]) - 1];
+            const dInput = document.getElementById('desc'), vInput = document.getElementById('valor'), dtInput = document.getElementById('data-reg'), tInput = document.getElementById('tipo');
+            if(!vInput.value || !dtInput.value) return alert("Preencha valor e data!");
+            const mes = window.mesesNomes[parseInt(dtInput.value.split('-')[1]) - 1];
             const ref = window.f_doc(window.db, "usuarios", window.auth.currentUser.uid, "meses", mes);
-            
-            try {
-                const snap = await window.f_getDoc(ref);
-                let lista = snap.exists() ? snap.data().transacoes : [];
-                lista.push({ descricao: desc || "Lançamento", valor: parseFloat(val), tipo: tipo, data: dataReg });
-                await window.f_setDoc(ref, { transacoes: lista });
-                
-                // Limpeza e feedback
-                document.getElementById('desc').value = "";
-                document.getElementById('valor').value = "";
-                fecharModal(); 
-                carregarDados();
-            } catch(e) {
-                alert("Erro ao salvar: " + e.message);
-            }
+            const snap = await window.f_getDoc(ref);
+            let lista = snap.exists() ? snap.data().transacoes : [];
+            lista.push({ descricao: dInput.value || "Lançamento", valor: parseFloat(vInput.value), tipo: tInput.value, data: dtInput.value });
+            await window.f_setDoc(ref, { transacoes: lista });
+            dInput.value = ""; vInput.value = ""; fecharModal(); carregarDados();
         }
 
         async function apagar(mes, idx) {
-            if(!confirm("Deseja realmente apagar este lançamento?")) return;
+            if(!confirm("Apagar?")) return;
             const ref = window.f_doc(window.db, "usuarios", window.auth.currentUser.uid, "meses", mes);
             const snap = await window.f_getDoc(ref);
             let lista = snap.data().transacoes;
@@ -336,10 +311,7 @@
         }
         function fecharModal() { document.getElementById('modal').style.display = 'none'; }
         function toggleTheme() { document.body.classList.toggle('light-mode'); }
+    </script>
+</body>
+</html>
 
-        function processarCompartilhamento() {
-            const texto = new URLSearchParams(window.location.search).get('text');
-            if (texto) {
-                const match = texto.match(/R\$\s?(\d+,\d{2})/);
-                if (match) document.getElementById('valor').value = match[1].replace(',', '.');
-              
