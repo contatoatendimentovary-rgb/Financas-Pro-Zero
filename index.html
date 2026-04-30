@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#EAB308">
-    <title>FinançasPRO | Versão Final</title>
+    <title>FinançasPRO | Gold Edition</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -19,95 +19,119 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 100px; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 110px; overflow-x: hidden; }
 
+        /* Header */
         .header { padding: 50px 20px 20px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
         .nav-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         
         .month-bar { display: flex; overflow-x: auto; gap: 8px; scrollbar-width: none; }
         .month-bar::-webkit-scrollbar { display: none; }
-        .m-item { padding: 10px 18px; border-radius: 12px; background: #1A1A1A; color: var(--subtext); border: 1px solid var(--border); font-weight: 700; white-space: nowrap; }
+        .m-item { padding: 10px 18px; border-radius: 12px; background: #1A1A1A; color: var(--subtext); border: 1px solid var(--border); font-weight: 700; white-space: nowrap; font-size: 0.8rem; }
         .m-item.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
-        .hero { text-align: center; padding: 35px 20px; }
-        .hero h1 { font-size: 3rem; font-weight: 900; margin-top: 5px; letter-spacing: -1px; }
+        /* Hero */
+        .hero { text-align: center; padding: 30px 20px 20px; }
+        .hero h1 { font-size: 2.8rem; font-weight: 900; letter-spacing: -1.5px; }
+        .hero span { color: var(--subtext); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
 
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; }
-        .s-card { background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--border); }
-        .s-card small { font-size: 0.6rem; font-weight: 900; color: var(--subtext); text-transform: uppercase; display: block; margin-bottom: 4px; }
+        /* Cards de Resumo */
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; margin-bottom: 20px; }
+        .s-card { background: var(--card); padding: 18px; border-radius: 20px; border: 1px solid var(--border); }
+        .s-card small { font-size: 0.6rem; font-weight: 900; color: var(--subtext); display: block; margin-bottom: 4px; }
+        .s-card b { font-size: 1.1rem; }
 
-        .t-row { background: var(--card); padding: 18px; border-radius: 20px; margin: 0 20px 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .t-info b { display: block; font-size: 0.95rem; }
-        .t-info span { font-size: 0.65rem; font-weight: 800; color: var(--subtext); text-transform: uppercase; }
+        /* Gráfico Ajustado */
+        .chart-container { position: relative; width: 180px; height: 180px; margin: 0 auto; }
 
-        .btn-del { background: #27272A; border: none; color: var(--red); padding: 10px; border-radius: 12px; font-size: 1rem; margin-left: 10px; cursor: pointer; }
+        /* Lista de Transações */
+        .t-row { background: var(--card); padding: 16px; border-radius: 18px; margin: 0 20px 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .t-info b { display: block; font-size: 0.9rem; }
+        .t-info span { font-size: 0.6rem; font-weight: 800; color: var(--subtext); text-transform: uppercase; }
+        .btn-del { background: #27272A; border: none; color: var(--red); width: 35px; height: 35px; border-radius: 10px; margin-left: 10px; font-size: 0.9rem; }
 
-        .nav-bot { position: fixed; bottom: 0; width: 100%; height: 85px; background: var(--card); border-top: 1px solid var(--border); display: flex; padding-bottom: 15px; }
+        /* Bottom Nav */
+        .nav-bot { position: fixed; bottom: 0; width: 100%; height: 85px; background: var(--card); border-top: 1px solid var(--border); display: flex; padding-bottom: 15px; z-index: 1000; }
         .n-btn { flex: 1; border: none; background: none; color: var(--subtext); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 0.65rem; }
         .n-btn.active { color: var(--accent); }
+        .n-btn i { font-size: 1.4rem; margin-bottom: 4px; }
 
-        .ai-fab { position: fixed; bottom: 105px; right: 20px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); color: #000; border: none; font-size: 24px; box-shadow: 0 10px 25px rgba(234, 179, 8, 0.4); z-index: 900; }
+        /* FAB IA */
+        .ai-fab { position: fixed; bottom: 100px; right: 20px; width: 56px; height: 56px; border-radius: 18px; background: var(--accent); color: #000; border: none; font-size: 22px; box-shadow: 0 8px 20px rgba(234,179,8,0.3); z-index: 900; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: flex-end; }
-        .sheet { background: var(--bg); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; border-top: 3px solid var(--accent); }
-        input, select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-weight: 700; }
+        /* Modais */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: flex-end; }
+        .sheet { background: var(--bg); width: 100%; border-radius: 25px 25px 0 0; padding: 25px; border-top: 3px solid var(--accent); animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        input, select { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); color: #fff; font-weight: 700; }
+        .btn-save { width: 100%; padding: 16px; border-radius: 12px; background: var(--accent); color: #000; border: none; font-weight: 900; font-size: 1rem; }
     </style>
 </head>
 <body>
 
     <div id="ai-panel" style="display:none; position:fixed; inset:0; background:var(--bg); z-index:5000; flex-direction:column;">
         <div style="padding:20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-            <b>✨ IA INTELIGENTE</b>
+            <b>✨ INTELIGÊNCIA FINANCEIRA</b>
             <button onclick="toggleAI()" style="background:none; border:none; color:#fff; font-size:2rem;">&times;</button>
         </div>
         <div id="chat-box" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px;"></div>
         <div style="padding:20px; display:flex; gap:10px; background:var(--card);">
-            <input type="text" id="ai-in" placeholder="Diga o que aconteceu..." style="margin-bottom:0;">
-            <button onclick="askIA()" style="background:var(--accent); border:none; padding:0 20px; border-radius:12px; font-weight:900;">ENVIAR</button>
+            <input type="text" id="ai-in" placeholder="Ex: Paguei 30 no Uber" style="margin-bottom:0;">
+            <button onclick="askIA()" style="background:var(--accent); border:none; padding:0 20px; border-radius:12px; font-weight:900;">OK</button>
         </div>
     </div>
 
     <header class="header">
         <div class="nav-top">
-            <b style="font-size: 1.1rem;">FINANÇAS<span style="color:var(--accent)">PRO</span></b>
-            <div id="user-badge" onclick="login()" style="background:var(--accent); color:#000; padding:6px 15px; border-radius:10px; font-size:0.7rem; font-weight:900;">LOGIN</div>
+            <b style="font-size: 1rem; letter-spacing: -0.5px;">FINANÇAS<span style="color:var(--accent)">PRO</span></b>
+            <div id="user-info" onclick="login()" style="background:var(--accent); color:#000; padding:6px 14px; border-radius:10px; font-size:0.65rem; font-weight:900;">LOGIN</div>
         </div>
         <div class="month-bar" id="m-list"></div>
     </header>
 
     <div class="hero">
-        <span style="color:var(--subtext); font-weight:800; font-size:0.7rem; text-transform:uppercase;">Saldo Atual</span>
+        <span>Meu Saldo</span>
         <h1 id="v-bal">R$ 0,00</h1>
     </div>
 
     <div class="stats">
-        <div class="s-card"><small>ENTRADAS</small><b id="v-in" style="color:var(--green)">R$ 0,00</b></div>
-        <div class="s-card"><small>SAÍDAS</small><b id="v-out" style="color:var(--red)">R$ 0,00</b></div>
+        <div class="s-card"><small>RECEITAS</small><b id="v-in" style="color:var(--green)">R$ 0,00</b></div>
+        <div class="s-card"><small>DESPESAS</small><b id="v-out" style="color:var(--red)">R$ 0,00</b></div>
     </div>
 
-    <div id="v-dash" style="padding:30px 20px;"><canvas id="chart"></canvas></div>
-    <div id="v-list" style="display:none; padding:20px 0;"><div id="t-cont"></div></div>
+    <div id="v-dash" style="padding:10px 20px;">
+        <div style="background:var(--card); padding:30px; border-radius:25px; border:1px solid var(--border); text-align:center;">
+            <div class="chart-container">
+                <canvas id="chart"></canvas>
+            </div>
+            <p style="margin-top:15px; font-size:0.7rem; color:var(--subtext); font-weight:700;">DISTRIBUIÇÃO MENSAL</p>
+        </div>
+    </div>
+
+    <div id="v-list" style="display:none; padding-top:10px;">
+        <div id="t-cont"></div>
+    </div>
 
     <button class="ai-fab" onclick="toggleAI()">✨</button>
 
     <nav class="nav-bot">
         <button class="n-btn active" onclick="tab('dash', this)"><i>📊</i>Home</button>
-        <button class="n-btn" onclick="openAdd()"><i>➕</i>Novo</button>
-        <button class="n-btn" onclick="tab('list', this)"><i>📜</i>Lista</button>
+        <button class="n-btn" onclick="openAdd()"><i>➕</i>Lançar</button>
+        <button class="n-btn" onclick="tab('list', this)"><i>📜</i>Extrato</button>
     </nav>
 
     <div id="m-add" class="modal" onclick="if(event.target==this) closeAdd()">
         <div class="sheet">
-            <h3>Novo Lançamento</h3><br>
-            <input type="text" id="in-desc" placeholder="Descrição">
+            <h3 style="margin-bottom:15px;">Novo Registro</h3>
+            <input type="text" id="in-desc" placeholder="O que foi?">
             <input type="number" id="in-val" placeholder="0.00">
             <select id="in-tipo">
-                <option value="entrada">Receita</option>
-                <option value="fixo">Fixo</option>
-                <option value="lazer" selected>Variável</option>
+                <option value="entrada">Faturamento / Pix</option>
+                <option value="fixo">Gasto Fixo</option>
+                <option value="lazer" selected>Gasto Variável</option>
             </select>
             <input type="date" id="in-date">
-            <button onclick="save()" style="width:100%; padding:18px; border-radius:12px; background:var(--accent); font-weight:900; border:none;">SALVAR</button>
+            <button class="btn-save" onclick="save()">CONFIRMAR</button>
         </div>
     </div>
 
@@ -128,6 +152,7 @@
                 b.innerText = m;
                 b.onclick = () => { document.querySelectorAll('.m-item').forEach(x => x.classList.remove('active')); b.classList.add('active'); mesAtivo = m; sync(); };
                 list.appendChild(b);
+                if(m === mesAtivo) b.scrollIntoView({ inline: 'center' });
             });
             sync();
         }
@@ -144,7 +169,7 @@
                     trans.forEach((t, i) => {
                         const v = parseFloat(t.valor);
                         if(t.tipo==='entrada') r+=v; else g+=v;
-                        html += `<div class="t-row"><div class="t-info"><b>${t.descricao || 'Sem título'}</b><span>${t.tipo}</span></div>
+                        html += `<div class="t-row"><div class="t-info"><b>${t.descricao || 'Lançamento'}</b><span>${t.tipo}</span></div>
                                  <div style="display:flex;align-items:center;"><b style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">R$ ${v.toFixed(2)}</b>
                                  <button class="btn-del" onclick="del(${i})">🗑️</button></div></div>`;
                     });
@@ -152,7 +177,7 @@
                 document.getElementById('v-bal').innerText = (r-g).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
                 document.getElementById('v-in').innerText = "R$ "+r.toFixed(2);
                 document.getElementById('v-out').innerText = "R$ "+g.toFixed(2);
-                document.getElementById('t-cont').innerHTML = html || "<p style='text-align:center;padding:40px;opacity:0.3;'>Vazio</p>";
+                document.getElementById('t-cont').innerHTML = html || "<p style='text-align:center;padding:50px;opacity:0.3;'>Sem dados.</p>";
                 render(r, g);
             });
         }
@@ -168,29 +193,27 @@
         }
 
         async function del(index) {
-            if(!confirm("Apagar este lançamento?")) return;
+            if(!confirm("Deseja apagar?")) return;
             const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo.toLowerCase());
             const snap = await ref.get();
-            let list = snap.data().transacoes;
-            list.splice(index, 1);
+            let list = snap.data().transacoes; list.splice(index, 1);
             await ref.set({ transacoes: list });
         }
 
         async function askIA() {
             const inp = document.getElementById('ai-in'), box = document.getElementById('chat-box');
             const txt = inp.value; if(!txt) return;
-            box.innerHTML += `<div style="background:var(--accent); color:#000; padding:12px; border-radius:15px; align-self:flex-end;">${txt}</div>`;
+            box.innerHTML += `<div style="background:var(--accent); color:#000; padding:12px; border-radius:15px; align-self:flex-end; font-weight:700;">${txt}</div>`;
             inp.value = "";
             
             try {
                 const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method:'POST', headers:{'Authorization':'Bearer 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','Content-Type':'application/json'},
-                    body:JSON.stringify({ model:"llama-3.1-8b-instant", messages:[{role:"user", content:`Analise: "${txt}". Se for gasto use tipo "lazer". Retorne JSON: {"desc":"Nome","valor":0.0,"tipo":"entrada/lazer"}`}], response_format:{"type":"json_object"}})
+                    body:JSON.stringify({ model:"llama-3.1-8b-instant", messages:[{role:"user", content:`Analise: "${txt}". Responda APENAS JSON: {"desc":"Nome","valor":0.0,"tipo":"entrada/fixo/lazer"}`}], response_format:{"type":"json_object"}})
                 });
                 let r = JSON.parse((await res.json()).choices[0].message.content);
                 
-                // BLINDAGEM CONTRA UNDEFINED
-                if(!r.desc || r.desc === "undefined") r.desc = txt.substring(0, 20);
+                if(!r.desc || r.desc === "undefined") r.desc = txt;
                 if(txt.toLowerCase().includes("gastei") || txt.toLowerCase().includes("paguei")) r.tipo = "lazer";
 
                 const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo.toLowerCase());
@@ -205,7 +228,11 @@
         function render(inVal, outVal) {
             const ctx = document.getElementById('chart').getContext('2d');
             if(myChart) myChart.destroy();
-            myChart = new Chart(ctx, { type:'doughnut', data:{ datasets:[{data:[outVal||1, inVal||1], backgroundColor:['#EF4444','#EAB308'], borderWidth:0}]}, options:{cutout:'85%'} });
+            myChart = new Chart(ctx, { 
+                type:'doughnut', 
+                data:{ datasets:[{data:[outVal||0.1, inVal||0.1], backgroundColor:['#EF4444','#EAB308'], borderWidth:0}]}, 
+                options:{ cutout:'88%', plugins: { legend: { display: false } } } 
+            });
         }
 
         function tab(v, b) {
@@ -219,7 +246,7 @@
         function toggleAI() { const p = document.getElementById('ai-panel'); p.style.display = p.style.display==='none'?'flex':'none'; }
 
         init();
-        auth.onAuthStateChanged(u => { if(u){ document.getElementById('user-badge').innerText = u.displayName.split(' ')[0]; sync(); } });
+        auth.onAuthStateChanged(u => { if(u){ document.getElementById('user-info').innerText = u.displayName.split(' ')[0].toUpperCase(); sync(); } });
     </script>
 </body>
 </html>
