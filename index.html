@@ -163,27 +163,33 @@
         let chartP = null, chartB = null;
         let dadosFinanceiros = { rec:0, f:0, l:0, i:0, saldo:0 };
 
-        // --- FUNÇÕES GLOBAIS (PARA O HTML ENXERGAR) ---
-        window.loginGoogle = () => signInWithPopup(auth, new GoogleAuthProvider());
-        window.toggleTheme = () => document.body.classList.toggle('dark-mode');
-        window.abrirAI = () => document.getElementById('ai-modal').style.display = 'flex';
-        window.fecharAI = () => document.getElementById('ai-modal').style.display = 'none';
-        window.fecharModal = () => document.getElementById('modal').style.display = 'none';
-        window.abrirModalLançamento = () => {
+        // ---------------------------------------------
+        // 1. FUNÇÕES ISOLADAS DE UI
+        // ---------------------------------------------
+        function loginGoogle() { signInWithPopup(auth, new GoogleAuthProvider()); }
+        function toggleTheme() { document.body.classList.toggle('dark-mode'); }
+        function abrirAI() { document.getElementById('ai-modal').style.display = 'flex'; }
+        function fecharAI() { document.getElementById('ai-modal').style.display = 'none'; }
+        function fecharModal() { document.getElementById('modal').style.display = 'none'; }
+        
+        function abrirModalLançamento() {
             document.getElementById('data-reg').value = new Date().toISOString().split('T')[0];
             document.getElementById('modal').style.display = 'flex';
-        };
+        }
 
-        window.switchTab = (id, btn) => {
+        function switchTab(id, btn) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             btn.classList.add('active');
-        };
+        }
 
         const fmt = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-        window.carregarDados = async () => {
+        // ---------------------------------------------
+        // 2. FUNÇÕES DE BANCO DE DADOS E LÓGICA
+        // ---------------------------------------------
+        async function carregarDados() {
             if (!auth.currentUser) return;
             const mesSel = document.getElementById('filtroMes').value;
             let investAnual = Array(12).fill(0), saldoTotal = 0, f = 0, l = 0, i = 0, rec = 0;
@@ -218,9 +224,9 @@
             document.getElementById('lista-geral').innerHTML = htmlGeral || '<p style="text-align:center; padding:30px; opacity:0.3">Sem registros</p>';
             document.getElementById('lista-invest').innerHTML = htmlInvest || '<p style="text-align:center; padding:30px; opacity:0.3">Sem investimentos</p>';
             renderCharts(f, l, i, investAnual, rec);
-        };
+        }
 
-        window.salvarRegistro = async () => {
+        async function salvarRegistro() {
             const v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value;
             if(!v || !dt) return alert("Preencha Valor e Data!");
             const mes = mesesNomes[parseInt(dt.split('-')[1]) - 1];
@@ -229,21 +235,23 @@
             let lista = snap.exists() ? snap.data().transacoes : [];
             lista.push({ descricao: document.getElementById('desc').value || "S/ Nome", valor: parseFloat(v), tipo: document.getElementById('tipo').value, data: dt });
             await setDoc(ref, { transacoes: lista });
-            fecharModal();
-            carregarDados();
-        };
+            
+            fecharModal(); 
+            carregarDados(); 
+        }
 
-        window.apagarRegistro = async (mes, idx) => {
+        async function apagarRegistro(mes, idx) {
             if(!confirm("Remover este item?")) return;
             const ref = doc(db, "usuarios", auth.currentUser.uid, "meses", mes);
             const snap = await getDoc(ref);
             let lista = snap.data().transacoes; 
             lista.splice(idx, 1);
             await setDoc(ref, { transacoes: lista });
-            carregarDados();
-        };
+            
+            carregarDados(); 
+        }
 
-        window.perguntarIA = async () => {
+        async function perguntarIA() {
             const input = document.getElementById('ai-input');
             const pergunta = input.value;
             const historico = document.getElementById('chat-historico');
@@ -253,7 +261,9 @@
             input.value = "";
             historico.scrollTop = historico.scrollHeight;
 
-            const contexto = `Henrique (Estudante de Gestão) tem: Receita ${fmt(dadosFinanceiros.rec)}, Gastos ${fmt(dadosFinanceiros.f+dadosFinanceiros.l)}, Aportes ${fmt(dadosFinanceiros.i)}, Saldo ${fmt(dadosFinanceiros.saldo)}. Responda curto: ${pergunta}`;
+            const contexto = `Você é um Consultor Financeiro focado em Gestão Comercial. Usuário: Henrique.
+            Dados Reais: Receita Profit ${fmt(dadosFinanceiros.rec)}, Gastos Essenciais ${fmt(dadosFinanceiros.f)}, Lazer ${fmt(dadosFinanceiros.l)}, Aportes ${fmt(dadosFinanceiros.i)}, Saldo em Mãos ${fmt(dadosFinanceiros.saldo)}.
+            Analise a pergunta e responda de forma curta e técnica: ${pergunta}`;
 
             try {
                 const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${Gemini_API_Key}`, {
@@ -268,7 +278,7 @@
             } catch (e) {
                 historico.innerHTML += `<div class="chat-bubble ai-bubble">Erro de conexão.</div>`;
             }
-        };
+        }
 
         function renderCharts(f, l, i, barras, rec) {
             const ctxP = document.getElementById('graficoPizza').getContext('2d');
@@ -290,14 +300,7 @@
                 <div class="progress-container"><div class="bar" style="width:${pct(i)}%; background:var(--accent)"></div></div>`;
         }
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0].toUpperCase();
-                document.getElementById('filtroMes').value = mesesNomes[new Date().getMonth()];
-                carregarDados();
-            }
-        });
-    </script>
-</body>
-</html>
-
+        // ---------------------------------------------
+        // 3. ATRIBUIR TUDO AO WINDOW (ESSENCIAL PARA OS CLIQUES)
+        // ---------------------------------------------
+        window.loginGoogle = loginG
