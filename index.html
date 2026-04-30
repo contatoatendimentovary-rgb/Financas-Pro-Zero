@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finan Pro - CFO Digital</title>
+    <title>Finan Pro - Gestão Comercial</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -14,127 +14,92 @@
         :root {
             --bg: #0F172A; --header-bg: #1E293B; --card: #1E293B; --text-main: #F1F5F9;
             --text-sub: #94A3B8; --border: #334155; --accent: #6366F1;
-            --green: #10B981; --orange: #F59E0B; --red: #EF4444; 
-            --ai-gradient: linear-gradient(135deg, #10B981 0%, #6366F1 100%);
+            --green: #10B981; --red: #EF4444; --orange: #F59E0B;
         }
-        [data-theme="light"] {
-            --bg: #F8FAFC; --header-bg: #FFFFFF; --card: #FFFFFF; --text-main: #0F172A;
-            --text-sub: #64748B; --border: #E2E8F0;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text-main); padding-bottom: 110px; transition: 0.3s; overflow-x: hidden; }
-        
-        .glass-header { background: var(--header-bg); padding: 50px 20px 40px; border-radius: 0 0 30px 30px; border-bottom: 1px solid var(--border); text-align: center; }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .theme-toggle { background: var(--card); border: 1px solid var(--border); color: var(--text-main); padding: 8px 12px; border-radius: 12px; cursor: pointer; }
-        .user-pill { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 800; cursor: pointer; font-size: 0.8rem; }
-        .main-balance h1 { font-size: 2.8rem; font-weight: 800; letter-spacing: -1px; margin: 5px 0; }
-        
-        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; margin-top: -25px; position: relative; z-index: 10; }
-        .stat-card { background: var(--card); padding: 18px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        
-        .ai-popup { display: none; position: fixed; bottom: 100px; left: 15px; right: 15px; background: var(--card); border: 1px solid var(--accent); border-radius: 28px; padding: 22px; z-index: 3000; flex-direction: column; max-height: 75vh; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
-        .chat-area { flex: 1; overflow-y: auto; margin: 15px 0; font-size: 0.9rem; min-height: 250px; scroll-behavior: smooth; }
-        .chat-bubble { margin-bottom: 12px; padding: 14px; border-radius: 18px; max-width: 90%; line-height: 1.4; }
-        .ai-bubble { background: rgba(99, 102, 241, 0.1); color: var(--text-main); border-bottom-left-radius: 4px; border: 1px solid rgba(99, 102, 241, 0.2); }
-        .user-bubble { background: var(--accent); color: white; margin-left: auto; border-bottom-right-radius: 4px; }
-        
-        .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--header-bg); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
-        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; flex: 1; cursor: pointer; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); color: var(--text-main); padding-bottom: 100px; }
+        .glass-header { background: var(--header-bg); padding: 40px 20px; border-radius: 0 0 30px 30px; text-align: center; border-bottom: 1px solid var(--border); }
+        .main-balance h1 { font-size: 2.5rem; margin: 10px 0; }
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 20px; margin-top: -20px; }
+        .stat-card { background: var(--card); padding: 15px; border-radius: 20px; border: 1px solid var(--border); }
+        .entry-card { background: var(--card); padding: 15px; border-radius: 15px; margin: 0 20px 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--header-bg); display: flex; justify-content: space-around; padding: 15px 0 30px; border-top: 1px solid var(--border); }
+        .nav-btn { background: none; border: none; color: var(--text-sub); font-size: 0.7rem; cursor: pointer; }
         .nav-btn.active { color: var(--accent); }
-        .nav-btn span { font-size: 1.4rem; margin-bottom: 4px; }
-        
-        .floating-btn { position: fixed; bottom: 115px; right: 20px; width: 65px; height: 65px; border-radius: 50%; background: var(--ai-gradient); color: white; border: none; font-size: 28px; z-index: 999; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4); cursor: pointer; }
-        
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 4000; align-items: flex-end; backdrop-filter: blur(8px); }
-        .modal-sheet { background: var(--card); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; border-top: 3px solid var(--accent); }
-        .input-grid input, .input-grid select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 15px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); outline: none; font-size: 1rem; }
-        
-        .progress-container { background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; margin: 8px 0 15px; }
-        .bar { height: 100%; transition: 1s ease-in-out; }
-        
-        .entry-card { background: var(--card); padding: 16px; border-radius: 20px; margin: 0 20px 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .tab-content { display: none; } .tab-content.active { display: block; }
-        .viz-card { background: var(--card); margin: 20px; padding: 22px; border-radius: 28px; border: 1px solid var(--border); }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: flex-end; }
+        .modal-content { background: var(--card); width: 100%; padding: 30px; border-radius: 30px 30px 0 0; }
+        input, select { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: white; }
+        .progress-bar { height: 8px; background: var(--border); border-radius: 4px; margin: 5px 0 15px; overflow: hidden; }
+        .progress-fill { height: 100%; transition: 0.5s; }
+        .ai-popup { display: none; position: fixed; bottom: 100px; left: 15px; right: 15px; background: var(--card); border: 1px solid var(--accent); border-radius: 28px; padding: 22px; z-index: 3000; flex-direction: column; max-height: 70vh; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        .chat-area { flex: 1; overflow-y: auto; margin: 15px 0; font-size: 0.9rem; min-height: 200px; }
+        .chat-bubble { margin-bottom: 12px; padding: 14px; border-radius: 18px; max-width: 90%; line-height: 1.4; }
+        .ai-bubble { background: rgba(99, 102, 241, 0.1); color: var(--text-main); border-bottom-left-radius: 4px; }
+        .user-bubble { background: var(--accent); color: white; margin-left: auto; border-bottom-right-radius: 4px; }
     </style>
 </head>
 <body>
 
     <div id="ai-modal" class="ai-popup">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <b style="color:var(--accent); font-size: 0.9rem;">Mente Financeira</b>
+            <b style="color:var(--accent);">Mente Financeira</b>
             <button onclick="fecharAI()" style="background:none; border:none; font-size:1.8rem; color:var(--text-sub);">&times;</button>
         </div>
         <div class="chat-area" id="chat-historico"></div>
-        <div style="display:flex; gap:8px; background:var(--bg); padding:8px; border-radius:15px;">
-            <input type="text" id="ai-input" placeholder="Dúvida sobre o fluxo?" style="flex:1; border:none; background:none; color:var(--text-main); outline:none;">
-            <button onclick="perguntarIA()" style="background:var(--accent); color:white; border:none; padding:10px 15px; border-radius:10px; font-weight:bold;">ENVIAR</button>
+        <div style="display:flex; gap:8px;">
+            <input type="text" id="ai-input" placeholder="Dúvida sobre o fluxo?" style="flex:1;">
+            <button onclick="perguntarIA()" style="background:var(--accent); color:white; border:none; padding:10px; border-radius:10px; font-weight:bold;">IR</button>
         </div>
     </div>
 
     <header class="glass-header">
-        <div class="header-top">
-            <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
-            <div style="font-weight: 800; color: var(--accent);">FINAN PRO</div>
-            <button id="btnAuth" class="user-pill" onclick="loginGoogle()">CONECTAR</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <div style="font-weight:800; color:var(--accent)">FINAN PRO</div>
+            <button onclick="loginGoogle()" id="btnAuth" style="background:var(--accent); color:white; border:none; padding:8px 15px; border-radius:15px; font-weight:bold;">LOGIN</button>
         </div>
-        <div class="main-balance"><h1 id="saldo">R$ 0,00</h1><small style="color: var(--text-sub);">FLUXO DE CAIXA ATUAL</small></div>
+        <div class="main-balance"><small>SALDO TOTAL</small><h1 id="saldo">R$ 0,00</h1></div>
     </header>
 
     <div class="stats-row">
-        <div class="stat-card"><small style="color:var(--text-sub); font-size: 0.65rem;">ENTRADAS</small><b id="resumo-receita" style="color: var(--green); display:block;">R$ 0,00</b></div>
-        <div class="stat-card"><small style="color:var(--text-sub); font-size: 0.65rem;">SAÍDAS</small><b id="resumo-despesa" style="color: var(--red); display:block;">R$ 0,00</b></div>
+        <div class="stat-card"><small>ENTRADAS</small><b id="res-rec" style="color:var(--green); display:block;">R$ 0,00</b></div>
+        <div class="stat-card"><small>SAÍDAS</small><b id="res-des" style="color:var(--red); display:block;">R$ 0,00</b></div>
     </div>
 
-    <main>
-        <section id="aba-dashboard" class="tab-content active">
-            <div class="viz-card"><canvas id="graficoPizza" style="max-height: 200px;"></canvas></div>
-            <div id="metas-container" style="padding: 0 20px;"></div>
-        </section>
-
-        <section id="aba-extrato" class="tab-content">
-            <div style="padding: 20px;">
-                <select id="filtroMes" class="input-grid" onchange="carregarDados()">
-                    <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
-                    <option value="março">Março</option><option value="abril">Abril</option>
-                    <option value="maio">Maio</option><option value="junho">Junho</option>
-                    <option value="julho">Julho</option><option value="agosto">Agosto</option>
-                    <option value="setembro">Setembro</option><option value="outubro">Outubro</option>
-                    <option value="novembro">Novembro</option><option value="dezembro">Dezembro</option>
-                </select>
-            </div>
-            <div id="lista-geral"></div>
-        </section>
+    <main style="margin-top:30px;">
+        <div id="aba-dash">
+            <div style="margin: 0 20px;"><canvas id="chartJS" style="max-height: 180px;"></canvas></div>
+            <div id="perc-labels" style="padding: 20px;"></div>
+        </div>
+        <div id="aba-extrato" style="display:none;">
+            <div style="padding:0 20px 10px;"><select id="filtroMes" onchange="carregarDados()"></select></div>
+            <div id="lista-transacoes"></div>
+        </div>
     </main>
 
-    <button class="floating-btn" onclick="abrirAI()">✨</button>
+    <div class="bottom-nav">
+        <button class="nav-btn active" onclick="showTab('aba-dash', this)">📊 DASH</button>
+        <button class="nav-btn" onclick="openModal()">➕ NOVO</button>
+        <button class="nav-btn" onclick="showTab('aba-extrato', this)">📜 EXTRATO</button>
+    </div>
 
-    <nav class="bottom-tab-bar">
-        <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active"><span>📊</span>Dash</button>
-        <button onclick="abrirModalLançamento()" class="nav-btn"><span>➕</span>Novo</button>
-        <button onclick="switchTab('aba-extrato', this)" class="nav-btn"><span>📜</span>Extrato</button>
-    </nav>
-
-    <div id="modal" class="modal-overlay" onclick="if(event.target==this) fecharModal()">
-        <div class="modal-sheet">
-            <h3 style="margin-bottom: 20px; text-align: center;">Novo Registro</h3>
-            <div class="input-grid">
-                <input type="text" id="desc" placeholder="Descrição">
-                <input type="number" id="valor" placeholder="Valor (Ex: 50.00)">
-                <input type="date" id="data-reg">
-                <select id="tipo">
-                    <option value="fixo">🏠 Fixo</option>
-                    <option value="lazer">🍦 Lazer</option>
-                    <option value="investimento">📈 Reserva</option>
-                    <option value="entrada">💰 Receita</option>
-                </select>
-                <button onclick="salvarRegistro()" id="btnSalvar" style="width:100%; padding:20px; background:var(--accent); color:white; border:none; border-radius:18px; font-weight:bold;">CONFIRMAR</button>
-            </div>
+    <div class="modal" id="modalLanca">
+        <div class="modal-content">
+            <h3 style="margin-bottom:20px; text-align:center;">Novo Lançamento</h3>
+            <input type="text" id="desc" placeholder="Ex: Almoço">
+            <input type="number" id="valor" placeholder="Valor">
+            <input type="date" id="data">
+            <select id="tipo">
+                <option value="entrada">💰 Receita</option>
+                <option value="fixo">🏠 Fixo</option>
+                <option value="lazer">🍦 Lazer</option>
+                <option value="investimento">📈 Reserva</option>
+            </select>
+            <button onclick="salvar()" id="btnSalvar" style="width:100%; padding:15px; background:var(--accent); color:white; border:none; border-radius:12px; font-weight:bold;">CONFIRMAR</button>
+            <button onclick="closeModal()" style="width:100%; background:none; border:none; color:var(--text-sub); margin-top:10px;">Voltar</button>
         </div>
     </div>
 
     <script>
-        // CONFIG FIREBASE - COLOQUE SEUS DADOS AQUI
         const firebaseConfig = { 
             apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE", 
             authDomain: "financaspro-1e0e8.firebaseapp.com", 
@@ -147,142 +112,115 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
         
+        // CHAVE API INSERIDA AQUI
         const GROQ_API_KEY = "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"; 
-        let dadosFinanceiros = { rec:0, f:0, l:0, i:0, saldo:0 };
-        const mesesNomes = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
-        let chartP = null;
+        
+        const meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+        let meuGrafico = null;
+        let resumoGlobal = { saldo: 0 };
 
-        function toggleTheme() { document.body.getAttribute('data-theme') === 'light' ? document.body.removeAttribute('data-theme') : document.body.setAttribute('data-theme', 'light'); }
+        const selectMes = document.getElementById('filtroMes');
+        meses.forEach(m => { const opt = document.createElement('option'); opt.value = m; opt.text = m.charAt(0).toUpperCase() + m.slice(1); selectMes.add(opt); });
+        selectMes.value = meses[new Date().getMonth()];
+
+        async function loginGoogle() { try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); } catch(e) { console.error(e); } }
+        function showTab(id, btn) { 
+            document.getElementById('aba-dash').style.display = id === 'aba-dash' ? 'block' : 'none';
+            document.getElementById('aba-extrato').style.display = id === 'aba-extrato' ? 'block' : 'none';
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+        function openModal() { document.getElementById('data').value = new Date().toISOString().split('T')[0]; document.getElementById('modalLanca').style.display = 'flex'; }
+        function closeModal() { document.getElementById('modalLanca').style.display = 'none'; }
         function abrirAI() { document.getElementById('ai-modal').style.display = 'flex'; }
         function fecharAI() { document.getElementById('ai-modal').style.display = 'none'; }
-        function fecharModal() { document.getElementById('modal').style.display = 'none'; }
-        function abrirModalLançamento() { document.getElementById('data-reg').value = new Date().toISOString().split('T')[0]; document.getElementById('modal').style.display = 'flex'; }
-        function switchTab(id, btn) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); btn.classList.add('active'); }
-
-        async function loginGoogle() { 
-            const provider = new firebase.auth.GoogleAuthProvider();
-            try { await auth.signInWithPopup(provider); } catch (e) { console.error(e); } 
-        }
 
         async function carregarDados() {
             if (!auth.currentUser) return;
-            const mes = document.getElementById('filtroMes').value;
-            const docRef = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mes);
+            const mesSel = document.getElementById('filtroMes').value;
+            const doc = await db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesSel).get();
+            let sal = 0, ent = 0, sai = 0, f = 0, l = 0, i = 0, html = "";
             
-            try {
-                const snap = await docRef.get();
-                let s = 0, f = 0, l = 0, i = 0, r = 0, html = "";
-                
-                if (snap.exists) {
-                    const transacoes = snap.data().transacoes || [];
-                    transacoes.sort((a,b) => b.timestamp - a.timestamp);
-                    transacoes.forEach(t => {
-                        const v = Number(t.valor);
-                        if (t.tipo === 'entrada') { s += v; r += v; }
-                        else { s -= v; if(t.tipo==='fixo') f+=v; else if(t.tipo==='lazer') l+=v; else i+=v; }
-                        html += `<div class="entry-card"><div><b>${t.descricao}</b><br><small>${t.data}</small></div> <span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}; font-weight:800;">${v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span></div>`;
-                    });
-                }
-                dadosFinanceiros = { rec:r, f, l, i, saldo:s };
-                document.getElementById('saldo').innerText = s.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-                document.getElementById('resumo-receita').innerText = r.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-                document.getElementById('resumo-despesa').innerText = (f+l+i).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-                document.getElementById('lista-geral').innerHTML = html || "<p style='text-align:center;padding:40px;opacity:0.5'>Sem movimentações.</p>";
-                renderCharts(f, l, i);
-            } catch (e) { console.error("Erro ao ler:", e); }
+            if (doc.exists) {
+                const dados = doc.data().transacoes || [];
+                dados.sort((a,b) => b.timestamp - a.timestamp);
+                dados.forEach(t => {
+                    const v = Number(t.valor);
+                    if (t.tipo === 'entrada') { ent += v; sal += v; }
+                    else { sai += v; sal -= v; if(t.tipo==='fixo') f+=v; else if(t.tipo==='lazer') l+=v; else i+=v; }
+                    html += `<div class="entry-card"><div><b>${t.descricao}</b><br><small>${t.data}</small></div><span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">${v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span></div>`;
+                });
+            }
+            resumoGlobal.saldo = sal;
+            document.getElementById('saldo').innerText = sal.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            document.getElementById('res-rec').innerText = ent.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            document.getElementById('res-des').innerText = sai.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            document.getElementById('lista-transacoes').innerHTML = html || "<p style='text-align:center;padding:20px;opacity:0.5;'>Vazio.</p>";
+            atualizarGrafico(f, l, i);
         }
 
-        async function salvarRegistro() {
-            if (!auth.currentUser) return alert("Conecta o Google primeiro!");
-            const v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value, ds = document.getElementById('desc').value, tp = document.getElementById('tipo').value;
-            
-            if(!v || !ds || !dt) return alert("Preenche tudo aí, Henrique!");
+        async function salvar() {
+            if (!auth.currentUser) return alert("Logue primeiro!");
+            const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data').value, tp = document.getElementById('tipo').value;
+            if(!d || !v || !dt) return alert("Preencha tudo!");
 
             const btn = document.getElementById('btnSalvar');
             btn.disabled = true; btn.innerText = "GRAVANDO...";
 
             try {
-                const mesIndex = new Date(dt + "T00:00:00").getMonth();
-                const mesNome = mesesNomes[mesIndex];
-                const docRef = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesNome);
-                
-                const novaTransacao = {
-                    descricao: ds,
-                    valor: parseFloat(v),
-                    tipo: tp,
-                    data: dt,
-                    timestamp: Date.now()
-                };
-
-                await docRef.set({
-                    transacoes: firebase.firestore.FieldValue.arrayUnion(novaTransacao)
+                const mesNome = meses[new Date(dt + "T12:00:00").getMonth()];
+                const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesNome);
+                await ref.set({
+                    transacoes: firebase.firestore.FieldValue.arrayUnion({
+                        descricao: d, valor: parseFloat(v), tipo: tp, data: dt, timestamp: Date.now()
+                    })
                 }, { merge: true });
 
-                fecharModal();
-                await carregarDados();
-                
+                closeModal();
+                await carregarDados(); 
                 abrirAI();
-                const pIA = tp === 'entrada' ? `Boa! R$ ${v} de ${ds}. O que faço com isso?` : `Gastei R$ ${v} com ${ds}. Como tá meu limite?`;
-                perguntarIA(pIA);
-
-            } catch (e) { 
-                console.error("Erro ao salvar:", e); 
-                alert("Erro no banco! Olha o Console (F12).");
-            } finally {
-                btn.disabled = false; btn.innerText = "CONFIRMAR";
-                document.getElementById('valor').value = ""; document.getElementById('desc').value = "";
-            }
+                perguntarIA(tp === 'entrada' ? `Henrique, entrou R$ ${v} de ${d}.` : `Gastei R$ ${v} com ${d}.`);
+            } catch(e) { console.error(e); }
+            finally { btn.disabled = false; btn.innerText = "CONFIRMAR"; document.getElementById('desc').value = ""; document.getElementById('valor').value = ""; }
         }
 
         async function perguntarIA(perguntaExtra = null) {
-            const input = document.getElementById('ai-input');
-            const chat = document.getElementById('chat-historico');
+            const input = document.getElementById('ai-input'), chat = document.getElementById('chat-historico');
             const texto = perguntaExtra || input.value;
             if(!texto) return;
-
-            if(!perguntaExtra) chat.innerHTML += `<div class="chat-bubble user-bubble">${texto}</div>`;
-            chat.scrollTop = chat.scrollHeight;
-
+            if(!perguntaExtra) { chat.innerHTML += `<div class="chat-bubble user-bubble">${texto}</div>`; input.value = ""; }
+            
             try {
                 const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
                     body: JSON.stringify({ 
                         model: "llama-3.1-8b-instant",
-                        messages: [
-                            { role: "system", content: "Você é o parceiro de finanças do Henrique. Ele estuda Gestão Comercial. Seja direto, humano e dê conselhos reais sobre o dinheiro dele. Saldo: R$" + dadosFinanceiros.saldo },
-                            { role: "user", content: texto }
-                        ]
+                        messages: [{ role: "system", content: "Você é o parceiro de negócios do Henrique. Ele estuda Gestão Comercial. Seja direto, humano e use termos como 'fluxo' e 'game'. Saldo: R$" + resumoGlobal.saldo }, { role: "user", content: texto }]
                     })
                 });
-                const d = await res.json();
-                chat.innerHTML += `<div class="chat-bubble ai-bubble">${d.choices[0].message.content}</div>`;
-            } catch (e) { chat.innerHTML += `<div class="chat-bubble ai-bubble">Erro na IA, mas o registro foi salvo!</div>`; }
+                const data = await res.json();
+                chat.innerHTML += `<div class="chat-bubble ai-bubble">${data.choices[0].message.content}</div>`;
+            } catch(e) { chat.innerHTML += `<div class="chat-bubble ai-bubble">Bora focar no jogo, a IA deu um soluço aqui.</div>`; }
             chat.scrollTop = chat.scrollHeight;
         }
 
-        function renderCharts(f, l, i) {
-            const ctx = document.getElementById('graficoPizza').getContext('2d');
-            if(chartP) chartP.destroy();
-            chartP = new Chart(ctx, { type:'doughnut', data:{ labels:['Fixos','Lazer','Reserva'], datasets:[{ data:[f||1, l||0, i||0], backgroundColor:['#EF4444','#F59E0B','#6366F1'], borderWidth:0 }] }, options:{ cutout:'75%', plugins:{legend:{display:false}} }});
-            
-            const total = (f+l+i) || 1;
-            document.getElementById('metas-container').innerHTML = `
-                <div style="margin-top:20px;">
-                    <div style="display:flex; justify-content:space-between;"><small>Essencial</small><small>${((f/total)*100).toFixed(0)}%</small></div>
-                    <div class="progress-container"><div class="bar" style="width:${(f/total)*100}%;background:var(--red)"></div></div>
-                    <div style="display:flex; justify-content:space-between;"><small>Lazer</small><small>${((l/total)*100).toFixed(0)}%</small></div>
-                    <div class="progress-container"><div class="bar" style="width:${(l/total)*100}%;background:var(--orange)"></div></div>
-                </div>`;
+        function atualizarGrafico(f, l, i) {
+            const ctx = document.getElementById('chartJS').getContext('2d');
+            if(meuGrafico) meuGrafico.destroy();
+            meuGrafico = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: ['Fixos', 'Lazer', 'Reserva'], datasets: [{ data: [f||1, l||0, i||0], backgroundColor: ['#EF4444', '#F59E0B', '#6366F1'], borderWidth: 0 }] },
+                options: { cutout: '80%', plugins: { legend: { display: false } } }
+            });
+            const total = (f + l + i) || 1;
+            document.getElementById('perc-labels').innerHTML = `
+                <small>Fixos: ${((f/total)*100).toFixed(0)}%</small><div class="progress-bar"><div class="progress-fill" style="width:${(f/total)*100}%; background:var(--red)"></div></div>
+                <small>Lazer: ${((l/total)*100).toFixed(0)}%</small><div class="progress-bar"><div class="progress-fill" style="width:${(l/total)*100}%; background:var(--orange)"></div></div>
+            `;
         }
 
-        auth.onAuthStateChanged(user => { 
-            if (user) { 
-                document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0].toUpperCase(); 
-                document.getElementById('filtroMes').value = mesesNomes[new Date().getMonth()];
-                carregarDados(); 
-            } 
-        });
+        auth.onAuthStateChanged(user => { if (user) { document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0].toUpperCase(); carregarDados(); } });
     </script>
 </body>
 </html>
