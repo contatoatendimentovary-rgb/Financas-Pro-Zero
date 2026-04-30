@@ -1,125 +1,135 @@
-// script.js - FinançasPRO Premium (Ajuste de Gráfico e Layout)
-
+// script.js - FinançasPRO Premium
 let currentChart;
 
-// Alternador de Tema
-document.getElementById('toggleTheme').onclick = () => {
-    document.body.classList.toggle('dark-mode');
-    window.carregarDados();
-};
-
-// Sistema de Abas
-function switchTab(tabId, el) {
+// Sistema de Abas (Sincronizado com o Index)
+window.switchTab = (tabId, el) => {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
     el.classList.add('active');
-    window.carregarDados();
-}
-
-// Carregamento de Dados (Dashboard, Extrato, Metas)
-window.carregarDados = async () => {
-    const user = window.auth.currentUser; if (!user) return;
-    const mes = document.getElementById('filtroMes').value;
-    const ref = window.doc(window.db, "usuarios", user.uid, "meses", mes);
-    const snap = await window.getDoc(ref);
-    
-    let r = 0, f = 0, l = 0, i = 0, html = "";
-    let trans = snap.exists() ? snap.data().transacoes : [];
-
-    // Ordenar transações por data automaticamente
-    trans.sort((a, b) => new Date(a.data) - new Date(b.data));
-
-    trans.forEach((t, idx) => {
-        const v = parseFloat(t.valor);
-        if (t.tipo === 'entrada') r += v;
-        else { if(t.tipo === 'fixo') f += v; else if(t.tipo === 'lazer') l += v; else i += v; }
-        
-        // Pega o dia (ex: Dia 15)
-        const dia = t.data ? t.data.split('-')[2] : '??';
-
-        html += `
-        <div class="entry-card">
-            <div>
-                <span class="badge-dia">Dia ${dia}</span>
-                <b>${t.descricao}</b><br>
-                <small>${t.tipo}</small>
-            </div>
-            <div style="text-align:right">
-                <span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">
-                    ${t.tipo==='entrada'?'+':'-'} R$ ${v.toFixed(2)}
-                </span><br>
-                <button class="btn-del" onclick="deletar(${idx})">Remover</button>
-            </div>
-        </div>`;
-    });
-
-    // Atualização dos Card de Saldo e Resumo
-    const totalGasto = f + l + i;
-    document.getElementById('saldo').innerText = `R$ ${(r - totalGasto).toFixed(2)}`;
-    document.getElementById('resumo-receita').innerText = `R$ ${r.toFixed(0)}`;
-    document.getElementById('resumo-despesa').innerText = `R$ ${totalGasto.toFixed(0)}`;
-    
-    // Lista de Lançamentos (Extrato)
-    document.getElementById('lista').innerHTML = html || '<p style="text-align:center;opacity:0.5;padding:20px;">Vazio</p>';
-    
-    updateBars(r, f, l, i);
-    
-    // CHAMADA DO GRÁFICO (Aqui estão os principais ajustes)
-    renderPizza(f, l, i);
+    // Se mudar para aba que tem gráfico, ele renderiza novamente para evitar bugs de layout
+    if (tabId === 'aba-dashboard' || tabId === 'aba-invest') window.carregarDados();
 };
 
-// Barras de Progresso (Aba Metas)
-function updateBars(r, f, l, i) {
-    const set = (id, v, m) => {
-        const p = m > 0 ? Math.min((v/m)*100, 100) : 0;
-        document.getElementById(`bar-${id}`).style.width = p + '%';
-        document.getElementById(`txt-${id}`).innerText = `R$ ${v.toFixed(0)} / ${m.toFixed(0)}`;
-    };
-    set('fixo', f, r * 0.5); set('lazer', l, r * 0.3); set('invest', i, r * 0.2);
-}
+// Carregamento de Dados (Dashboard e Extrato)
+window.carregarDados = async () => {
+    const user = window.auth.currentUser; 
+    if (!user) return;
 
-// --- AJUSTE DEFINITIVO DO GRÁFICO ---
-function renderPizza(f, l, i) {
-    const ctx = document.getElementById('graficoPizza').getContext('2d');
+    const mesSel = document.getElementById('filtroMes').value;
     
-    // Evita sobreposição de gráficos ao carregar
+    // Feedback visual de carregamento
+    const listaGeral = document.getElementById('lista-geral');
+    if (listaGeral) listaGeral.innerHTML = '<div class="entry loading" style="height:80px"></div>';
+
+    let r = 0, f = 0, l = 0, i = 0;
+    let investMeses = Array(12).fill(0);
+    let htmlGeral = "", htmlInvest = "";
+
+    // Buscar dados de todos os meses para o gráfico de barras
+    const promises = window.mesesNomes.map(m => window.f_getDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", m)));
+    const snaps = await Promise.all(promises);
+
+    snaps.forEach((snap, index) => {
+        const mesNome = window.mesesNomes[index];
+        if (snap.exists()) {
+            let trans = snap.data().transacoes || [];
+            
+            // Ordenar por data (Mais recente primeiro no extrato)
+            trans.sort((a, b) => new Date(b.data) - new Date(a.data));
+
+            trans.forEach((t, idx) => {
+                const v = parseFloat(t.valor);
+                
+                // Acumular para o gráfico de investimentos (barra anual)
+                if (t.tipo === 'investimento') investMeses[index] += v;
+
+                // Processar apenas o mês selecionado para o Dashboard/Extrato
+                if (mesNome === mesSel) {
+                    if (t.tipo === 'entrada') { r += v; }
+                    else { 
+                        if(t.tipo === 'fixo') f += v; 
+                        else if(t.tipo === 'lazer') l += v; 
+                        else if(t.tipo === 'investimento') i += v;
+                    }
+
+                    const corValor = t.tipo === 'entrada' ? 'var(--green)' : 'var(--red)';
+                    const sinal = t.tipo === 'entrada' ? '+' : '-';
+                    const icon = window.getIcon ? window.getIcon(t.tipo, t.descricao) : '🏷️';
+
+                    const card = `
+                    <div class="entry">
+                        <div class="entry-left">
+                            <div class="entry-icon">${icon}</div>
+                            <div class="entry-info">
+                                <b>${t.descricao}</b>
+                                <small>${t.data.split('-').reverse().join('/')}</small>
+                            </div>
+                        </div>
+                        <div class="entry-right">
+                            <span style="color:${corValor}">${sinal} R$ ${v.toFixed(2)}</span>
+                            <button style="background:none;border:none;color:var(--red);font-size:1.2rem;cursor:pointer" onclick="apagar('${mesNome}', ${idx})">×</button>
+                        </div>
+                    </div>`;
+
+                    htmlGeral += card;
+                    if(t.tipo === 'investimento') htmlInvest += card;
+                }
+            });
+        }
+    });
+
+    // Atualizar Saldo Principal
+    const saldoTotal = r - (f + l + i);
+    const saldoElement = document.getElementById('saldo');
+    if (saldoElement) {
+        saldoElement.innerText = `R$ ${saldoTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        saldoElement.style.color = saldoTotal >= 0 ? 'var(--text)' : 'var(--red)';
+    }
+
+    // Injetar Listas
+    if (listaGeral) listaGeral.innerHTML = htmlGeral || '<p style="text-align:center;color:var(--text-sub);padding:20px">Vazio</p>';
+    const listaInvest = document.getElementById('lista-invest');
+    if (listaInvest) listaInvest.innerHTML = htmlInvest || '<p style="text-align:center;color:var(--text-sub);padding:20px">Sem aportes</p>';
+
+    // Atualizar Visualizações
+    renderPizza(f, l, i);
+    if(window.renderBarras) window.renderBarras(investMeses);
+    atualizarRegra(f, l, i, r);
+};
+
+// --- GRÁFICO DOUGHNUT (Look Premium) ---
+function renderPizza(f, l, i) {
+    const canvas = document.getElementById('graficoPizza');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
     if (currentChart) currentChart.destroy();
     
+    // Se não houver dados, exibe um gráfico cinza vazio
+    const temDados = (f + l + i) > 0;
+    const dataValues = temDados ? [f, l, i] : [1];
+    const bgColors = temDados ? ['#FDE047', '#22C55E', '#525252'] : ['#27272A'];
+
     currentChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            // Rótulos técnicos, não visíveis na legenda, mas usados por tooltips
-            labels: ['Essencial', 'Lazer', 'Invest'],
+            labels: ['Essencial', 'Lazer', 'Investimento'],
             datasets: [{ 
-                data: [f, l, i], 
-                // Cores Black & Neon (Amarelo, Laranja, Vermelho)
-                backgroundColor: ['#EF4444', '#F97316', '#FDE047'], 
-                borderWidth: 0 // Sem bordas para look moderno
+                data: dataValues, 
+                backgroundColor: bgColors, 
+                borderWidth: 0,
+                hoverOffset: 4
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false, // O CSS controla o tamanho
-            cutout: '88%', // Buraco central maior (look Mobils)
+            cutout: '85%', // Buraco bem grande para o saldo aparecer no meio (opcional)
             plugins: {
-                // REMOÇÃO DA LEGENDA EMBUTIDA
-                legend: {
-                    display: false // Desativa a legenda que espremia o gráfico
-                },
-                // HabilitaTooltips (Diz o valor ao clicar)
+                legend: { display: false },
                 tooltip: {
-                    enabled: true,
-                    backgroundColor: 'rgba(0,0,0,0.8)',
-                    titleFont: { family: 'Plus Jakarta Sans', size: 14, weight: '800' },
-                    bodyFont: { family: 'Plus Jakarta Sans', size: 12 },
-                    padding: 10,
+                    enabled: temDados,
                     callbacks: {
-                        label: function(context) {
-                            let label = context.label || '';
-                            let value = context.parsed || 0;
-                            return label + ': R$ ' + value.toFixed(2);
-                        }
+                        label: (item) => ` R$ ${item.raw.toFixed(2)}`
                     }
                 }
             }
@@ -127,47 +137,29 @@ function renderPizza(f, l, i) {
     });
 }
 
-// Modal de Lançamento
-document.getElementById('abrirModal').onclick = () => {
-    document.getElementById('modal').style.display = 'flex';
-    // Preenche com a data de hoje por padrão
-    document.getElementById('data-lancamento').valueAsDate = new Date();
-};
-document.getElementById('btnFechar').onclick = () => document.getElementById('modal').style.display = 'none';
-
-// Salvar Lançamento no Firebase
-document.getElementById('btnSalvar').onclick = async () => {
+// Lógica de Apagar (Melhorada)
+window.apagar = async (mes, idx) => {
+    if(!confirm("Deseja excluir este registro?")) return;
     const user = window.auth.currentUser;
-    const d = document.getElementById('desc').value, v = document.getElementById('valor').value, t = document.getElementById('tipo').value, dt = document.getElementById('data-lancamento').value, m = document.getElementById('filtroMes').value;
+    const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mes);
+    const snap = await window.f_getDoc(ref);
     
-    if (!user || !d || !v || !dt) { alert("Preencha Descrição, Valor e Data!"); return; }
-
-    const ref = window.doc(window.db, "usuarios", user.uid, "meses", m);
-    const snap = await window.getDoc(ref);
-    let trans = snap.exists() ? snap.data().transacoes : [];
-    
-    // Adiciona o novo lançamento
-    trans.push({ descricao: d, valor: parseFloat(v), tipo: t, data: dt });
-    
-    // Salva no Firebase
-    await window.setDoc(ref, { transacoes: trans });
-    
-    // Fecha o modal e limpa
-    document.getElementById('modal').style.display = 'none';
-    document.getElementById('desc').value = "";
-    document.getElementById('valor').value = "";
-    window.carregarDados();
+    if (snap.exists()) {
+        let lista = snap.data().transacoes;
+        lista.splice(idx, 1);
+        await window.f_setDoc(ref, { transacoes: lista });
+        window.carregarDados();
+    }
 };
 
-// Remover Lançamento
-window.deletar = async (idx) => {
-    const user = window.auth.currentUser; const m = document.getElementById('filtroMes').value;
-    const ref = window.doc(window.db, "usuarios", user.uid, "meses", m);
-    const snap = await window.getDoc(ref);
-    let trans = snap.data().transacoes; trans.splice(idx, 1);
-    await window.setDoc(ref, { transacoes: trans });
-    window.carregarDados();
+// Ícones dinâmicos (Caso não esteja no Index)
+window.getIcon = (tipo, desc) => {
+    const d = desc.toLowerCase();
+    if (tipo === 'entrada') return '💰';
+    if (tipo === 'investimento') return '📈';
+    if (d.includes('comida') || d.includes('ifood') || d.includes('restaurante')) return '🍴';
+    if (d.includes('uber') || d.includes('gasolina') || d.includes('carro')) return '🚗';
+    if (d.includes('mercado') || d.includes('compra')) return '🛒';
+    if (d.includes('aluguel') || d.includes('casa') || d.includes('luz')) return '🏠';
+    return '🏷️';
 };
-
-// Filtro de Mês
-document.getElementById('filtroMes').onchange = () => window.carregarDados();
