@@ -3,266 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finan Pro - Gestão Comercial</title>
+    <title>Finan Pro</title>
     
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json">
+
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
+    
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
-            --bg: #0F172A; --header-bg: #1E293B; --card: #1E293B; --text-main: #F1F5F9;
-            --text-sub: #94A3B8; --border: #334155; --accent: #6366F1;
-            --green: #10B981; --orange: #F59E0B; --red: #EF4444; 
-            --ai-gradient: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            --bg: #0a0a0a;
+            --card: #161616;
+            --text: #ffffff;
+            --accent: #00e676;
+            --secondary: #2979ff;
         }
-        [data-theme="light"] {
-            --bg: #F8FAFC; --header-bg: #FFFFFF; --card: #FFFFFF; --text-main: #0F172A;
-            --text-sub: #64748B; --border: #E2E8F0;
+
+        body {
+            margin: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text-main); padding-bottom: 110px; transition: 0.3s; }
-        .glass-header { background: var(--header-bg); padding: 50px 20px 40px; border-radius: 0 0 30px 30px; border-bottom: 1px solid var(--border); text-align: center; }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .theme-toggle { background: var(--card); border: 1px solid var(--border); color: var(--text-main); padding: 8px 12px; border-radius: 12px; cursor: pointer; }
-        .user-pill { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 800; cursor: pointer; }
-        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; margin-top: -25px; position: relative; z-index: 10; }
-        .stat-card { background: var(--card); padding: 18px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .ai-popup { display: none; position: fixed; bottom: 100px; left: 15px; right: 15px; background: var(--card); border: 1px solid var(--accent); border-radius: 28px; padding: 22px; z-index: 3000; flex-direction: column; max-height: 70vh; }
-        .chat-area { flex: 1; overflow-y: auto; margin: 15px 0; font-size: 0.9rem; min-height: 100px; }
-        .chat-bubble { margin-bottom: 10px; padding: 12px; border-radius: 16px; max-width: 90%; }
-        .ai-bubble { background: rgba(79, 70, 229, 0.15); color: var(--text-main); }
-        .user-bubble { background: var(--accent); color: white; margin-left: auto; }
-        .viz-card { background: var(--card); margin: 20px; padding: 22px; border-radius: 28px; border: 1px solid var(--border); }
-        .tab-content { display: none; } .tab-content.active { display: block; }
-        .entry-card { background: var(--card); padding: 18px; border-radius: 22px; margin: 0 20px 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--header-bg); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
-        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; flex: 1; cursor: pointer; }
-        .nav-btn.active { color: var(--accent); font-weight: 800; }
-        .nav-btn span { font-size: 1.5rem; margin-bottom: 5px; }
-        .floating-btn { position: fixed; bottom: 115px; right: 20px; width: 64px; height: 64px; border-radius: 50%; background: var(--ai-gradient); color: white; border: none; font-size: 28px; z-index: 999; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); z-index: 4000; align-items: flex-end; backdrop-filter: blur(5px); }
-        .modal-sheet { background: var(--card); width: 100%; border-radius: 35px 35px 0 0; padding: 35px; border-top: 2px solid var(--accent); }
-        .input-grid input, .input-grid select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 16px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); outline: none; }
-        .progress-container { background: var(--border); height: 10px; border-radius: 5px; overflow: hidden; margin: 8px 0 15px; }
-        .bar { height: 100%; transition: 1s ease-in-out; }
+
+        /* Header Estilo App */
+        header {
+            background: var(--card);
+            padding: env(safe-area-inset-top) 20px 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #222;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+            cursor: pointer;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 500px;
+            margin: auto;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        /* Botão de Login Google */
+        .btn-google {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: white;
+            color: black;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            width: 100%;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Utilitários */
+        .hidden { display: none !important; }
+        .balance { font-size: 2.2rem; font-weight: 800; color: var(--accent); margin: 10px 0; }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            margin: 8px 0;
+            border-radius: 12px;
+            border: 1px solid #333;
+            background: #222;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        .btn-main {
+            background: var(--accent);
+            color: black;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            width: 100%;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 0 4px 14px rgba(0, 230, 118, 0.3);
+        }
     </style>
 </head>
 <body>
 
-    <div id="ai-modal" class="ai-popup">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <b style="color:var(--accent)">✨ GEMINI ASSISTENTE</b>
-            <button onclick="fecharAI()" style="background:none; border:none; font-size:1.8rem; color:var(--text-sub); cursor:pointer;">&times;</button>
-        </div>
-        <div class="chat-area" id="chat-historico">
-            <div class="chat-bubble ai-bubble">Olá Henrique! Sou o Gemini. Estou pronto para analisar suas finanças.</div>
-        </div>
-        <div style="display:flex; gap:10px;">
-            <input type="text" id="ai-input" placeholder="Sua pergunta..." style="flex:1; padding:15px; border-radius:15px; border:1px solid var(--border); background:var(--bg); color:var(--text-main);">
-            <button onclick="perguntarIA()" style="background:var(--accent); color:white; border:none; padding:0 20px; border-radius:15px; font-weight:bold;">ENVIAR</button>
-        </div>
+<header>
+    <div id="auth-status">
+        <span class="material-icons" id="login-icon">account_circle</span>
+    </div>
+    <div style="text-align: center;">
+        <strong style="letter-spacing: 1px;">FINAN PRO</strong>
+    </div>
+    <button onclick="toggleTheme()" style="background:none; border:none; color:white;">
+        <span class="material-icons">dark_mode</span>
+    </button>
+</header>
+
+<div class="container">
+    <div id="login-screen" class="card">
+        <h2 style="text-align:center">Bem-vindo</h2>
+        <p style="text-align:center; color:#888;">Acesse sua conta para sincronizar seus dados financeiros.</p>
+        <button class="btn-google" onclick="loginGoogle()">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
+            Entrar com Google
+        </button>
     </div>
 
-    <header class="glass-header">
-        <div class="header-top">
-            <button class="theme-toggle" onclick="toggleTheme()" id="btn-theme">☀️</button>
-            <div style="font-size: 1.2rem; font-weight: 800; color: var(--accent);">Finan Pro</div>
-            <button id="btnAuth" class="user-pill" onclick="loginGoogle()">ENTRAR</button>
+    <div id="main-app" class="hidden">
+        <div class="card" style="text-align: center;">
+            <small style="color: #888; text-transform: uppercase;">Saldo Disponível</small>
+            <div class="balance" id="display-saldo">R$ 0,00</div>
         </div>
-        <h1 id="saldo" style="font-size: 2.8rem; margin: 10px 0;">R$ 0,00</h1>
-        <small style="color: var(--text-sub); text-transform: uppercase;">Saldo Disponível</small>
-    </header>
 
-    <div class="stats-row">
-        <div class="stat-card">
-            <small style="color:var(--text-sub); font-weight:700;">RECEITAS</small>
-            <b id="resumo-receita" style="color: var(--green); display:block; margin-top:5px;">R$ 0,00</b>
-        </div>
-        <div class="stat-card">
-            <small style="color:var(--text-sub); font-weight:700;">DESPESAS</small>
-            <b id="resumo-despesa" style="color: var(--red); display:block; margin-top:5px;">R$ 0,00</b>
+        <div class="card">
+            <h3>Lançamento Rápido</h3>
+            <input type="text" id="desc" placeholder="O que você comprou/vendeu?">
+            <input type="number" id="valor" placeholder="Valor (0,00)" step="0.01">
+            <select id="cat">
+                <option value="50">Essencial (50%)</option>
+                <option value="30">Desejos (30%)</option>
+                <option value="20">Investimento (20%)</option>
+            </select>
+            <button class="btn-main" onclick="salvarOperacao()">Adicionar</button>
         </div>
     </div>
+</div>
 
-    <main>
-        <section id="aba-dashboard" class="tab-content active">
-            <div class="viz-card">
-                <p style="font-size: 0.8rem; color: var(--text-sub); margin-bottom:15px;">DISTRIBUIÇÃO 50/30/20</p>
-                <canvas id="graficoPizza" style="max-height: 180px;"></canvas>
-            </div>
-            <div id="metas-container" style="padding: 0 20px;"></div>
-        </section>
+<script>
+    // --- SUA CONFIGURAÇÃO DO FIREBASE ---
+    const firebaseConfig = {
+        apiKey: "SUA_API_KEY",
+        authDomain: "SEU_DOMINIO.firebaseapp.com",
+        projectId: "SEU_PROJETO_ID",
+        storageBucket: "SEU_PROJETO.appspot.com",
+        messagingSenderId: "ID_SENDER",
+        appId: "SEU_APP_ID"
+    };
 
-        <section id="aba-extrato" class="tab-content">
-            <div style="padding: 20px;">
-                <select id="filtroMes" class="input-grid" onchange="carregarDados()">
-                    <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
-                    <option value="março">Março</option><option value="abril">Abril</option>
-                    <option value="maio">Maio</option><option value="junho">Junho</option>
-                    <option value="julho">Julho</option><option value="agosto">Agosto</option>
-                    <option value="setembro">Setembro</option><option value="outubro">Outubro</option>
-                    <option value="novembro">Novembro</option><option value="dezembro">Dezembro</option>
-                </select>
-            </div>
-            <div id="lista-geral"></div>
-        </section>
-    </main>
+    // Inicialização
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-    <button class="floating-btn" onclick="abrirAI()">✨</button>
+    // --- LÓGICA DE AUTH REFEITA ---
+    
+    // 1. Função de Login com Redirecionamento (Melhor para PWA/Mobile)
+    function loginGoogle() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        // Usar signInWithPopup para desktop ou signInWithRedirect para mobile
+        auth.signInWithPopup(provider).catch(err => alert("Erro ao logar: " + err.message));
+    }
 
-    <nav class="bottom-tab-bar">
-        <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active"><span>📊</span>DASH</button>
-        <button onclick="abrirModalLançamento()" class="nav-btn"><span>➕</span>NOVO</button>
-        <button onclick="switchTab('aba-extrato', this)" class="nav-btn"><span>📜</span>EXTRATO</button>
-    </nav>
+    // 2. Observador de Estado (O Coração do App)
+    auth.onAuthStateChanged(user => {
+        const loginScreen = document.getElementById('login-screen');
+        const mainApp = document.getElementById('main-app');
+        const authStatus = document.getElementById('auth-status');
 
-    <div id="modal" class="modal-overlay" onclick="if(event.target==this) fecharModal()">
-        <div class="modal-sheet">
-            <h3 style="margin-bottom: 20px; text-align: center;">Novo Registro</h3>
-            <div class="input-grid">
-                <input type="text" id="desc" placeholder="Descrição">
-                <input type="number" step="0.01" id="valor" placeholder="Valor R$">
-                <input type="date" id="data-reg">
-                <select id="tipo">
-                    <option value="fixo">Essencial (50%)</option>
-                    <option value="lazer">Lazer (30%)</option>
-                    <option value="investimento">Reserva (20%)</option>
-                    <option value="entrada">Receita (+)</option>
-                </select>
-                <button onclick="salvarRegistro()" style="width:100%; padding:18px; background:var(--accent); color:white; border:none; border-radius:16px; font-weight:bold;">SALVAR</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // FORÇAR LIMPEZA DE SERVICE WORKER (IMPORTANTE PARA DESTRAVAR)
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(registrations => {
-                for (let registration of registrations) { registration.unregister(); }
-            });
+        if (user) {
+            // Usuário Logado
+            loginScreen.classList.add('hidden');
+            mainApp.classList.remove('hidden');
+            authStatus.innerHTML = `<img src="${user.photoURL}" class="user-avatar" onclick="logout()">`;
+            
+            // Iniciar escuta de dados em tempo real
+            syncDados(user.uid);
+        } else {
+            // Usuário Deslogado
+            loginScreen.classList.remove('hidden');
+            mainApp.classList.add('hidden');
+            authStatus.innerHTML = `<span class="material-icons">account_circle</span>`;
         }
+    });
 
-        // FIREBASE CONFIG
-        const firebaseConfig = { 
-            apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE", 
-            authDomain: "financaspro-1e0e8.firebaseapp.com", 
-            projectId: "financaspro-1e0e8", 
-            storageBucket: "financaspro-1e0e8.firebasestorage.app", 
-            messagingSenderId: "659521706556", 
-            appId: "1:659521706556:web:86f2174c4c8a89335ac139" 
+    function logout() {
+        if(confirm("Deseja sair da conta?")) auth.signOut();
+    }
+
+    // --- LÓGICA DE DADOS (FIRESTORE) ---
+
+    function salvarOperacao() {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const dados = {
+            descricao: document.getElementById('desc').value,
+            valor: parseFloat(document.getElementById('valor').value),
+            categoria: document.getElementById('cat').value,
+            data: firebase.firestore.FieldValue.serverTimestamp()
         };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const Gemini_Key = "AIzaSyAr3RLlLHop8BnGRUr-bMQV7mCSLIcsKgM"; 
 
-        let chartP = null;
-        let dadosFinanceiros = { rec:0, f:0, l:0, i:0, saldo:0 };
-        const meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+        if(!dados.descricao || isNaN(dados.valor)) return alert("Preencha os campos corretamente");
 
-        // UI ACTIONS
-        function toggleTheme() {
-            document.body.getAttribute('data-theme') === 'light' ? document.body.removeAttribute('data-theme') : document.body.setAttribute('data-theme', 'light');
-        }
-        function abrirAI() { document.getElementById('ai-modal').style.display = 'flex'; }
-        function fecharAI() { document.getElementById('ai-modal').style.display = 'none'; }
-        function fecharModal() { document.getElementById('modal').style.display = 'none'; }
-        function abrirModalLançamento() {
-            document.getElementById('data-reg').value = new Date().toISOString().split('T')[0];
-            document.getElementById('modal').style.display = 'flex';
-        }
-        function switchTab(id, btn) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            btn.classList.add('active');
-        }
+        db.collection("users").doc(user.uid).collection("financas").add(dados)
+            .then(() => {
+                document.getElementById('desc').value = "";
+                document.getElementById('valor').value = "";
+            });
+    }
 
-        // LOGIC
-        async function loginGoogle() {
-            try {
-                await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-            } catch (e) { alert("Dica: Use um navegador real ou hospede no Vercel para o login funcionar."); }
-        }
-
-        async function carregarDados() {
-            if (!auth.currentUser) return;
-            const mesSel = document.getElementById('filtroMes').value;
-            const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesSel);
-            const snap = await ref.get();
-            
-            let s = 0, f = 0, l = 0, i = 0, r = 0, html = "";
-            if (snap.exists) {
-                (snap.data().transacoes || []).forEach((t, idx) => {
-                    const v = parseFloat(t.valor);
-                    if (t.tipo === 'entrada') { s += v; r += v; }
-                    else { s -= v; if(t.tipo==='fixo') f+=v; else if(t.tipo==='lazer') l+=v; else i+=v; }
-                    html += `<div class="entry-card"><b>${t.descricao}</b> <span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">${v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span></div>`;
+    function syncDados(uid) {
+        db.collection("users").doc(uid).collection("financas")
+            .orderBy("data", "desc")
+            .onSnapshot(snapshot => {
+                let total = 0;
+                snapshot.forEach(doc => {
+                    total += doc.data().valor;
                 });
-            }
-            dadosFinanceiros = { rec:r, f, l, i, saldo:s };
-            document.getElementById('saldo').innerText = s.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-            document.getElementById('resumo-receita').innerText = r.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-            document.getElementById('resumo-despesa').innerText = (f+l+i).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-            document.getElementById('lista-geral').innerHTML = html || "<p style='text-align:center;padding:20px'>Vazio</p>";
-            renderCharts(f, l, i);
-        }
+                document.getElementById('display-saldo').innerText = 
+                    total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            });
+    }
+</script>
 
-        async function salvarRegistro() {
-            if (!auth.currentUser) return alert("Faça login!");
-            const v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value;
-            const mes = meses[parseInt(dt.split('-')[1]) - 1];
-            const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mes);
-            const snap = await ref.get();
-            let lista = snap.exists ? snap.data().transacoes : [];
-            lista.push({ descricao: document.getElementById('desc').value, valor: v, tipo: document.getElementById('tipo').value, data: dt });
-            await ref.set({ transacoes: lista });
-            fecharModal(); carregarDados();
-        }
-
-        async function perguntarIA() {
-            const input = document.getElementById('ai-input');
-            const chat = document.getElementById('chat-historico');
-            if(!input.value) return;
-            const txt = input.value;
-            chat.innerHTML += `<div class="chat-bubble user-bubble">${txt}</div>`;
-            input.value = "";
-            try {
-                const prompt = `Usuário Henrique. Saldo: ${dadosFinanceiros.saldo}, Receitas: ${dadosFinanceiros.rec}, Gastos: ${dadosFinanceiros.f+dadosFinanceiros.l+dadosFinanceiros.i}. Regra 50/30/20. Pergunta: ${txt}`;
-                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${Gemini_Key}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-                });
-                const data = await resp.json();
-                chat.innerHTML += `<div class="chat-bubble ai-bubble">${data.candidates[0].content.parts[0].text}</div>`;
-                chat.scrollTop = chat.scrollHeight;
-            } catch (e) { chat.innerHTML += `<div class="chat-bubble ai-bubble">Erro na IA. Verifique sua chave.</div>`; }
-        }
-
-        function renderCharts(f, l, i) {
-            const ctx = document.getElementById('graficoPizza').getContext('2d');
-            if(chartP) chartP.destroy();
-            chartP = new Chart(ctx, { type:'doughnut', data:{ labels:['Fixo','Lazer','Reserva'], datasets:[{ data:[f||1, l||0.1, i||0.1], backgroundColor:['#EF4444','#F59E0B','#6366F1'], borderWidth:0 }] }, options:{ cutout:'75%', plugins:{legend:{display:false}} }});
-            
-            const base = (f+l+i) || 1;
-            const pct = (v) => ((v/base)*100).toFixed(0);
-            document.getElementById('metas-container').innerHTML = `
-                <small>Essencial (Meta 50%): ${pct(f)}%</small><div class="progress-container"><div class="bar" style="width:${pct(f)}%;background:var(--red)"></div></div>
-                <small>Lazer (Meta 30%): ${pct(l)}%</small><div class="progress-container"><div class="bar" style="width:${pct(l)}%;background:var(--orange)"></div></div>
-                <small>Investimento (Meta 20%): ${pct(i)}%</small><div class="progress-container"><div class="bar" style="width:${pct(i)}%;background:var(--accent)"></div></div>`;
-        }
-
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0].toUpperCase();
-                document.getElementById('filtroMes').value = meses[new Date().getMonth()];
-                carregarDados();
-            }
-        });
-        renderCharts(0,0,0);
-    </script>
 </body>
 </html>
