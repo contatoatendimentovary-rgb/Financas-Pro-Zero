@@ -54,11 +54,11 @@
 
     <div id="ai-modal" class="ai-popup">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <b style="color:var(--accent); font-size: 0.8rem;">✨ CONSULTOR FINAN PRO</b>
+            <b style="color:var(--accent); font-size: 0.8rem;">✨ CONSULTOR FINANCEIRO (GROQ)</b>
             <button onclick="fecharAI()" style="background:none; border:none; font-size:1.5rem; color:var(--text-sub);">&times;</button>
         </div>
         <div class="chat-area" id="chat-historico">
-            <div class="chat-bubble ai-bubble">Olá Henrique! Sou seu assistente de Gestão Comercial. Como posso ajudar hoje?</div>
+            <div class="chat-bubble ai-bubble">Olá Henrique! Usei uma conexão mais estável para te ajudar com sua Gestão Comercial. Como posso auxiliar?</div>
         </div>
         <div style="display:flex; gap:8px;">
             <input type="text" id="ai-input" placeholder="Perguntar..." style="flex:1; padding:12px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text-main);">
@@ -118,8 +118,8 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
         
-        // CHAVE API SOLICITADA
-        const Gemini_API_Key = "AIzaSyABN1kT-ycsJkhVT0OtqRoK8r2Z1iwrD5I"; 
+        // CHAVE NOVA DA GROQ (Llama 3)
+        const GROQ_API_KEY = "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"; 
 
         let chartP = null;
         let dadosFinanceiros = { rec:0, f:0, l:0, i:0, saldo:0 };
@@ -167,7 +167,7 @@
             fecharModal(); carregarDados();
         }
 
-        // IA - MODELO FLASH 1.5 ATUALIZADO COM ENDPOINT v1beta
+        // IA - INTEGRAÇÃO VIA GROQ (Llama 3) - MAIS ESTÁVEL QUE GEMINI
         async function perguntarIA() {
             const input = document.getElementById('ai-input');
             const chat = document.getElementById('chat-historico');
@@ -179,22 +179,28 @@
             chat.scrollTop = chat.scrollHeight;
 
             try {
-                const prompt = `Henrique (Estudante de Gestão Comercial). Saldo: R$${dadosFinanceiros.saldo}. Essencial: R$${dadosFinanceiros.f}, Lazer: R$${dadosFinanceiros.l}, Reserva: R$${dadosFinanceiros.i}. Analise e responda brevemente: ${textoUser}`;
+                const prompt = `Usuário Henrique (Estudante de Gestão Comercial). Saldo: R$${dadosFinanceiros.saldo}. Essencial: R$${dadosFinanceiros.f}, Lazer: R$${dadosFinanceiros.l}, Reserva: R$${dadosFinanceiros.i}. Analise e responda brevemente como consultor: ${textoUser}`;
                 
-                // Chamada para a versão beta que é mais estável para chaves individuais
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${Gemini_API_Key}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${GROQ_API_KEY}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "llama3-8b-8192",
+                        messages: [{ role: "user", content: prompt }],
+                        temperature: 0.5
+                    })
                 });
 
                 const data = await response.json();
                 if(data.error) throw new Error(data.error.message);
 
-                const botResposta = data.candidates[0].content.parts[0].text;
+                const botResposta = data.choices[0].message.content;
                 chat.innerHTML += `<div class="chat-bubble ai-bubble">${botResposta}</div>`;
             } catch (e) {
-                chat.innerHTML += `<div class="chat-bubble ai-bubble" style="color:var(--red)"><b>Erro:</b> ${e.message}</div>`;
+                chat.innerHTML += `<div class="chat-bubble ai-bubble" style="color:var(--red)"><b>Erro na IA:</b> ${e.message}</div>`;
             }
             chat.scrollTop = chat.scrollHeight;
         }
