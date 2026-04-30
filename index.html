@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="pt-br" data-theme="light">
+<html lang="pt-br" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#EAB308">
-    <title>FinançasPRO | Off-White Edition</title>
+    <title>FinançasPRO | Versão Final</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -14,148 +14,120 @@
 
     <style>
         :root {
-            /* Palette Off-White Premium */
-            --bg: #FDFDFD; 
-            --card: #FFFFFF; 
-            --accent: #EAB308; 
-            --text: #18181B;
-            --subtext: #71717A; 
-            --green: #10B981; 
-            --red: #EF4444; 
-            --border: #F1F1F4;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            --bg: #050505; --card: #121212; --accent: #EAB308; --text: #FFFFFF;
+            --subtext: #A1A1AA; --green: #22C55E; --red: #EF4444; --border: #27272A;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text); padding-bottom: 100px; }
 
-        /* Header & Month Bar */
-        .header { padding: 50px 20px 20px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
+        .header { padding: 50px 20px 20px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
         .nav-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .user-badge { background: #18181B; color: #fff; padding: 8px 16px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
-
+        
         .month-bar { display: flex; overflow-x: auto; gap: 8px; scrollbar-width: none; }
         .month-bar::-webkit-scrollbar { display: none; }
-        .m-item { padding: 10px 20px; border-radius: 14px; background: #F4F4F5; color: var(--subtext); font-weight: 700; font-size: 0.85rem; border: none; white-space: nowrap; transition: 0.2s; }
-        .m-item.active { background: var(--accent); color: #000; box-shadow: 0 4px 10px rgba(234, 179, 8, 0.2); }
+        .m-item { padding: 10px 18px; border-radius: 12px; background: #1A1A1A; color: var(--subtext); border: 1px solid var(--border); font-weight: 700; white-space: nowrap; }
+        .m-item.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
-        /* Balance Section */
-        .hero { text-align: center; padding: 40px 20px; }
-        .hero span { font-size: 0.75rem; font-weight: 800; color: var(--subtext); text-transform: uppercase; letter-spacing: 1px; }
-        .hero h1 { font-size: 3.2rem; font-weight: 900; margin-top: 5px; color: #18181B; }
+        .hero { text-align: center; padding: 35px 20px; }
+        .hero h1 { font-size: 3rem; font-weight: 900; margin-top: 5px; letter-spacing: -1px; }
 
-        /* Summary Cards */
-        .summary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; }
-        .s-box { background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow); }
-        .s-box small { font-size: 0.65rem; font-weight: 800; color: var(--subtext); display: block; margin-bottom: 5px; }
-        .s-box b { font-size: 1.25rem; }
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; }
+        .s-card { background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--border); }
+        .s-card small { font-size: 0.6rem; font-weight: 900; color: var(--subtext); text-transform: uppercase; display: block; margin-bottom: 4px; }
 
-        /* Transaction List */
-        .t-item { background: var(--card); padding: 20px; border-radius: 22px; margin: 0 20px 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); }
-        .t-info b { display: block; font-size: 1rem; color: #18181B; margin-bottom: 2px; }
-        .t-info span { font-size: 0.7rem; font-weight: 700; color: var(--subtext); text-transform: uppercase; }
+        .t-row { background: var(--card); padding: 18px; border-radius: 20px; margin: 0 20px 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .t-info b { display: block; font-size: 0.95rem; }
+        .t-info span { font-size: 0.65rem; font-weight: 800; color: var(--subtext); text-transform: uppercase; }
 
-        /* Navigation Bottom */
+        .btn-del { background: #27272A; border: none; color: var(--red); padding: 10px; border-radius: 12px; font-size: 1rem; margin-left: 10px; cursor: pointer; }
+
         .nav-bot { position: fixed; bottom: 0; width: 100%; height: 85px; background: var(--card); border-top: 1px solid var(--border); display: flex; padding-bottom: 15px; }
-        .n-btn { flex: 1; border: none; background: none; color: var(--subtext); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 0.7rem; }
+        .n-btn { flex: 1; border: none; background: none; color: var(--subtext); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 0.65rem; }
         .n-btn.active { color: var(--accent); }
-        .n-btn i { font-size: 1.6rem; margin-bottom: 4px; }
 
-        /* IA Trigger */
-        .ai-btn { position: fixed; bottom: 105px; right: 20px; width: 64px; height: 64px; border-radius: 22px; background: #18181B; color: var(--accent); border: none; font-size: 26px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); z-index: 99; }
+        .ai-fab { position: fixed; bottom: 105px; right: 20px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); color: #000; border: none; font-size: 24px; box-shadow: 0 10px 25px rgba(234, 179, 8, 0.4); z-index: 900; }
 
-        /* Modals */
-        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 1000; align-items: flex-end; }
-        .sheet { background: var(--bg); width: 100%; border-radius: 32px 32px 0 0; padding: 35px; box-shadow: 0 -10px 40px rgba(0,0,0,0.1); }
-        input, select { width: 100%; padding: 18px; margin-bottom: 15px; border-radius: 16px; border: 1px solid var(--border); background: #F9F9FB; font-weight: 700; font-size: 1rem; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: flex-end; }
+        .sheet { background: var(--bg); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; border-top: 3px solid var(--accent); }
+        input, select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-weight: 700; }
     </style>
 </head>
 <body>
 
-    <div id="ai-view" style="display:none; position:fixed; inset:0; background:var(--bg); z-index:2000; flex-direction:column;">
-        <div style="padding:25px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-            <b style="letter-spacing: -0.5px;">✨ IA INTELIGENTE</b>
-            <button onclick="toggleIA()" style="border:none; background:none; font-size:2rem;">&times;</button>
+    <div id="ai-panel" style="display:none; position:fixed; inset:0; background:var(--bg); z-index:5000; flex-direction:column;">
+        <div style="padding:20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+            <b>✨ IA INTELIGENTE</b>
+            <button onclick="toggleAI()" style="background:none; border:none; color:#fff; font-size:2rem;">&times;</button>
         </div>
-        <div id="chat" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:12px;"></div>
-        <div style="padding:25px; display:flex; gap:10px; background:var(--card);">
-            <input type="text" id="ai-input" placeholder="Ex: Gastei 50 no mercado hoje" style="margin-bottom:0;">
-            <button onclick="processIA()" style="background:#18181B; color:var(--accent); border:none; padding:0 25px; border-radius:16px; font-weight:900;">OK</button>
+        <div id="chat-box" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px;"></div>
+        <div style="padding:20px; display:flex; gap:10px; background:var(--card);">
+            <input type="text" id="ai-in" placeholder="Diga o que aconteceu..." style="margin-bottom:0;">
+            <button onclick="askIA()" style="background:var(--accent); border:none; padding:0 20px; border-radius:12px; font-weight:900;">ENVIAR</button>
         </div>
     </div>
 
     <header class="header">
         <div class="nav-top">
-            <b style="font-size: 1.2rem; letter-spacing: -1px;">FINANÇAS<span style="color:var(--accent)">PRO</span></b>
-            <div id="user-display" onclick="login()" class="user-badge">ENTRAR</div>
+            <b style="font-size: 1.1rem;">FINANÇAS<span style="color:var(--accent)">PRO</span></b>
+            <div id="user-badge" onclick="login()" style="background:var(--accent); color:#000; padding:6px 15px; border-radius:10px; font-size:0.7rem; font-weight:900;">LOGIN</div>
         </div>
-        <div class="month-bar" id="month-list"></div>
+        <div class="month-bar" id="m-list"></div>
     </header>
 
     <div class="hero">
-        <span>Saldo Global</span>
-        <h1 id="total">R$ 0,00</h1>
+        <span style="color:var(--subtext); font-weight:800; font-size:0.7rem; text-transform:uppercase;">Saldo Atual</span>
+        <h1 id="v-bal">R$ 0,00</h1>
     </div>
 
-    <div class="summary">
-        <div class="s-box"><small>RECEBIDOS</small><b id="v-in" style="color:var(--green)">R$ 0,00</b></div>
-        <div class="s-box"><small>GASTOS</small><b id="v-out" style="color:var(--red)">R$ 0,00</b></div>
+    <div class="stats">
+        <div class="s-card"><small>ENTRADAS</small><b id="v-in" style="color:var(--green)">R$ 0,00</b></div>
+        <div class="s-card"><small>SAÍDAS</small><b id="v-out" style="color:var(--red)">R$ 0,00</b></div>
     </div>
 
-    <div id="tab-home" style="padding:30px 20px;">
-        <div style="background:var(--card); padding:25px; border-radius:30px; border:1px solid var(--border); box-shadow: var(--shadow);">
-            <canvas id="mainChart"></canvas>
-        </div>
-    </div>
+    <div id="v-dash" style="padding:30px 20px;"><canvas id="chart"></canvas></div>
+    <div id="v-list" style="display:none; padding:20px 0;"><div id="t-cont"></div></div>
 
-    <div id="tab-list" style="display:none; padding-top:20px;">
-        <div id="trans-list"></div>
-    </div>
-
-    <button class="ai-btn" onclick="toggleIA()">✨</button>
+    <button class="ai-fab" onclick="toggleAI()">✨</button>
 
     <nav class="nav-bot">
-        <button class="n-btn active" onclick="switchTab('home', this)"><i>📊</i>Início</button>
-        <button class="n-btn" onclick="openModal()"><i>➕</i>Novo</button>
-        <button class="n-btn" onclick="switchTab('list', this)"><i>📜</i>Extrato</button>
+        <button class="n-btn active" onclick="tab('dash', this)"><i>📊</i>Home</button>
+        <button class="n-btn" onclick="openAdd()"><i>➕</i>Novo</button>
+        <button class="n-btn" onclick="tab('list', this)"><i>📜</i>Lista</button>
     </nav>
 
-    <div id="modal-add" class="overlay" onclick="if(event.target==this) closeModal()">
+    <div id="m-add" class="modal" onclick="if(event.target==this) closeAdd()">
         <div class="sheet">
-            <h2 style="margin-bottom:20px; letter-spacing:-1px;">Novo Registro</h2>
-            <input type="text" id="desc" placeholder="Descrição">
-            <input type="number" id="valor" placeholder="0,00">
-            <select id="tipo">
-                <option value="entrada">💵 Entrada / Receita</option>
-                <option value="fixo">🏠 Gasto Fixo</option>
-                <option value="lazer" selected>🍿 Gasto Variável</option>
+            <h3>Novo Lançamento</h3><br>
+            <input type="text" id="in-desc" placeholder="Descrição">
+            <input type="number" id="in-val" placeholder="0.00">
+            <select id="in-tipo">
+                <option value="entrada">Receita</option>
+                <option value="fixo">Fixo</option>
+                <option value="lazer" selected>Variável</option>
             </select>
-            <input type="date" id="data">
-            <button onclick="manualSave()" style="width:100%; padding:20px; border-radius:18px; background:var(--accent); color:#000; border:none; font-weight:900; font-size:1.1rem;">SALVAR REGISTRO</button>
+            <input type="date" id="in-date">
+            <button onclick="save()" style="width:100%; padding:18px; border-radius:12px; background:var(--accent); font-weight:900; border:none;">SALVAR</button>
         </div>
     </div>
 
     <script>
-        const CFG = { apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE", authDomain: "financaspro-1e0e8.firebaseapp.com", projectId: "financaspro-1e0e8", storageBucket: "financaspro-1e0e8.firebasestorage.app", messagingSenderId: "659521706556", appId: "1:659521706556:web:86f2174c4c8a89335ac139" };
-        firebase.initializeApp(CFG);
+        const FB = { apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE", authDomain: "financaspro-1e0e8.firebaseapp.com", projectId: "financaspro-1e0e8", storageBucket: "financaspro-1e0e8.firebasestorage.app", messagingSenderId: "659521706556", appId: "1:659521706556:web:86f2174c4c8a89335ac139" };
+        firebase.initializeApp(FB);
         const auth = firebase.auth(), db = firebase.firestore();
 
         const MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-        let mesRef = MESES[new Date().getMonth()];
-        let chart = null;
+        let mesAtivo = MESES[new Date().getMonth()];
+        let myChart = null;
 
-        function start() {
-            const container = document.getElementById('month-list');
+        function init() {
+            const list = document.getElementById('m-list');
             MESES.forEach(m => {
-                const b = document.createElement('button');
-                b.className = `m-item ${m === mesRef ? 'active' : ''}`;
+                const b = document.createElement('div');
+                b.className = `m-item ${m === mesAtivo ? 'active' : ''}`;
                 b.innerText = m;
-                b.onclick = () => {
-                    document.querySelectorAll('.m-item').forEach(x => x.classList.remove('active'));
-                    b.classList.add('active'); mesRef = m; sync();
-                };
-                container.appendChild(b);
-                if(m === mesRef) b.scrollIntoView({ inline: 'center' });
+                b.onclick = () => { document.querySelectorAll('.m-item').forEach(x => x.classList.remove('active')); b.classList.add('active'); mesAtivo = m; sync(); };
+                list.appendChild(b);
             });
             sync();
         }
@@ -164,92 +136,90 @@
 
         function sync() {
             if(!auth.currentUser) return;
-            db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesRef.toLowerCase())
+            db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo.toLowerCase())
             .onSnapshot(doc => {
-                let rec=0, gas=0, fix=0, laz=0, html="";
+                let r=0, g=0, html="";
                 if(doc.exists) {
-                    const data = doc.data().transacoes || [];
-                    data.sort((a,b) => new Date(b.data) - new Date(a.data)).forEach(t => {
+                    const trans = doc.data().transacoes || [];
+                    trans.forEach((t, i) => {
                         const v = parseFloat(t.valor);
-                        if(t.tipo === 'entrada') rec += v;
-                        else { gas += v; if(t.tipo === 'fixo') fix += v; else laz += v; }
-                        html += `<div class="t-item"><div class="t-info"><b>${t.descricao || 'Sem nome'}</b><span>${t.tipo}</span></div>
-                                 <b style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">R$ ${v.toFixed(2)}</b></div>`;
+                        if(t.tipo==='entrada') r+=v; else g+=v;
+                        html += `<div class="t-row"><div class="t-info"><b>${t.descricao || 'Sem título'}</b><span>${t.tipo}</span></div>
+                                 <div style="display:flex;align-items:center;"><b style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">R$ ${v.toFixed(2)}</b>
+                                 <button class="btn-del" onclick="del(${i})">🗑️</button></div></div>`;
                     });
                 }
-                document.getElementById('total').innerText = (rec - gas).toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
-                document.getElementById('v-in').innerText = "R$ " + rec.toFixed(2);
-                document.getElementById('v-out').innerText = "R$ " + gas.toFixed(2);
-                document.getElementById('trans-list').innerHTML = html || "<p style='text-align:center; opacity:0.2; margin-top:40px;'>Nenhum dado.</p>";
-                draw(fix, laz, rec - gas);
+                document.getElementById('v-bal').innerText = (r-g).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+                document.getElementById('v-in').innerText = "R$ "+r.toFixed(2);
+                document.getElementById('v-out').innerText = "R$ "+g.toFixed(2);
+                document.getElementById('t-cont').innerHTML = html || "<p style='text-align:center;padding:40px;opacity:0.3;'>Vazio</p>";
+                render(r, g);
             });
         }
 
-        function draw(f, l, s) {
-            const ctx = document.getElementById('mainChart').getContext('2d');
-            if(chart) chart.destroy();
-            chart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Fixo', 'Variável', 'Sobra'],
-                    datasets: [{
-                        data: [f||1, l||1, s > 0 ? s : 0.1],
-                        backgroundColor: ['#EF4444', '#EAB308', '#3B82F6'],
-                        borderWidth: 0
-                    }]
-                },
-                options: { cutout: '82%', plugins: { legend: { display: false } } }
-            });
+        async function save() {
+            const d = document.getElementById('in-desc').value, v = document.getElementById('in-val').value, t = document.getElementById('in-tipo').value;
+            if(!d || !v) return;
+            const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo.toLowerCase());
+            const snap = await ref.get();
+            let list = snap.exists ? snap.data().transacoes : [];
+            list.push({ descricao: d, valor: v, tipo: t, data: document.getElementById('in-date').value });
+            await ref.set({ transacoes: list }); closeAdd();
         }
 
-        async function processIA() {
-            const input = document.getElementById('ai-input'), chat = document.getElementById('chat');
-            if(!input.value) return;
-            const text = input.value;
-            chat.innerHTML += `<div style="background:var(--accent); color:#000; padding:15px; border-radius:20px; align-self:flex-end; font-weight:700;">${text}</div>`;
-            input.value = "";
+        async function del(index) {
+            if(!confirm("Apagar este lançamento?")) return;
+            const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo.toLowerCase());
+            const snap = await ref.get();
+            let list = snap.data().transacoes;
+            list.splice(index, 1);
+            await ref.set({ transacoes: list });
+        }
 
+        async function askIA() {
+            const inp = document.getElementById('ai-in'), box = document.getElementById('chat-box');
+            const txt = inp.value; if(!txt) return;
+            box.innerHTML += `<div style="background:var(--accent); color:#000; padding:12px; border-radius:15px; align-self:flex-end;">${txt}</div>`;
+            inp.value = "";
+            
             try {
-                const prompt = `Extraia dados de: "${text}". 
-                IMPORTANTE: Se for gasto, tipo deve ser 'lazer' ou 'fixo'. 
-                Retorne APENAS JSON: {"desc":"Nome","valor":0.00,"tipo":"entrada/fixo/lazer"}`;
-
                 const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer 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', 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ model: "llama-3.1-8b-instant", messages: [{role:"user", content:prompt}], response_format: {"type":"json_object"}})
+                    method:'POST', headers:{'Authorization':'Bearer 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','Content-Type':'application/json'},
+                    body:JSON.stringify({ model:"llama-3.1-8b-instant", messages:[{role:"user", content:`Analise: "${txt}". Se for gasto use tipo "lazer". Retorne JSON: {"desc":"Nome","valor":0.0,"tipo":"entrada/lazer"}`}], response_format:{"type":"json_object"}})
                 });
-
                 let r = JSON.parse((await res.json()).choices[0].message.content);
                 
-                // Correção de Undefined e Tipo
-                if(!r.desc || r.desc === "undefined") r.desc = text.charAt(0).toUpperCase() + text.slice(1);
-                const despesa = ["gastei","paguei","comi","comprei","lanche","mercado"].some(k => text.toLowerCase().includes(k));
-                if(despesa) r.tipo = "lazer";
+                // BLINDAGEM CONTRA UNDEFINED
+                if(!r.desc || r.desc === "undefined") r.desc = txt.substring(0, 20);
+                if(txt.toLowerCase().includes("gastei") || txt.toLowerCase().includes("paguei")) r.tipo = "lazer";
 
-                const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesRef.toLowerCase());
+                const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo.toLowerCase());
                 const snap = await ref.get();
                 let list = snap.exists ? snap.data().transacoes : [];
                 list.push({ ...r, data: new Date().toISOString().split('T')[0] });
                 await ref.set({ transacoes: list });
-                chat.innerHTML += `<div style="background:var(--card); border:1px solid var(--border); padding:15px; border-radius:20px;">✅ Lançado: ${r.desc}</div>`;
-            } catch(e) { chat.innerHTML += `<div>Erro na IA.</div>`; }
-            chat.scrollTop = chat.scrollHeight;
+                box.innerHTML += `<div style="background:#27272A; padding:12px; border-radius:15px;">✅ Lançado: ${r.desc}</div>`;
+            } catch(e) { box.innerHTML += `<div>Erro na conexão.</div>`; }
         }
 
-        function switchTab(t, b) {
-            document.getElementById('tab-home').style.display = t === 'home' ? 'block' : 'none';
-            document.getElementById('tab-list').style.display = t === 'list' ? 'block' : 'none';
-            document.querySelectorAll('.n-btn').forEach(x => x.classList.remove('active'));
-            b.classList.add('active');
+        function render(inVal, outVal) {
+            const ctx = document.getElementById('chart').getContext('2d');
+            if(myChart) myChart.destroy();
+            myChart = new Chart(ctx, { type:'doughnut', data:{ datasets:[{data:[outVal||1, inVal||1], backgroundColor:['#EF4444','#EAB308'], borderWidth:0}]}, options:{cutout:'85%'} });
         }
 
-        function openModal() { document.getElementById('data').value = new Date().toISOString().split('T')[0]; document.getElementById('modal-add').style.display='flex'; }
-        function closeModal() { document.getElementById('modal-add').style.display='none'; }
-        function toggleIA() { const v = document.getElementById('ai-view'); v.style.display = v.style.display === 'none' ? 'flex' : 'none'; }
+        function tab(v, b) {
+            document.getElementById('v-dash').style.display = v==='dash'?'block':'none';
+            document.getElementById('v-list').style.display = v==='list'?'block':'none';
+            document.querySelectorAll('.n-btn').forEach(n => n.classList.remove('active')); b.classList.add('active');
+        }
 
-        start();
-        auth.onAuthStateChanged(u => { if(u) { document.getElementById('user-display').innerText = u.displayName.split(' ')[0]; sync(); } });
+        function openAdd() { document.getElementById('in-date').value = new Date().toISOString().split('T')[0]; document.getElementById('m-add').style.display='flex'; }
+        function closeAdd() { document.getElementById('m-add').style.display='none'; }
+        function toggleAI() { const p = document.getElementById('ai-panel'); p.style.display = p.style.display==='none'?'flex':'none'; }
+
+        init();
+        auth.onAuthStateChanged(u => { if(u){ document.getElementById('user-badge').innerText = u.displayName.split(' ')[0]; sync(); } });
     </script>
 </body>
 </html>
