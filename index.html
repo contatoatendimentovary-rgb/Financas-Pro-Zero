@@ -29,7 +29,7 @@
         .user-pill { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 800; cursor: pointer; font-size: 0.8rem; }
         .main-balance h1 { font-size: 2.8rem; font-weight: 800; letter-spacing: -1px; margin: 5px 0; }
         .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; margin-top: -25px; position: relative; z-index: 10; }
-        .stat-card { background: var(--card); padding: 18px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .stat-card { background: var(--card); padding: 18px; border-radius: 24px; border: 1px solid var(--border); }
         .viz-card { background: var(--card); margin: 20px; padding: 22px; border-radius: 28px; border: 1px solid var(--border); }
         .tab-content { display: none; } .tab-content.active { display: block; }
         .entry-card { background: var(--card); padding: 16px; border-radius: 20px; margin: 0 20px 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
@@ -55,10 +55,10 @@
     <div id="ai-modal" class="ai-popup">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <b style="color:var(--accent); font-size: 0.8rem;">✨ CONSULTOR FINAN PRO</b>
-            <button onclick="fecharAI()" style="background:none; border:none; font-size:1.5rem; color:var(--text-sub); cursor:pointer;">&times;</button>
+            <button onclick="fecharAI()" style="background:none; border:none; font-size:1.5rem; color:var(--text-sub);">&times;</button>
         </div>
         <div class="chat-area" id="chat-historico">
-            <div class="chat-bubble ai-bubble">Olá Henrique! Conexão restabelecida. Como posso te ajudar hoje?</div>
+            <div class="chat-bubble ai-bubble">Olá Henrique! Conexão ajustada. Como posso ajudar nas finanças hoje?</div>
         </div>
         <div style="display:flex; gap:8px;">
             <input type="text" id="ai-input" placeholder="Perguntar..." style="flex:1; padding:12px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text-main);">
@@ -112,7 +112,6 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
         
-        // CHAVE ATUALIZADA
         const Gemini_Key = "AIzaSyAu6YrB0AkovAt6wWcN8h0xd9TjcaS2WRE"; 
 
         let chartP = null;
@@ -126,7 +125,7 @@
         function abrirModalLançamento() { document.getElementById('data-reg').value = new Date().toISOString().split('T')[0]; document.getElementById('modal').style.display = 'flex'; }
         function switchTab(id, btn) { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); btn.classList.add('active'); }
 
-        async function loginGoogle() { try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); } catch (e) { alert("Use HTTPS."); } }
+        async function loginGoogle() { try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); } catch (e) { alert("Erro no login."); } }
 
         async function carregarDados() {
             if (!auth.currentUser) return;
@@ -145,23 +144,23 @@
             document.getElementById('saldo').innerText = s.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
             document.getElementById('resumo-receita').innerText = r.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
             document.getElementById('resumo-despesa').innerText = (f+l+i).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-            document.getElementById('lista-geral').innerHTML = html || "<p style='text-align:center;padding:40px;opacity:0.5'>Sem dados.</p>";
+            document.getElementById('lista-geral').innerHTML = html || "<p style='text-align:center;padding:40px;opacity:0.5'>Vazio.</p>";
             renderCharts(f, l, i);
         }
 
         async function salvarRegistro() {
-            if (!auth.currentUser) return alert("Faça login!");
+            if (!auth.currentUser) return;
             const v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value;
             const mes = mesesNomes[parseInt(dt.split('-')[1]) - 1];
             const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mes);
             const snap = await ref.get();
             let lista = snap.exists ? snap.data().transacoes : [];
-            lista.push({ descricao: document.getElementById('desc').value || "Sem nome", valor: v, tipo: document.getElementById('tipo').value, data: dt });
+            lista.push({ descricao: document.getElementById('desc').value, valor: v, tipo: document.getElementById('tipo').value, data: dt });
             await ref.set({ transacoes: lista });
             fecharModal(); carregarDados();
         }
 
-        // IA GEMINI - AJUSTE DE MODELO PARA gemini-pro
+        // IA GEMINI - AJUSTE FINAL DE NOME DE MODELO
         async function perguntarIA() {
             const input = document.getElementById('ai-input');
             const chat = document.getElementById('chat-historico');
@@ -173,10 +172,10 @@
             chat.scrollTop = chat.scrollHeight;
 
             try {
-                const contexto = `Sou o Henrique. Meu Saldo é R$${dadosFinanceiros.saldo}. Gastos: Fixo R$${dadosFinanceiros.f}, Lazer R$${dadosFinanceiros.l}, Reserva R$${dadosFinanceiros.i}. Analise meu faturamento e responda de forma breve: ${pUser}`;
+                const contexto = `Henrique. Saldo R$${dadosFinanceiros.saldo}. Gastos: Fixo R$${dadosFinanceiros.f}, Lazer R$${dadosFinanceiros.l}, Reserva R$${dadosFinanceiros.i}. Analise e responda: ${pUser}`;
                 
-                // Alterado para o endpoint do gemini-pro (mais estável para chaves individuais)
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${Gemini_Key}`, {
+                // Nomenclatura universal gemini-1.5-flash-latest
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${Gemini_Key}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -185,10 +184,7 @@
                 });
 
                 const resData = await response.json();
-
-                if(resData.error) {
-                    throw new Error(`${resData.error.status}: ${resData.error.message}`);
-                }
+                if(resData.error) throw new Error(`${resData.error.status}: ${resData.error.message}`);
 
                 const botMsg = resData.candidates[0].content.parts[0].text;
                 chat.innerHTML += `<div class="chat-bubble ai-bubble">${botMsg}</div>`;
