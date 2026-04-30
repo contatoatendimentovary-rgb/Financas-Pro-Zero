@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finan Pro Turbo | IA</title>
+    <title>Finan Pro | Gestão Comercial</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -12,100 +12,113 @@
 
     <style>
         :root {
-            --bg: #0B0F1A; --card: #161B2C; --accent: #7C3AED; --text: #FFFFFF;
-            --subtext: #94A3B8; --green: #10B981; --red: #EF4444; --border: rgba(255, 255, 255, 0.08);
+            /* Tema Padrão (Claro) - Identidade Azul */
+            --bg: #F0F2F5; --card: #FFFFFF; --accent: #0052FF; --text: #1A1D23;
+            --subtext: #64748B; --green: #00C853; --red: #FF3B30; --border: #E2E8F0;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 100px; overflow-x: hidden; }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0B0F1A; --card: #161B2C; --accent: #3B82F6; --text: #FFFFFF;
+                --subtext: #94A3B8; --green: #10B981; --red: #EF4444; --border: rgba(255, 255, 255, 0.08);
+            }
+        }
 
-        .fin-toast { position: fixed; top: -100px; left: 20px; right: 20px; background: var(--accent); color: white; padding: 18px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 5000; transition: 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); display: flex; align-items: center; gap: 12px; font-weight: 600; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 100px; transition: background 0.3s; }
+
+        /* Toast de Feedback */
+        .fin-toast { position: fixed; top: -100px; left: 20px; right: 20px; background: var(--accent); color: white; padding: 18px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 5000; transition: 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); display: flex; align-items: center; gap: 12px; font-weight: 600; }
         .fin-toast.show { top: 20px; }
 
-        .header { padding: 50px 24px 30px; background: linear-gradient(180deg, #1E1B4B 0%, var(--bg) 100%); }
+        .header { padding: 50px 24px 30px; background: var(--card); border-bottom: 1px solid var(--border); }
         .nav-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .logo { font-weight: 900; color: var(--accent); font-size: 1.2rem; }
-        .user-pill { background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 8px 16px; border-radius: 50px; font-size: 0.75rem; color: white; font-weight: bold; }
+        .user-pill { background: var(--bg); border: 1px solid var(--border); padding: 8px 16px; border-radius: 50px; font-size: 0.75rem; color: var(--text); font-weight: 700; }
 
-        .month-scroll { display: flex; overflow-x: auto; gap: 8px; padding: 10px 0; scrollbar-width: none; }
+        .month-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 10px 0; scrollbar-width: none; }
         .m-btn { padding: 10px 22px; border-radius: 50px; border: 1px solid var(--border); background: var(--card); color: var(--subtext); font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
         .m-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
 
         .hero { text-align: center; margin: 30px 0; }
-        .hero h1 { font-size: 3.2rem; font-weight: 800; letter-spacing: -2px; }
-        .hero small { color: var(--subtext); font-size: 0.7rem; text-transform: uppercase; font-weight: 700; }
+        .hero h1 { font-size: 3rem; font-weight: 800; letter-spacing: -1.5px; }
+        .hero small { color: var(--subtext); font-size: 0.7rem; text-transform: uppercase; font-weight: 800; }
 
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 24px; }
-        .stat-card { background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--border); }
+        .stat-card { background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .stat-card span { font-size: 0.65rem; color: var(--subtext); font-weight: 800; display: block; margin-bottom: 5px; }
 
-        .chart-box { background: var(--card); margin: 0 24px; padding: 25px; border-radius: 30px; border: 1px solid var(--border); }
+        .chart-container { background: var(--card); margin: 24px; padding: 30px; border-radius: 32px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
 
+        /* Estilo do Extrato com Data */
         .t-item { background: var(--card); padding: 18px; border-radius: 22px; margin: 0 24px 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .btn-del { color: var(--red); background: rgba(239, 68, 68, 0.1); border: none; width: 35px; height: 35px; border-radius: 12px; }
+        .t-info { display: flex; flex-direction: column; }
+        .t-date { font-size: 0.65rem; font-weight: 700; color: var(--accent); background: rgba(0, 82, 255, 0.08); padding: 2px 8px; border-radius: 6px; width: fit-content; margin-bottom: 4px; }
+        
+        .btn-del { color: var(--red); background: rgba(255, 59, 48, 0.1); border: none; width: 35px; height: 35px; border-radius: 12px; cursor: pointer; }
 
-        .ai-fab { position: fixed; bottom: 110px; right: 24px; width: 64px; height: 64px; border-radius: 22px; background: var(--accent); color: white; border: none; font-size: 28px; z-index: 1000; }
+        /* IA FAB */
+        .ai-fab { position: fixed; bottom: 110px; right: 24px; width: 64px; height: 64px; border-radius: 22px; background: var(--accent); color: white; border: none; font-size: 28px; box-shadow: 0 10px 25px rgba(0, 82, 255, 0.3); z-index: 1000; }
         .ai-panel { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 2000; flex-direction: column; }
-        .ai-head { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .chat-view { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .msg { padding: 16px 20px; border-radius: 22px; max-width: 85%; font-size: 0.95rem; }
+        .ai-head { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--card); }
+        .chat-box { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .msg { padding: 16px 20px; border-radius: 22px; max-width: 85%; font-size: 0.95rem; line-height: 1.5; }
         .m-ai { background: var(--card); border: 1px solid var(--border); }
         .m-user { background: var(--accent); color: white; align-self: flex-end; }
 
-        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 90px; background: rgba(22, 27, 44, 0.98); border-top: 1px solid var(--border); display: flex; padding-bottom: 25px; }
+        .navbar { position: fixed; bottom: 0; width: 100%; height: 90px; background: var(--card); border-top: 1px solid var(--border); display: flex; padding-bottom: 25px; }
         .nav-tab { flex: 1; border: none; background: none; color: var(--subtext); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; }
         .nav-tab.active { color: var(--accent); }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000; align-items: flex-end; }
-        .sheet { background: var(--card); width: 100%; border-radius: 35px 35px 0 0; padding: 35px; border-top: 2px solid var(--accent); }
-        input, select { width: 100%; padding: 18px; margin-bottom: 12px; border-radius: 18px; border: 1px solid var(--border); background: var(--bg); color: white; }
-        .btn-go { width: 100%; padding: 20px; border-radius: 20px; background: var(--accent); color: white; border: none; font-weight: 800; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 3000; align-items: flex-end; }
+        .sheet { background: var(--card); width: 100%; border-radius: 35px 35px 0 0; padding: 35px; }
+        input, select { width: 100%; padding: 18px; margin-bottom: 12px; border-radius: 18px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 1rem; }
+        .btn-go { width: 100%; padding: 20px; border-radius: 20px; background: var(--accent); color: white; border: none; font-weight: 800; font-size: 1.1rem; }
     </style>
 </head>
 <body>
 
     <div id="ai-panel" class="ai-panel">
-        <div class="ai-head"><b style="color:var(--accent)">✨ FIN PRO TURBO</b> <button onclick="closeAI()" style="background:none; border:none; color:white; font-size:1.8rem;">&times;</button></div>
-        <div class="chat-view" id="chat-box"><div class="msg m-ai">Fala Henrique! Pode lançar seus gastos aqui por texto. Ex: "Gastei 30 no lanche" 🚀</div></div>
+        <div class="ai-head"><b>✨ INTELIGÊNCIA FIN PRO</b> <button onclick="closeAI()" style="border:none;background:none;font-size:1.8rem;color:var(--text)">&times;</button></div>
+        <div class="chat-box" id="chat-list"><div class="msg m-ai">Henrique, pode lançar seus gastos direto por aqui! Digite "Gastei 50 no mercado" por exemplo.</div></div>
         <div style="padding:20px; display:flex; gap:10px; background:var(--card);">
-            <input type="text" id="ai-input" placeholder="Lançar ou perguntar...">
+            <input type="text" id="ai-input" placeholder="Dúvida ou lançamento...">
             <button onclick="askIA()" style="background:var(--accent); color:white; border:none; padding:0 20px; border-radius:15px; font-weight:bold;">OK</button>
         </div>
     </div>
 
     <header class="header">
-        <div class="nav-top"><div class="logo">FINAN PRO</div><button id="user-btn" class="user-pill" onclick="login()">LOGIN</button></div>
+        <div class="nav-top"><b style="color:var(--accent)">FINAN PRO</b> <button id="user-btn" class="user-pill" onclick="login()">CONECTAR</button></div>
         <div class="month-scroll" id="month-list"></div>
-        <div class="hero"><small id="month-title">CARREGANDO...</small><h1 id="total-bal">R$ 0,00</h1></div>
+        <div class="hero"><small id="month-label">SALDO ACUMULADO</small><h1 id="txt-bal">R$ 0,00</h1></div>
     </header>
 
     <div class="grid">
-        <div class="stat-card"><span>RECEITAS</span><b id="total-in" style="color:var(--green)">R$ 0,00</b></div>
-        <div class="stat-card"><span>DESPESAS</span><b id="total-out" style="color:var(--red)">R$ 0,00</b></div>
+        <div class="stat-card"><span>TOTAL RECEBIDO</span><b id="txt-in" style="color:var(--green)">R$ 0,00</b></div>
+        <div class="stat-card"><span>TOTAL GASTO</span><b id="txt-out" style="color:var(--red)">R$ 0,00</b></div>
     </div>
 
-    <main id="tab-dash">
-        <div style="padding:30px 24px 15px; font-size: 0.8rem; font-weight: 800; color: var(--subtext);">PATRIMÔNIO ACUMULATIVO</div>
-        <div class="chart-box"><canvas id="pizChart" style="max-height: 200px;"></canvas></div>
+    <main id="view-dash">
+        <div style="padding:25px 24px 0; font-size: 0.8rem; font-weight: 800; color: var(--subtext);">DISTRIBUIÇÃO PATRIMONIAL</div>
+        <div class="chart-container"><canvas id="mainChart" style="max-height: 220px;"></canvas></div>
     </main>
 
-    <main id="tab-list" style="display:none;">
-        <div style="padding:30px 24px 15px; font-size: 0.8rem; font-weight: 800; color: var(--subtext);">EXTRATO</div>
-        <div id="list-view"></div>
+    <main id="view-list" style="display:none;">
+        <div style="padding:25px 24px 10px; font-size: 0.8rem; font-weight: 800; color: var(--subtext);">EXTRATO DETALHADO</div>
+        <div id="list-container"></div>
     </main>
 
     <button class="ai-fab" onclick="openAI()">✨</button>
 
-    <nav class="nav-bar">
-        <button class="nav-tab active" onclick="tab('dash', this)"><span>📊</span>HOME</button>
-        <button class="nav-tab" onclick="openAdd()"><span>➕</span>ADD</button>
+    <nav class="navbar">
+        <button class="nav-tab active" onclick="tab('dash', this)"><span>📊</span>DASH</button>
+        <button class="nav-tab" onclick="openAdd()"><span>➕</span>LANÇAR</button>
         <button class="nav-tab" onclick="tab('list', this)"><span>📜</span>LISTA</button>
     </nav>
 
     <div id="modal-add" class="modal" onclick="if(event.target==this) closeAdd()">
         <div class="sheet">
             <h3 style="text-align:center; margin-bottom:25px;">Novo Registro</h3>
-            <input type="text" id="add-desc" placeholder="Descrição">
-            <input type="number" id="add-val" placeholder="Valor (R$)">
+            <input type="text" id="add-desc" placeholder="O que foi?">
+            <input type="number" id="add-val" placeholder="Valor R$">
             <select id="add-tipo">
                 <option value="fixo">🏠 Essencial (50%)</option>
                 <option value="lazer">🍿 Lazer (30%)</option>
@@ -113,7 +126,7 @@
                 <option value="entrada">💵 Receita (+)</option>
             </select>
             <input type="date" id="add-date">
-            <button class="btn-go" onclick="save()">SALVAR</button>
+            <button class="btn-go" onclick="save()">SALVAR AGORA</button>
         </div>
     </div>
 
@@ -127,9 +140,9 @@
 
         const MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
         let mesAtivo = MESES[new Date().getMonth()];
-        let chart = null, cacheData = { bal:0, in:0, f:0, l:0, i:0 };
+        let chartRef = null, appData = { bal:0, in:0, f:0, l:0, i:0 };
 
-        function init() {
+        function initMonths() {
             const list = document.getElementById('month-list');
             MESES.forEach(m => {
                 const b = document.createElement('button');
@@ -145,7 +158,7 @@
 
         function toast(tipo) {
             const t = document.createElement('div'); t.className = 'fin-toast';
-            t.innerHTML = `<span>✨</span> ${tipo === 'entrada' ? 'Receita lançada!' : 'Gasto registrado!'}`;
+            t.innerHTML = `<span>✨</span> ${tipo === 'entrada' ? 'Receita adicionada!' : 'Gasto registrado!'}`;
             document.body.appendChild(t);
             setTimeout(() => t.classList.add('show'), 100);
             setTimeout(() => { t.classList.remove('show'); setTimeout(()=>t.remove(),400); }, 3000);
@@ -158,14 +171,15 @@
         function tab(v, b) {
             document.querySelectorAll('main').forEach(m => m.style.display='none');
             document.querySelectorAll('.nav-tab').forEach(n => n.classList.remove('active'));
-            document.getElementById('tab-'+v).style.display='block'; b.classList.add('active');
+            document.getElementById('view-'+v).style.display='block'; b.classList.add('active');
         }
 
         async function login() { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
 
         function sync() {
             if(!auth.currentUser) return;
-            document.getElementById('month-title').innerText = `GESTÃO - ${mesAtivo.toUpperCase()}`;
+            document.getElementById('month-label').innerText = `Gestão Comercial - ${mesAtivo}`;
+            
             db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo.toLowerCase())
             .onSnapshot(doc => {
                 let sin=0, sf=0, sl=0, si=0, html="";
@@ -173,18 +187,19 @@
                     const trans = doc.data().transacoes || [];
                     trans.reverse().forEach((t, idx) => {
                         const v = parseFloat(t.valor);
+                        const dataFormatada = t.data ? t.data.split('-').reverse().slice(0,2).join('/') : '--/--';
                         if(t.tipo==='entrada') sin+=v; else { if(t.tipo==='fixo') sf+=v; else if(t.tipo==='lazer') sl+=v; else si+=v; }
-                        html += `<div class="t-item"><div><b>${t.descricao}</b><br><small>${t.tipo}</small></div>
-                                 <div style="display:flex;align-items:center;gap:12px;"><b style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">R$ ${v.toFixed(2)}</b>
+                        html += `<div class="t-item"><div class="t-info"><span class="t-date">${dataFormatada}</span><b>${t.descricao}</b><small>${t.tipo}</small></div>
+                                 <div style="display:flex;align-items:center;gap:15px;"><b style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">R$ ${v.toFixed(2)}</b>
                                  <button class="btn-del" onclick="del(${trans.length - 1 - idx})">🗑️</button></div></div>`;
                     });
                 }
-                cacheData = { bal: sin-(sf+sl+si), in: sin, f: sf, l: sl, i: si };
-                document.getElementById('total-bal').innerText = cacheData.bal.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-                document.getElementById('total-in').innerText = "R$ "+sin.toFixed(2);
-                document.getElementById('total-out').innerText = "R$ "+(sf+sl+si).toFixed(2);
-                document.getElementById('list-view').innerHTML = html || "<p style='text-align:center;opacity:0.2;padding:50px'>Sem dados.</p>";
-                render(sf, sl, si, sin);
+                appData = { bal: sin-(sf+sl+si), in: sin, f: sf, l: sl, i: si };
+                document.getElementById('txt-bal').innerText = appData.bal.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+                document.getElementById('txt-in').innerText = "R$ "+sin.toFixed(2);
+                document.getElementById('txt-out').innerText = "R$ "+(sf+sl+si).toFixed(2);
+                document.getElementById('list-container').innerHTML = html || "<p style='text-align:center;opacity:0.3;padding:50px'>Sem movimentos.</p>";
+                renderChart(sf, sl, si, sin);
             });
         }
 
@@ -203,29 +218,30 @@
             const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo.toLowerCase());
             const snap = await ref.get();
             let lista = snap.data().transacoes;
-            lista.splice(idx, 1); await ref.set({ transacoes: lista });
+            lista.splice(idx, 1);
+            await ref.set({ transacoes: lista });
         }
 
-        function render(f, l, i, s) {
-            const ctx = document.getElementById('pizChart').getContext('2d');
-            if(chart) chart.destroy();
-            chart = new Chart(ctx, {
-                type: 'doughnut',
+        function renderChart(f, l, i, s) {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            if(chartRef) chartRef.destroy();
+            chartRef = new Chart(ctx, {
+                type: 'pie',
                 data: {
-                    labels: ['Fixo', 'Lazer', 'Reserva', 'Livre'],
-                    datasets: [{ data: [f||0.1, l||0.1, i||0.1, (s-(f+l+i))||0.1], backgroundColor: ['#EF4444', '#F59E0B', '#10B981', '#7C3AED'], borderWidth: 0 }]
+                    labels: ['Essencial', 'Lazer', 'Reserva', 'Livre'],
+                    datasets: [{ data: [f||0.1, l||0.1, i||0.1, (s-(f+l+i))||0.1], backgroundColor: ['#FF3B30', '#F59E0B', '#00C853', '#0052FF'], borderWidth: 4, borderColor: getComputedStyle(document.body).getPropertyValue('--card') }]
                 },
-                options: { cutout: '80%', plugins: { legend: { display: false } }, animation: { duration: 400 } }
+                options: { plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, font: { weight: 'bold' } } } }, animation: { duration: 600 } }
             });
         }
 
         async function askIA() {
-            const inp = document.getElementById('ai-input'), box = document.getElementById('chat-box');
+            const inp = document.getElementById('ai-input'), box = document.getElementById('chat-list');
             if(!inp.value) return;
-            const userMsg = inp.value; box.innerHTML += `<div class="msg m-user">${userMsg}</div>`;
+            const msg = inp.value; box.innerHTML += `<div class="msg m-user">${msg}</div>`;
             inp.value = ""; box.scrollTop = box.scrollHeight;
             try {
-                const prompt = `Analise: "${userMsg}". Se for gasto/ganho, responda APENAS JSON: {"desc":"item","valor":0,"tipo":"fixo/lazer/investimento/entrada","msg":"humana"}. Se não, responda {"msg":"texto"}.`;
+                const prompt = `Analise: "${msg}". Se for gasto/ganho, responda JSON: {"desc":"item","valor":0,"tipo":"fixo/lazer/investimento/entrada","msg":"ok"}. Se não, {"msg":"texto"}.`;
                 const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method:'POST', headers:{'Authorization':`Bearer ${GROQAPY}`,'Content-Type':'application/json'},
                     body:JSON.stringify({ model:"llama-3.1-8b-instant", messages:[{role:"user", content:prompt}], response_format:{"type":"json_object"}})
@@ -237,13 +253,13 @@
                     let lista = snap.exists ? snap.data().transacoes : [];
                     lista.push({ descricao: r.desc, valor: r.valor, tipo: r.tipo, data: new Date().toISOString().split('T')[0] });
                     await ref.set({ transacoes: lista }); toast(r.tipo);
-                }
-                box.innerHTML += `<div class="msg m-ai">${r.msg}</div>`;
-            } catch(e) { box.innerHTML += `<div class="msg m-ai">Erro ao processar. 😅</div>`; }
+                    box.innerHTML += `<div class="msg m-ai">✅ Lançado: ${r.desc} de R$ ${r.valor}.</div>`;
+                } else { box.innerHTML += `<div class="msg m-ai">${r.msg}</div>`; }
+            } catch(e) { box.innerHTML += `<div class="msg m-ai">Houve um erro no processamento.</div>`; }
             box.scrollTop = box.scrollHeight;
         }
 
-        init();
+        initMonths();
         auth.onAuthStateChanged(u => { if(u) { document.getElementById('user-btn').innerText = u.displayName.split(' ')[0].toUpperCase(); sync(); } });
     </script>
 </body>
