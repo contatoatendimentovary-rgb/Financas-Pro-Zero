@@ -19,20 +19,16 @@
             --card: #161616;
             --text: #ffffff;
             --accent: #00e676;
-            --red: #ff5252;
-            --yellow: #ffd740;
-            --blue: #448aff;
         }
 
         body {
             margin: 0;
             background-color: var(--bg);
             color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, system-ui, sans-serif;
             overflow-x: hidden;
         }
 
-        /* Loader que não bloqueia o clique após sumir */
         #loader {
             position: fixed;
             inset: 0;
@@ -42,8 +38,10 @@
             align-items: center;
             justify-content: center;
             z-index: 10000;
+            transition: opacity 0.3s;
         }
-        .hidden { display: none !important; pointer-events: none; }
+
+        .hidden { display: none !important; }
 
         header {
             background: var(--card);
@@ -51,9 +49,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
             border-bottom: 1px solid #222;
         }
 
@@ -71,7 +66,6 @@
 
         .balance { font-size: 2.2rem; font-weight: 800; color: var(--accent); margin: 5px 0; }
         
-        /* Barra 50/30/20 */
         .progress-container {
             height: 12px; display: flex; border-radius: 6px;
             overflow: hidden; background: #333; margin: 15px 0;
@@ -80,32 +74,28 @@
 
         input, select {
             width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px;
-            border: 1px solid #333; background: #1a1a1a; color: white; font-size: 1rem;
-            box-sizing: border-box;
+            border: 1px solid #333; background: #1a1a1a; color: white; box-sizing: border-box;
         }
 
         .btn-main {
             background: var(--accent); color: #000; border: none; padding: 16px;
-            border-radius: 12px; width: 100%; font-weight: bold; font-size: 1rem;
-            cursor: pointer; transition: 0.2s;
+            border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer;
         }
-        .btn-main:active { transform: scale(0.98); opacity: 0.8; }
 
-        /* IA Chat UI */
         .chat-box {
             height: 220px; overflow-y: auto; background: #000;
             padding: 15px; border-radius: 12px; border: 1px solid #222;
             font-size: 0.95rem; margin-bottom: 12px;
         }
         .msg-user { color: var(--accent); margin-bottom: 10px; font-weight: bold; }
-        .msg-ai { color: #ddd; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid #1a1a1a; }
+        .msg-ai { color: #ddd; margin-bottom: 15px; border-bottom: 1px solid #1a1a1a; padding-bottom: 5px; }
     </style>
 </head>
 <body>
 
 <div id="loader">
-    <span class="material-icons" style="font-size: 50px; color: var(--accent); margin-bottom: 15px;">sync</span>
-    <strong>Finan Pro</strong>
+    <span class="material-icons" style="font-size: 50px; color: var(--accent); margin-bottom: 15px;">refresh</span>
+    <strong id="loader-text">Sincronizando...</strong>
 </div>
 
 <header>
@@ -116,11 +106,11 @@
 
 <div class="container">
     <div id="login-screen" class="card" style="display: none; text-align: center;">
-        <h2 style="margin-top:0">Acesso</h2>
-        <p style="color: #888; margin-bottom: 25px;">Entre com sua conta Google para sincronizar seus dados.</p>
-        <button onclick="loginGoogle()" class="btn-main" style="background: #fff; color: #000; display: flex; align-items: center; justify-content: center; gap: 10px;">
+        <h2>Acesso Requerido</h2>
+        <p style="color: #888; margin-bottom: 25px;">Olá Henrique, entre para gerenciar seus ativos.</p>
+        <button id="login-click" onclick="loginGoogle()" class="btn-main" style="background: #fff; color: #000; display: flex; align-items: center; justify-content: center; gap: 10px;">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
-            LOGAR COM GOOGLE
+            ENTRAR COM GOOGLE
         </button>
     </div>
 
@@ -128,20 +118,16 @@
         <div class="card" style="text-align: center;">
             <small style="color: #888;">SALDO TOTAL</small>
             <div class="balance" id="display-saldo">R$ 0,00</div>
-            
             <div class="progress-container">
-                <div id="b-ess" class="bar" style="background: var(--red); width: 0%;"></div>
-                <div id="b-des" class="bar" style="background: var(--yellow); width: 0%;"></div>
-                <div id="b-inv" class="bar" style="background: var(--blue); width: 0%;"></div>
-            </div>
-            <div style="display:flex; justify-content:space-around; font-size:0.6rem; color: #888;">
-                <span>🔴 ESSENCIAL</span><span>🟡 LAZER</span><span>🔵 INVEST</span>
+                <div id="b-ess" class="bar" style="background: #ff5252; width: 0%;"></div>
+                <div id="b-des" class="bar" style="background: #ffd740; width: 0%;"></div>
+                <div id="b-inv" class="bar" style="background: #448aff; width: 0%;"></div>
             </div>
         </div>
 
         <div class="card">
             <h3>Lançamento</h3>
-            <input type="text" id="desc" placeholder="Ex: Compra de Material">
+            <input type="text" id="desc" placeholder="Ex: Lucro Operação">
             <input type="number" id="valor" placeholder="Valor R$" step="0.01">
             <select id="cat">
                 <option value="50">Essencial (50%)</option>
@@ -152,23 +138,20 @@
         </div>
 
         <div class="card">
-            <h3>Assistente de Gestão Comercial</h3>
+            <h3>Consultor IA</h3>
             <div id="chat-box" class="chat-box"></div>
             <div style="display:flex; gap:10px;">
-                <input type="text" id="ia-prompt" placeholder="Margem de lucro? Trading?">
-                <button onclick="perguntarIA()" style="width:55px; background:var(--accent); border-radius:12px; border:none; cursor:pointer;">
-                    <span class="material-icons">send</span>
-                </button>
+                <input type="text" id="ia-prompt" placeholder="Como está minha gestão?">
+                <button onclick="perguntarIA()" style="width:55px; background:var(--accent); border:none; border-radius:12px;"><span class="material-icons">send</span></button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // --- 1. CONFIGURAÇÃO FIREBASE ---
     const firebaseConfig = {
         apiKey: "SUA_API_KEY",
-        authDomain: "SEU_DOMINIO.firebaseapp.com",
+        authDomain: "SEU_PROJETO.firebaseapp.com",
         projectId: "SEU_PROJETO_ID",
         storageBucket: "SEU_PROJETO.appspot.com",
         messagingSenderId: "ID",
@@ -177,65 +160,51 @@
 
     const GEMINI_KEY = "AQ.Ab8RN6I0HBcnj_r4GU5euHnkGszaF6janYmUoxfyF_lKvbQteg";
 
-    // Inicialização
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // --- 2. LÓGICA DE LOGIN REVISADA ---
+    // 1. Persistência e Recuperação de Login
+    async function initAuth() {
+        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        
+        try {
+            const result = await auth.getRedirectResult();
+            if (result.user) console.log("Login via redirect concluído");
+        } catch (error) {
+            console.error("Erro no retorno do login:", error.message);
+        }
 
-    // Força a persistência local
-    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        auth.onAuthStateChanged(user => {
+            document.getElementById('loader').classList.add('hidden');
+            if (user) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+                document.getElementById('auth-status').innerHTML = `<img src="${user.photoURL}" class="user-avatar">`;
+                syncDados(user.uid);
+            } else {
+                document.getElementById('login-screen').style.display = 'block';
+                document.getElementById('main-app').style.display = 'none';
+            }
+        });
+    }
 
     function loginGoogle() {
+        document.getElementById('login-click').innerText = "Carregando...";
+        document.getElementById('login-click').disabled = true;
         const provider = new firebase.auth.GoogleAuthProvider();
-        // Usando Redirect para garantir compatibilidade com PWA
         auth.signInWithRedirect(provider);
     }
 
-    // Gerenciamento de Estado
-    auth.onAuthStateChanged(async (user) => {
-        const loader = document.getElementById('loader');
-        const loginScreen = document.getElementById('login-screen');
-        const mainApp = document.getElementById('main-app');
+    function logout() { if(confirm("Sair?")) auth.signOut(); }
 
-        if (user) {
-            loginScreen.style.display = 'none';
-            mainApp.style.display = 'block';
-            document.getElementById('auth-status').innerHTML = `<img src="${user.photoURL}" class="user-avatar">`;
-            syncDados(user.uid);
-            loader.classList.add('hidden');
-        } else {
-            // Se não estiver logado, verifica se está voltando de um redirecionamento
-            try {
-                const result = await auth.getRedirectResult();
-                if (result.user) {
-                    // Usuário acabou de logar via redirect
-                    return; 
-                }
-            } catch (error) {
-                console.error("Erro no redirect:", error);
-            }
-            
-            loginScreen.style.display = 'block';
-            mainApp.style.display = 'none';
-            document.getElementById('auth-status').innerHTML = `<span class="material-icons">account_circle</span>`;
-            loader.classList.add('hidden');
-        }
-    });
-
-    function logout() {
-        if(confirm("Sair do Finan Pro?")) auth.signOut();
-    }
-
-    // --- 3. PERSISTÊNCIA DE DADOS ---
     function salvarOperacao() {
         const user = auth.currentUser;
         const desc = document.getElementById('desc').value;
         const valor = parseFloat(document.getElementById('valor').value);
         const cat = document.getElementById('cat').value;
 
-        if(!desc || isNaN(valor)) return alert("Dados inválidos");
+        if(!desc || isNaN(valor)) return;
 
         db.collection("users").doc(user.uid).collection("financas").add({
             desc, valor, cat, data: firebase.firestore.FieldValue.serverTimestamp()
@@ -257,9 +226,7 @@
                     if(data.cat === "30") d += data.valor;
                     if(data.cat === "20") i += data.valor;
                 });
-
                 document.getElementById('display-saldo').innerText = total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
-                
                 if(total !== 0) {
                     const abs = Math.abs(total);
                     document.getElementById('b-ess').style.width = (Math.abs(e)/abs*100) + "%";
@@ -269,36 +236,30 @@
             });
     }
 
-    // --- 4. IA GEMINI (TESTE) ---
     async function perguntarIA() {
         const input = document.getElementById('ia-prompt');
         const box = document.getElementById('chat-box');
-        const text = input.value;
-        if(!text) return;
-
-        box.innerHTML += `<div class="msg-user">Você: ${text}</div>`;
+        if(!input.value) return;
+        
+        const q = input.value;
+        box.innerHTML += `<div class="msg-user">Você: ${q}</div>`;
         input.value = "";
-        box.scrollTop = box.scrollHeight;
-
-        const context = `Atue como consultor comercial e de trading para o Henrique. 
-                         Saldo atual: ${document.getElementById('display-saldo').innerText}. 
-                         Use conceitos de Price Action e Gestão se necessário.
-                         Pergunta: ${text}`;
 
         try {
             const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {
                 method: "POST",
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ contents: [{ parts: [{ text: context }] }] })
+                body: JSON.stringify({ contents: [{ parts: [{ text: `Atue como consultor comercial do Henrique. Saldo: ${document.getElementById('display-saldo').innerText}. Pergunta: ${q}` }] }] })
             });
             const data = await res.json();
-            const aiResponse = data.candidates[0].content.parts[0].text;
-            box.innerHTML += `<div class="msg-ai"><b>IA:</b> ${aiResponse}</div>`;
+            box.innerHTML += `<div class="msg-ai"><b>IA:</b> ${data.candidates[0].content.parts[0].text}</div>`;
         } catch (e) {
-            box.innerHTML += `<div class="msg-ai">Erro na conexão com o cérebro da IA.</div>`;
+            box.innerHTML += `<div class="msg-ai">Erro na IA.</div>`;
         }
         box.scrollTop = box.scrollHeight;
     }
+
+    initAuth();
 </script>
 </body>
 </html>
