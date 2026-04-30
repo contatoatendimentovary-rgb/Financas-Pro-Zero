@@ -21,7 +21,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: var(--text-main); padding-bottom: 110px; transition: 0.3s; overflow-x: hidden; }
         
-        /* Layout & UI */
         .glass-header { background: var(--header-bg); padding: 50px 20px 40px; border-radius: 0 0 30px 30px; border-bottom: 1px solid var(--border); text-align: center; }
         .header-content { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .ai-badge { background: var(--ai-gradient); color: white; padding: 6px 14px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); }
@@ -32,7 +31,6 @@
         .stat-card { background: var(--card); padding: 18px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
         .stat-card b { display: block; font-size: 1.2rem; margin-top: 4px; }
 
-        /* AI Assistant Style */
         .ai-popup { display: none; position: fixed; bottom: 100px; left: 15px; right: 15px; background: var(--card); border: 1px solid var(--accent); border-radius: 28px; padding: 22px; box-shadow: 0 25px 50px rgba(0,0,0,0.4); z-index: 3000; animation: popUp 0.3s ease-out; max-height: 75vh; flex-direction: column; }
         @keyframes popUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
         .chat-area { flex: 1; overflow-y: auto; margin: 15px 0; font-size: 0.9rem; line-height: 1.5; }
@@ -71,11 +69,11 @@
             <button onclick="window.fecharAI()" style="background:none; border:none; font-size:1.5rem; color:var(--text-sub); cursor:pointer;">&times;</button>
         </div>
         <div class="chat-area" id="chat-historico">
-            <div class="chat-bubble ai-bubble">Olá Henrique! Analisei seus últimos trades e movimentações. Como posso ajudar você hoje?</div>
+            <div class="chat-bubble ai-bubble">Olá Henrique! Como posso ajudar na sua gestão comercial hoje?</div>
         </div>
         <div style="display:flex; gap:10px;">
-            <input type="text" id="ai-input" placeholder="Pergunte sobre suas finanças..." style="flex:1; padding:15px; border-radius:15px; border:1px solid var(--border); background:var(--bg); color:var(--text-main); outline:none;">
-            <button onclick="window.perguntarIA()" style="background:var(--accent); color:white; border:none; padding:0 20px; border-radius:15px; font-weight:800; cursor:pointer;">ENVIAR</button>
+            <input type="text" id="ai-input" placeholder="Pergunte algo..." style="flex:1; padding:15px; border-radius:15px; border:1px solid var(--border); background:var(--bg); color:var(--text-main); outline:none;">
+            <button onclick="window.perguntarIA()" style="background:var(--accent); color:white; border:none; padding:0 20px; border-radius:15px; font-weight:800; cursor:pointer;">OK</button>
         </div>
     </div>
 
@@ -86,7 +84,7 @@
             <button id="btnAuth" class="user-pill" onclick="window.loginGoogle()">ENTRAR</button>
         </div>
         <div class="main-balance">
-            <small style="color: var(--text-sub); font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px;">Saldo Atual</small>
+            <small style="color: var(--text-sub); font-weight: 800; text-transform: uppercase; font-size: 0.7rem;">Saldo Atual</small>
             <h1 id="saldo">R$ 0,00</h1>
         </div>
     </header>
@@ -139,7 +137,7 @@
     <div id="modal" class="modal-overlay" onclick="if(event.target==this) window.fecharModal()">
         <div class="modal-sheet">
             <div class="input-grid">
-                <input type="text" id="desc" placeholder="Ex: Lucro EUR/USD, Aluguel">
+                <input type="text" id="desc" placeholder="Descrição">
                 <input type="number" step="0.01" id="valor" placeholder="Valor 0,00">
                 <input type="date" id="data-reg">
                 <select id="tipo">
@@ -159,13 +157,14 @@
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // CONFIGURAÇÃO FIREBASE (BANCO DE DADOS)
         const firebaseConfig = { apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE", authDomain: "financaspro-1e0e8.firebaseapp.com", projectId: "financaspro-1e0e8", storageBucket: "financaspro-1e0e8.firebasestorage.app", messagingSenderId: "659521706556", appId: "1:659521706556:web:86f2174c4c8a89335ac139" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- CHAVE GEMINI IMPLEMENTADA ---
-        const Gemini_API_Key = "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE"; 
+        // CHAVE GEMINI (INTELIGÊNCIA ARTIFICIAL) - CORRIGIDA
+        const Gemini_API_Key = "AIzaSyAqK8CAFTdzgVeobrz0phGBXAaXLnMpLRI"; 
 
         window.mesesNomes = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
         window.chartP = null; window.chartB = null;
@@ -204,8 +203,8 @@
                         if (mesNome === mesSel) {
                             if (t.tipo === 'entrada') { saldoTotal += v; rec += v; }
                             else { saldoTotal -= v; if(t.tipo==='fixo') f+=v; else if(t.tipo==='lazer') l+=v; else i+=v; }
-                            const item = `<div class="entry-card"><div><b>${t.descricao}</b><br><small>${t.data}</small></div><div style="text-align:right"><span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}; font-weight:800">${fmt(v)}</span><br><button class="btn-del" onclick="window.apagar('${mesNome}', ${tIdx})">Remover</button></div></div>`;
-                            htmlGeral += item; if(t.tipo === 'investimento') htmlInvest += item;
+                            htmlGeral += `<div class="entry-card"><div><b>${t.descricao}</b><br><small>${t.data}</small></div><div style="text-align:right"><span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}; font-weight:800">${fmt(v)}</span><br><button class="btn-del" onclick="window.apagar('${mesNome}', ${tIdx})">Apagar</button></div></div>`;
+                            if(t.tipo === 'investimento') htmlInvest += `<div class="entry-card"><div><b>${t.descricao}</b><br><small>${t.data}</small></div><div style="text-align:right"><span style="color:var(--accent); font-weight:800">${fmt(v)}</span></div></div>`;
                         }
                     });
                 }
@@ -215,25 +214,22 @@
             document.getElementById('saldo').innerText = fmt(saldoTotal);
             document.getElementById('resumo-receita').innerText = fmt(rec);
             document.getElementById('resumo-despesa').innerText = fmt(f+l+i);
-            document.getElementById('lista-geral').innerHTML = htmlGeral || '<p style="text-align:center; padding:30px; opacity:0.3">Nenhum registro</p>';
+            document.getElementById('lista-geral').innerHTML = htmlGeral || '<p style="text-align:center; padding:30px; opacity:0.3">Sem registros</p>';
             document.getElementById('lista-invest').innerHTML = htmlInvest || '<p style="text-align:center; padding:30px; opacity:0.3">Sem aportes</p>';
             renderCharts(f, l, i, investAnual, rec);
         };
 
-        // --- INTEGRAÇÃO GEMINI IA CORRIGIDA ---
         window.perguntarIA = async () => {
             const input = document.getElementById('ai-input');
             const pergunta = input.value;
             const historico = document.getElementById('chat-historico');
-            
             if(!pergunta) return;
-            if(!Gemini_API_Key || Gemini_API_Key === "SUA_CHAVE_AQUI") return alert("Erro: Chave não configurada.");
 
             historico.innerHTML += `<div class="chat-bubble user-bubble">${pergunta}</div>`;
             input.value = "";
             historico.scrollTop = historico.scrollHeight;
 
-            const contexto = `Aja como um analista financeiro. Henrique (Estudante de Gestão) tem: Receita ${fmt(window.dadosFinanceiros.rec)}, Gastos ${fmt(window.dadosFinanceiros.f+window.dadosFinanceiros.l)}, Aportes ${fmt(window.dadosFinanceiros.i)}, Saldo ${fmt(window.dadosFinanceiros.saldo)}. Responda curto: ${pergunta}`;
+            const contexto = `Aja como analista de gestão. Henrique tem: Receita ${fmt(window.dadosFinanceiros.rec)}, Gastos ${fmt(window.dadosFinanceiros.f+window.dadosFinanceiros.l)}, Aportes ${fmt(window.dadosFinanceiros.i)}, Saldo ${fmt(window.dadosFinanceiros.saldo)}. Responda curto à pergunta: ${pergunta}`;
 
             try {
                 const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${Gemini_API_Key}`, {
@@ -246,7 +242,7 @@
                 historico.innerHTML += `<div class="chat-bubble ai-bubble">${respostaIA}</div>`;
                 historico.scrollTop = historico.scrollHeight;
             } catch (e) {
-                historico.innerHTML += `<div class="chat-bubble ai-bubble">Erro ao conectar com a IA.</div>`;
+                historico.innerHTML += `<div class="chat-bubble ai-bubble">Erro ao conectar com a IA. Verifique sua chave.</div>`;
             }
         };
 
@@ -272,9 +268,10 @@
 
         window.salvarRegistro = async () => {
             const v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value;
-            if(!v || !dt) return alert("Preencha os campos!");
+            if(!v || !dt) return alert("Preencha tudo!");
             const mes = window.mesesNomes[parseInt(dt.split('-')[1]) - 1];
             const ref = doc(db, "usuarios", auth.currentUser.uid, "meses", mes);
             const snap = await getDoc(ref);
             let lista = snap.exists() ? snap.data().transacoes : [];
-            lista.push({ descricao: document.getElementById('desc').value || "Movimentação", valor: parseFloat(v), tipo: document.getElementById('tipo').value, data: 
+            lista.push({ descricao: document.getElementById('desc').value || "Movimentação", valor: parseFloat(v), tipo: document.getElementById('tipo').value, data: dt });
+            await setDoc(ref, { transacoes: lista }); window.fecharModal(); win
