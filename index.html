@@ -19,7 +19,20 @@
             --gray-bar: #E4E4E7;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 110px; transition: 0.3s; overflow-x: hidden; }
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            padding-bottom: 110px; 
+            transition: background 0.3s, color 0.3s; 
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Feedback Tátil */
+        .nav-btn:active, .entry:active, .theme-btn:active, .btn-save:active {
+            transform: scale(0.96);
+            transition: transform 0.1s;
+        }
 
         /* Header */
         .header { padding: 50px 24px 20px; text-align: center; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid var(--border); }
@@ -28,16 +41,16 @@
         .logo span { color: var(--accent); }
         .theme-btn { background: var(--card); border: 1px solid var(--border); padding: 8px; border-radius: 12px; cursor: pointer; color: var(--text); }
         .balance-label { color: var(--text-sub); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-        .balance-val { font-size: 2.6rem; font-weight: 800; letter-spacing: -1px; }
+        .balance-val { font-size: 2.6rem; font-weight: 800; letter-spacing: -1px; transition: color 0.3s; }
 
-        /* Estilo 50/30/20 (Dashboard) */
+        /* Dashboard Cards */
         .viz-card { background: var(--card); margin: 20px 15px; padding: 25px; border-radius: 28px; border: 1px solid var(--border); }
         .prog-item { margin-bottom: 20px; }
         .prog-info { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; margin-bottom: 8px; }
         .bar-bg { background: var(--gray-bar); height: 12px; border-radius: 6px; overflow: hidden; }
         .bar-fill { height: 100%; border-radius: 6px; transition: 1s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        /* Lista de Lançamentos com Ícones */
+        /* Lista de Lançamentos */
         .entry { background: var(--card); margin: 0 15px 10px; padding: 16px; border-radius: 20px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
         .entry-left { display: flex; align-items: center; gap: 15px; }
         .entry-icon { width: 44px; height: 44px; border-radius: 14px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 1px solid var(--border); }
@@ -51,7 +64,7 @@
         .nav-btn.active { color: var(--accent); }
         .nav-btn span { font-size: 1.3rem; }
 
-        /* Botão FAB Dourado */
+        /* Botão FAB */
         .fab { background: var(--accent); color: #000; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: none; box-shadow: 0 4px 15px rgba(253, 224, 71, 0.3); }
 
         /* Modal */
@@ -63,6 +76,10 @@
 
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+
+        /* Skeleton Loading Effect */
+        .loading { animation: pulse 1.5s infinite; background: var(--gray-bar) !important; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -188,6 +205,10 @@
         async function carregarDados() {
             const user = window.auth.currentUser; if (!user) return;
             const mesSel = document.getElementById('filtroMes').value;
+            
+            // Início do carregamento visual
+            document.getElementById('lista-geral').innerHTML = '<div class="entry loading" style="height:80px"></div>';
+
             let investMeses = Array(12).fill(0), saldoM = 0, fixo = 0, lazer = 0, invest = 0, receita = 0;
             let htmlGeral = "", htmlInvest = "";
 
@@ -225,9 +246,12 @@
                 }
             });
 
-            document.getElementById('saldo').innerText = `R$ ${saldoM.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-            document.getElementById('lista-geral').innerHTML = htmlGeral || '<p style="text-align:center;color:var(--text-sub)">Vazio</p>';
-            document.getElementById('lista-invest').innerHTML = htmlInvest || '<p style="text-align:center;color:var(--text-sub)">Sem aportes</p>';
+            const saldoElement = document.getElementById('saldo');
+            saldoElement.innerText = `R$ ${saldoM.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            saldoElement.style.color = saldoM >= 0 ? 'var(--text)' : 'var(--red)';
+
+            document.getElementById('lista-geral').innerHTML = htmlGeral || '<p style="text-align:center;color:var(--text-sub);padding:20px">Nenhum lançamento este mês.</p>';
+            document.getElementById('lista-invest').innerHTML = htmlInvest || '<p style="text-align:center;color:var(--text-sub);padding:20px">Sem aportes registrados.</p>';
             
             renderPizza(fixo, lazer, invest);
             renderBarras(investMeses);
@@ -235,13 +259,19 @@
         }
 
         function atualizarRegra(f, l, i, rec) {
-            const total = rec || (f + l + i || 1);
-            document.getElementById('bar-fixo').style.width = Math.min((f/total)*100, 100) + '%';
-            document.getElementById('txt-fixo').innerText = ((f/total)*100).toFixed(0) + '%';
-            document.getElementById('bar-lazer').style.width = Math.min((l/total)*100, 100) + '%';
-            document.getElementById('txt-lazer').innerText = ((l/total)*100).toFixed(0) + '%';
-            document.getElementById('bar-invest').style.width = Math.min((i/total)*100, 100) + '%';
-            document.getElementById('txt-invest').innerText = ((i/total)*100).toFixed(0) + '%';
+            // Se não houver receita cadastrada, usa a soma dos gastos como base para evitar 0%
+            const totalRef = rec > 0 ? rec : (f + l + i || 1);
+            
+            const pF = (f / totalRef) * 100;
+            const pL = (l / totalRef) * 100;
+            const pI = (i / totalRef) * 100;
+
+            document.getElementById('bar-fixo').style.width = Math.min(pF, 100) + '%';
+            document.getElementById('txt-fixo').innerText = pF.toFixed(0) + '%';
+            document.getElementById('bar-lazer').style.width = Math.min(pL, 100) + '%';
+            document.getElementById('txt-lazer').innerText = pL.toFixed(0) + '%';
+            document.getElementById('bar-invest').style.width = Math.min(pI, 100) + '%';
+            document.getElementById('txt-invest').innerText = pI.toFixed(0) + '%';
         }
 
         function renderPizza(f, l, i) {
@@ -253,23 +283,38 @@
         function renderBarras(dados) {
             const ctx = document.getElementById('graficoBarras').getContext('2d');
             if(chartB) chartB.destroy();
-            chartB = new Chart(ctx, { type: 'bar', data: { labels: ['J','F','M','A','M','J','J','A','S','O','N','D'], datasets: [{ data: dados, backgroundColor: '#FDE047', borderRadius: 6 }] }, options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } } });
+            chartB = new Chart(ctx, { type: 'bar', data: { labels: ['J','F','M','A','M','J','J','A','S','O','N','D'], datasets: [{ data: dados, backgroundColor: '#FDE047', borderRadius: 6 }] }, options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#A1A1AA', font: { weight: 'bold' } } } } } });
         }
 
         async function salvarRegistro() {
-            const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value, t = document.getElementById('tipo').value;
-            if(!v || !dt) return alert("Preencha valor e data!");
-            const mes = window.mesesNomes[parseInt(dt.split('-')[1]) - 1];
+            const desc = document.getElementById('desc').value;
+            const val = document.getElementById('valor').value;
+            const dataReg = document.getElementById('data-reg').value;
+            const tipo = document.getElementById('tipo').value;
+
+            if(!val || !dataReg) return alert("Preencha o valor e a data!");
+
+            const mes = window.mesesNomes[parseInt(dataReg.split('-')[1]) - 1];
             const ref = window.f_doc(window.db, "usuarios", window.auth.currentUser.uid, "meses", mes);
-            const snap = await window.f_getDoc(ref);
-            let lista = snap.exists() ? snap.data().transacoes : [];
-            lista.push({ descricao: d || "Lançamento", valor: v, tipo: t, data: dt });
-            await window.f_setDoc(ref, { transacoes: lista });
-            fecharModal(); carregarDados();
+            
+            try {
+                const snap = await window.f_getDoc(ref);
+                let lista = snap.exists() ? snap.data().transacoes : [];
+                lista.push({ descricao: desc || "Lançamento", valor: parseFloat(val), tipo: tipo, data: dataReg });
+                await window.f_setDoc(ref, { transacoes: lista });
+                
+                // Limpeza e feedback
+                document.getElementById('desc').value = "";
+                document.getElementById('valor').value = "";
+                fecharModal(); 
+                carregarDados();
+            } catch(e) {
+                alert("Erro ao salvar: " + e.message);
+            }
         }
 
         async function apagar(mes, idx) {
-            if(!confirm("Apagar?")) return;
+            if(!confirm("Deseja realmente apagar este lançamento?")) return;
             const ref = window.f_doc(window.db, "usuarios", window.auth.currentUser.uid, "meses", mes);
             const snap = await window.f_getDoc(ref);
             let lista = snap.data().transacoes;
@@ -285,7 +330,10 @@
             btn.classList.add('active');
         }
 
-        function abrirModal() { document.getElementById('modal').style.display = 'flex'; }
+        function abrirModal() { 
+            document.getElementById('data-reg').value = new Date().toISOString().split('T')[0];
+            document.getElementById('modal').style.display = 'flex'; 
+        }
         function fecharModal() { document.getElementById('modal').style.display = 'none'; }
         function toggleTheme() { document.body.classList.toggle('light-mode'); }
 
@@ -294,12 +342,4 @@
             if (texto) {
                 const match = texto.match(/R\$\s?(\d+,\d{2})/);
                 if (match) document.getElementById('valor').value = match[1].replace(',', '.');
-                document.getElementById('desc').value = texto.includes('Inter') ? "Banco Inter" : "Lançamento";
-                document.getElementById('data-reg').value = new Date().toISOString().split('T')[0];
-                abrirModal();
-                window.history.replaceState({}, "", "/");
-            }
-        }
-    </script>
-</body>
-</html>
+              
