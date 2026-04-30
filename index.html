@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finan Pro | PWA Final</title>
+    <title>Finan Pro | Gestão Comercial</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -11,94 +11,76 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
-        /* MODO CLARO - Suave para os olhos (Eye-Care) */
+        /* TEMA CLARO SUAVE (Eye-Care) */
         :root {
-            --bg: #F3F4F6;        /* Cinza gelo suave, sem estourar o branco */
-            --card: #FAFAFA;      /* Branco fosco para os blocos */
-            --accent: #2563EB;    /* Azul Royal corporativo */
-            --text: #1E293B;      /* Texto cinza bem escuro (menos contraste que o preto puro) */
-            --subtext: #64748B;
-            --green: #10B981;
-            --red: #EF4444;
-            --border: #E2E8F0;
+            --bg: #F3F4F6; --card: #FAFAFA; --accent: #2563EB; --text: #1E293B;
+            --subtext: #64748B; --green: #10B981; --red: #EF4444; --border: #E2E8F0;
             --shadow: rgba(0, 0, 0, 0.04);
         }
 
-        /* MODO ESCURO - Fundo profundo e focado */
+        /* TEMA ESCURO */
         [data-theme="dark"] {
-            --bg: #0B0F1A;
-            --card: #161B2C;
-            --accent: #3B82F6;
-            --text: #F8FAFC;
-            --subtext: #94A3B8;
-            --border: rgba(255, 255, 255, 0.06);
+            --bg: #0B0F1A; --card: #161B2C; --accent: #3B82F6; --text: #F8FAFC;
+            --subtext: #94A3B8; --border: rgba(255, 255, 255, 0.08);
             --shadow: rgba(0, 0, 0, 0.2);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 110px; transition: background-color 0.3s ease, color 0.3s ease; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 110px; transition: background 0.3s; }
 
-        .fin-toast { position: fixed; top: -100px; left: 20px; right: 20px; background: var(--accent); color: white; padding: 20px; border-radius: 20px; box-shadow: 0 12px 30px var(--shadow); z-index: 5000; transition: 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28); display: flex; align-items: center; gap: 12px; font-weight: 700; }
-        .fin-toast.show { top: 25px; }
-
-        .header { padding: 45px 24px 25px; background: var(--card); border-bottom-left-radius: 35px; border-bottom-right-radius: 35px; box-shadow: 0 10px 30px var(--shadow); transition: background-color 0.3s; }
-        .nav-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 10px;}
-        .logo { font-weight: 900; color: var(--accent); font-size: 1.3rem; letter-spacing: -1px; }
+        .header { padding: 45px 24px 25px; background: var(--card); border-bottom-left-radius: 35px; border-bottom-right-radius: 35px; box-shadow: 0 10px 30px var(--shadow); position: relative; z-index: 10; }
+        .nav-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .logo { font-weight: 900; color: var(--accent); font-size: 1.2rem; }
         
-        .header-actions { display: flex; gap: 10px; align-items: center; }
-        .theme-btn { background: var(--bg); border: 1px solid var(--border); width: 40px; height: 40px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; transition: 0.3s; color: var(--text); display: flex; align-items: center; justify-content: center; }
-        .user-pill { background: var(--bg); border: 1px solid var(--border); padding: 10px 18px; border-radius: 50px; font-size: 0.75rem; color: var(--text); font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .header-actions { display: flex; gap: 8px; align-items: center; }
+        .theme-btn { background: var(--bg); border: 1px solid var(--border); width: 38px; height: 38px; border-radius: 12px; cursor: pointer; color: var(--text); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .user-pill { background: var(--accent); color: white; border: none; padding: 10px 15px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; cursor: pointer; }
 
-        .month-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 10px 0; scrollbar-width: none; }
-        .m-btn { padding: 12px 22px; border-radius: 50px; border: 1px solid var(--border); background: var(--card); color: var(--subtext); font-size: 0.8rem; font-weight: 700; white-space: nowrap; cursor: pointer; transition: 0.3s; }
-        .m-btn.active { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 8px 15px rgba(37, 99, 235, 0.2); }
+        .month-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 5px 0; scrollbar-width: none; }
+        .m-btn { padding: 10px 20px; border-radius: 50px; border: 1px solid var(--border); background: var(--card); color: var(--subtext); font-size: 0.75rem; font-weight: 700; white-space: nowrap; cursor: pointer; }
+        .m-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
 
-        .hero { text-align: center; margin: 25px 0 15px; }
-        .hero h1 { font-size: 3rem; font-weight: 900; letter-spacing: -1.5px; color: var(--text); }
-        .hero small { color: var(--subtext); font-size: 0.75rem; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
+        .hero { text-align: center; margin: 20px 0; }
+        .hero h1 { font-size: 2.8rem; font-weight: 900; letter-spacing: -1.5px; }
+        .hero small { color: var(--subtext); font-size: 0.7rem; text-transform: uppercase; font-weight: 800; }
 
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 24px; margin-top: -15px; }
-        .stat-card { background: var(--card); padding: 22px; border-radius: 28px; border: 1px solid var(--border); box-shadow: 0 4px 15px var(--shadow); transition: 0.3s; }
-        .stat-card span { font-size: 0.7rem; color: var(--subtext); font-weight: 800; display: block; margin-bottom: 6px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 24px; margin-top: -10px; }
+        .stat-card { background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 4px 12px var(--shadow); }
+        .stat-card span { font-size: 0.65rem; color: var(--subtext); font-weight: 800; display: block; margin-bottom: 4px; }
 
-        .chart-box { background: var(--card); margin: 24px; padding: 30px; border-radius: 35px; border: 1px solid var(--border); box-shadow: 0 10px 30px var(--shadow); transition: 0.3s; }
+        .chart-box { background: var(--card); margin: 20px 24px; padding: 25px; border-radius: 30px; border: 1px solid var(--border); }
 
-        .t-item { background: var(--card); padding: 20px; border-radius: 24px; margin: 0 24px 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; transition: 0.3s; box-shadow: 0 2px 10px var(--shadow); }
-        .t-info { display: flex; flex-direction: column; gap: 4px; }
-        .t-date { font-size: 0.65rem; font-weight: 800; color: var(--accent); background: rgba(37, 99, 235, 0.08); padding: 4px 8px; border-radius: 6px; width: fit-content; }
-        .t-item b { font-size: 0.95rem; color: var(--text); }
-        .t-item small { color: var(--subtext); font-weight: 600; font-size: 0.7rem; }
-        
-        .btn-del { color: var(--red); background: rgba(239, 68, 68, 0.1); border: none; width: 40px; height: 40px; border-radius: 14px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .t-item { background: var(--card); padding: 18px; border-radius: 20px; margin: 0 24px 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px var(--shadow); }
+        .t-info { display: flex; flex-direction: column; gap: 3px; }
+        .t-date { font-size: 0.6rem; font-weight: 800; color: var(--accent); background: rgba(37, 99, 235, 0.1); padding: 3px 7px; border-radius: 5px; width: fit-content; }
+        .btn-del { color: var(--red); background: rgba(239, 68, 68, 0.1); border: none; width: 38px; height: 38px; border-radius: 12px; cursor: pointer; }
 
-        .ai-fab { position: fixed; bottom: 120px; right: 24px; width: 64px; height: 64px; border-radius: 22px; background: linear-gradient(135deg, var(--accent), #1E40AF); color: white; border: none; font-size: 28px; box-shadow: 0 12px 25px rgba(37, 99, 235, 0.4); z-index: 1000; cursor: pointer; }
+        .ai-fab { position: fixed; bottom: 110px; right: 24px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); color: white; border: none; font-size: 24px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 100; cursor: pointer; }
         .ai-panel { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 2000; flex-direction: column; }
-        .ai-head { padding: 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--card); }
-        .chat-view { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .msg { padding: 16px 20px; border-radius: 22px; max-width: 85%; font-size: 0.95rem; line-height: 1.5; }
-        .m-ai { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+        .ai-head { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--card); }
+        .chat-view { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .msg { padding: 14px 18px; border-radius: 18px; max-width: 85%; font-size: 0.9rem; }
+        .m-ai { background: var(--card); border: 1px solid var(--border); }
         .m-user { background: var(--accent); color: white; align-self: flex-end; }
 
-        .navbar { position: fixed; bottom: 0; width: 100%; height: 90px; background: var(--card); border-top: 1px solid var(--border); display: flex; padding-bottom: 25px; transition: 0.3s; z-index: 1500; }
+        .navbar { position: fixed; bottom: 0; width: 100%; height: 85px; background: var(--card); border-top: 1px solid var(--border); display: flex; padding-bottom: 20px; z-index: 1000; }
         .nav-tab { flex: 1; border: none; background: none; color: var(--subtext); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; cursor: pointer; }
         .nav-tab.active { color: var(--accent); }
-        .nav-tab span { font-size: 1.5rem; margin-bottom: 4px; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 3000; align-items: flex-end; }
-        .sheet { background: var(--card); width: 100%; border-radius: 35px 35px 0 0; padding: 35px; transition: 0.3s; }
-        input, select { width: 100%; padding: 18px; margin-bottom: 15px; border-radius: 18px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 1rem; font-weight: 600; outline: none; transition: 0.3s; }
-        input:focus, select:focus { border-color: var(--accent); }
-        .btn-go { width: 100%; padding: 20px; border-radius: 18px; background: var(--accent); color: white; border: none; font-weight: 900; font-size: 1.05rem; cursor: pointer; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 3000; align-items: flex-end; }
+        .sheet { background: var(--card); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; }
+        input, select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 15px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-weight: 600; outline: none; }
+        .btn-go { width: 100%; padding: 18px; border-radius: 15px; background: var(--accent); color: white; border: none; font-weight: 800; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="ai-panel" class="ai-panel">
-        <div class="ai-head"><b style="color:var(--text)">✨ IA FIN PRO</b> <button onclick="closeAI()" style="border:none;background:none;font-size:2rem;color:var(--text);cursor:pointer;">&times;</button></div>
-        <div class="chat-view" id="chat-box"><div class="msg m-ai">Henrique, sistema pronto. Pode lançar valores direto por texto. Ex: "Ganhei 1000 de comissão". 🚀</div></div>
-        <div style="padding:20px; display:flex; gap:10px; background:var(--card); border-top: 1px solid var(--border);">
-            <input type="text" id="ai-in" placeholder="Digite seu lançamento...">
-            <button onclick="askIA()" style="background:var(--accent); color:white; border:none; padding:0 22px; border-radius:16px; font-weight:900; cursor:pointer;">OK</button>
+        <div class="ai-head"><b>IA FIN PRO</b> <button onclick="closeAI()" style="border:none;background:none;font-size:1.5rem;color:var(--text);">&times;</button></div>
+        <div class="chat-view" id="chat-box"><div class="msg m-ai">Olá Henrique! Como posso ajudar hoje?</div></div>
+        <div style="padding:15px; display:flex; gap:10px; background:var(--card);">
+            <input type="text" id="ai-in" placeholder="Ex: Gastei 30 no café">
+            <button onclick="askIA()" style="background:var(--accent); color:white; border:none; padding:0 20px; border-radius:12px; font-weight:800;">OK</button>
         </div>
     </div>
 
@@ -106,27 +88,25 @@
         <div class="nav-top">
             <b class="logo">FINAN PRO</b> 
             <div class="header-actions">
-                <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
-                <button id="user-btn" class="user-pill" onclick="login()">CONECTAR CONTA</button>
+                <button class="theme-btn" onclick="toggleTheme()" id="t-icon">🌙</button>
+                <button id="user-btn" class="user-pill" onclick="login()">LOGIN</button>
             </div>
         </div>
         <div class="month-scroll" id="m-list"></div>
-        <div class="hero"><small id="m-label">CARREGANDO...</small><h1 id="v-bal">R$ 0,00</h1></div>
+        <div class="hero"><small id="m-label">SALDO TOTAL</small><h1 id="v-bal">R$ 0,00</h1></div>
     </header>
 
     <div class="grid">
-        <div class="stat-card"><span>TOTAL RECEBIDO</span><b id="v-in" style="color:var(--green)">R$ 0,00</b></div>
-        <div class="stat-card"><span>TOTAL GASTO</span><b id="v-out" style="color:var(--red)">R$ 0,00</b></div>
+        <div class="stat-card"><span>RECEBIDO</span><b id="v-in" style="color:var(--green)">R$ 0,00</b></div>
+        <div class="stat-card"><span>GASTO</span><b id="v-out" style="color:var(--red)">R$ 0,00</b></div>
     </div>
 
     <main id="v-dash">
-        <div style="padding:35px 24px 0; font-size: 0.75rem; font-weight: 900; color: var(--subtext); letter-spacing: 1px;">PATRIMÔNIO LÍQUIDO</div>
-        <div class="chart-box"><canvas id="pChart" style="max-height: 230px;"></canvas></div>
+        <div class="chart-box"><canvas id="pChart"></canvas></div>
     </main>
 
     <main id="v-list" style="display:none;">
-        <div style="padding:35px 24px 15px; font-size: 0.75rem; font-weight: 900; color: var(--subtext); letter-spacing: 1px;">MOVIMENTAÇÕES DO MÊS</div>
-        <div id="list-cont"></div>
+        <div id="list-cont" style="margin-top:20px;"></div>
     </main>
 
     <button class="ai-fab" onclick="openAI()">✨</button>
@@ -139,17 +119,17 @@
 
     <div id="m-add" class="modal" onclick="if(event.target==this) closeAdd()">
         <div class="sheet">
-            <h3 style="text-align:center; margin-bottom:25px; font-weight:900; color:var(--text)">Novo Registro</h3>
-            <input type="text" id="in-desc" placeholder="Descrição (Ex: Compras)">
-            <input type="number" id="in-val" placeholder="Valor R$">
+            <h3 style="margin-bottom:20px;">Novo Lançamento</h3>
+            <input type="text" id="in-desc" placeholder="O que é?">
+            <input type="number" id="in-val" placeholder="R$ 0,00">
             <select id="in-tipo">
-                <option value="fixo">🏠 Essencial (50%)</option>
-                <option value="lazer">🍿 Lazer (30%)</option>
-                <option value="investimento">💰 Reserva (20%)</option>
-                <option value="entrada">💵 Receita (+)</option>
+                <option value="fixo">🏠 Essencial</option>
+                <option value="lazer">🍿 Lazer</option>
+                <option value="investimento">💰 Reserva</option>
+                <option value="entrada">💵 Receita</option>
             </select>
             <input type="date" id="in-date">
-            <button class="btn-go" onclick="save()">SALVAR NO BANCO</button>
+            <button class="btn-go" onclick="save()">SALVAR</button>
         </div>
     </div>
 
@@ -163,26 +143,23 @@
 
         const MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
         let mesAtivo = MESES[new Date().getMonth()];
-        let myChart = null, dataC = { bal:0, in:0, f:0, l:0, i:0 };
-
-        // SISTEMA DE TEMAS (DARK/LIGHT)
-        function initTheme() {
-            const savedTheme = localStorage.getItem('finTheme') || 'dark';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            document.getElementById('theme-btn').innerText = savedTheme === 'dark' ? '☀️' : '🌙';
-        }
+        let myChart = null;
 
         function toggleTheme() {
-            const current = document.documentElement.getAttribute('data-theme');
-            const target = current === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', target);
+            const doc = document.documentElement;
+            const isDark = doc.getAttribute('data-theme') === 'dark';
+            const target = isDark ? 'light' : 'dark';
+            doc.setAttribute('data-theme', target);
+            document.getElementById('t-icon').innerText = isDark ? '🌙' : '☀️';
             localStorage.setItem('finTheme', target);
-            document.getElementById('theme-btn').innerText = target === 'dark' ? '☀️' : '🌙';
-            render(dataC.f, dataC.l, dataC.i, dataC.in); // Re-renderiza o gráfico para atualizar a borda
+            sync(); 
         }
 
         function init() {
-            initTheme();
+            const saved = localStorage.getItem('finTheme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+            document.getElementById('t-icon').innerText = saved === 'dark' ? '☀️' : '🌙';
+
             const list = document.getElementById('m-list');
             MESES.forEach(m => {
                 const b = document.createElement('button');
@@ -196,22 +173,16 @@
             });
         }
 
-        function toast(t) {
-            const el = document.createElement('div'); el.className = 'fin-toast';
-            el.innerHTML = `<span>⚡</span> ${t === 'entrada' ? 'Receita contabilizada!' : 'Despesa registrada!'}`;
-            document.body.appendChild(el);
-            setTimeout(() => el.classList.add('show'), 100);
-            setTimeout(() => { el.classList.remove('show'); setTimeout(()=>el.remove(),500); }, 3000);
-        }
-
         function openAI() { document.getElementById('ai-panel').style.display='flex'; }
         function closeAI() { document.getElementById('ai-panel').style.display='none'; }
         function openAdd() { document.getElementById('in-date').value = new Date().toISOString().split('T')[0]; document.getElementById('m-add').style.display='flex'; }
         function closeAdd() { document.getElementById('m-add').style.display='none'; }
+        
         function tab(v, b) {
             document.querySelectorAll('main').forEach(m => m.style.display='none');
             document.querySelectorAll('.nav-tab').forEach(n => n.classList.remove('active'));
-            document.getElementById('v-'+v).style.display='block'; b.classList.add('active');
+            document.getElementById('v-'+v).style.display='block';
+            b.classList.add('active');
         }
 
         async function login() { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
@@ -225,43 +196,35 @@
                 let sin=0, sf=0, sl=0, si=0, html="";
                 if(doc.exists) {
                     const trans = doc.data().transacoes || [];
-                    // Clona e reverte para exibir do mais novo para o mais velho
-                    const revercedArr = [...trans].reverse();
-                    
-                    revercedArr.forEach((t, idx) => {
+                    [...trans].reverse().forEach((t, idx) => {
                         const v = parseFloat(t.valor);
                         const d = t.data ? t.data.split('-').reverse().slice(0,2).join('/') : '--/--';
                         if(t.tipo==='entrada') sin+=v; else { if(t.tipo==='fixo') sf+=v; else if(t.tipo==='lazer') sl+=v; else si+=v; }
-                        
-                        // Lógica de deleção precisa baseada no índice real do array original
-                        const realIndex = trans.length - 1 - idx;
-                        
-                        html += `<div class="t-item"><div class="t-info"><span class="t-date">${d}</span><b>${t.descricao}</b><small>${t.tipo.toUpperCase()}</small></div>
+                        html += `<div class="t-item"><div class="t-info"><span class="t-date">${d}</span><b>${t.descricao}</b><small>${t.tipo}</small></div>
                                  <div style="display:flex;align-items:center;gap:15px;"><b style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">R$ ${v.toFixed(2)}</b>
-                                 <button class="btn-del" onclick="delTrans(${realIndex})">🗑️</button></div></div>`;
+                                 <button class="btn-del" onclick="delTrans(${trans.length - 1 - idx})">🗑️</button></div></div>`;
                     });
                 }
-                dataC = { bal: sin-(sf+sl+si), in: sin, f: sf, l: sl, i: si };
-                document.getElementById('v-bal').innerText = dataC.bal.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+                const bal = sin-(sf+sl+si);
+                document.getElementById('v-bal').innerText = bal.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
                 document.getElementById('v-in').innerText = "R$ "+sin.toFixed(2);
                 document.getElementById('v-out').innerText = "R$ "+(sf+sl+si).toFixed(2);
-                document.getElementById('list-cont').innerHTML = html || "<p style='text-align:center;opacity:0.4;padding:60px;font-weight:700;'>Nenhum registro ainda.</p>";
+                document.getElementById('list-cont').innerHTML = html;
                 render(sf, sl, si, sin);
             });
         }
 
         async function save() {
-            const d = document.getElementById('in-desc').value, v = document.getElementById('in-val').value, t = document.getElementById('in-tipo').value;
+            const d = document.getElementById('in-desc').value, v = document.getElementById('in-val').value, t = document.getElementById('in-tipo').value, dt = document.getElementById('in-date').value;
             if(!d || !v) return;
             const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo.toLowerCase());
             const snap = await ref.get();
             let lista = snap.exists ? snap.data().transacoes : [];
-            lista.push({ descricao: d, valor: v, tipo: t, data: document.getElementById('in-date').value });
+            lista.push({ descricao: d, valor: v, tipo: t, data: dt });
             await ref.set({ transacoes: lista });
-            closeAdd(); toast(t);
+            closeAdd();
         }
 
-        // Deleção usando o index exato
         async function delTrans(index) {
             const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo.toLowerCase());
             const snap = await ref.get();
@@ -272,16 +235,15 @@
 
         function render(f, l, i, s) {
             const ctx = document.getElementById('pChart').getContext('2d');
-            const cardColor = getComputedStyle(document.documentElement).getPropertyValue('--card').trim();
-            
+            const cardC = getComputedStyle(document.documentElement).getPropertyValue('--card').trim();
             if(myChart) myChart.destroy();
             myChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Fixo', 'Lazer', 'Reserva', 'Livre'],
-                    datasets: [{ data: [f||0.1, l||0.1, i||0.1, (s-(f+l+i))||0.1], backgroundColor: ['#EF4444', '#F59E0B', '#10B981', '#2563EB'], borderWidth: 6, borderColor: cardColor, hoverOffset: 8 }]
+                    datasets: [{ data: [f||0.1, l||0.1, i||0.1, (s-(f+l+i))||0.1], backgroundColor: ['#EF4444', '#F59E0B', '#10B981', '#3B82F6'], borderWidth: 5, borderColor: cardC }]
                 },
-                options: { cutout: '75%', plugins: { legend: { display: false } }, animation: { duration: 600 } }
+                options: { cutout: '75%', plugins: { legend: { display: false } } }
             });
         }
 
@@ -289,14 +251,29 @@
             const inp = document.getElementById('ai-in'), box = document.getElementById('chat-box');
             if(!inp.value) return;
             const txt = inp.value; box.innerHTML += `<div class="msg m-user">${txt}</div>`;
-            inp.value = ""; box.scrollTop = box.scrollHeight;
+            inp.value = "";
             try {
-                const p = `Analise: "${txt}". Se for gasto/ganho, responda JSON: {"desc":"item","valor":0,"tipo":"fixo/lazer/investimento/entrada","msg":"Ok!"}. Se não, {"msg":"texto"}.`;
+                const prompt = `Analise: "${txt}". Se for lançamento, JSON: {"desc":"item","valor":0,"tipo":"fixo/lazer/investimento/entrada"}. Se não, {"msg":"texto"}.`;
                 const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method:'POST', headers:{'Authorization':`Bearer ${GROQAPY}`,'Content-Type':'application/json'},
-                    body:JSON.stringify({ model:"llama-3.1-8b-instant", messages:[{role:"user", content:p}], response_format:{"type":"json_object"}})
+                    body:JSON.stringify({ model:"llama-3.1-8b-instant", messages:[{role:"user", content:prompt}], response_format:{"type":"json_object"}})
                 });
                 const r = JSON.parse((await res.json()).choices[0].message.content);
                 if(r.valor) {
                     const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo.toLowerCase());
-         
+                    const snap = await ref.get();
+                    let lista = snap.exists ? snap.data().transacoes : [];
+                    lista.push({ descricao: r.desc, valor: r.valor, tipo: r.tipo, data: new Date().toISOString().split('T')[0] });
+                    await ref.set({ transacoes: lista });
+                    box.innerHTML += `<div class="msg m-ai">✅ Lançado: ${r.desc} (R$ ${r.valor})</div>`;
+                } else { box.innerHTML += `<div class="msg m-ai">${r.msg}</div>`; }
+            } catch(e) { box.innerHTML += `<div class="msg m-ai">Erro ao processar.</div>`; }
+            box.scrollTop = box.scrollHeight;
+        }
+
+        init();
+        auth.onAuthStateChanged(u => { if(u) { document.getElementById('user-btn').innerText = u.displayName.split(' ')[0].toUpperCase(); sync(); } });
+    </script>
+</body>
+</html>
+
