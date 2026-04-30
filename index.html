@@ -1,269 +1,283 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finan Pro - Gestão Comercial</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finan Pro IA</title>
 
-    <style>
-        :root {
-            --bg: #0F172A; --header-bg: #1E293B; --card: #1E293B; --text-main: #F1F5F9;
-            --text-sub: #94A3B8; --border: #334155; --accent: #6366F1;
-            --green: #10B981; --red: #EF4444; --orange: #F59E0B;
-            --glass: rgba(30, 41, 59, 0.7);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text-main); padding-bottom: 100px; overflow-x: hidden; }
-        
-        /* Layout Principal */
-        .glass-header { background: var(--header-bg); padding: 45px 25px; border-radius: 0 0 35px 35px; text-align: center; border-bottom: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .main-balance h1 { font-size: 2.8rem; margin: 10px 0; letter-spacing: -1px; font-weight: 800; }
-        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; margin-top: -25px; }
-        .stat-card { background: var(--card); padding: 18px; border-radius: 24px; border: 1px solid var(--border); backdrop-filter: blur(10px); }
-        
-        .entry-card { background: var(--card); padding: 18px; border-radius: 20px; margin: 0 20px 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
-        
-        /* Menu Inferior Estilizado */
-        .bottom-nav { position: fixed; bottom: 20px; left: 20px; right: 20px; background: var(--glass); backdrop-filter: blur(15px); display: flex; justify-content: space-around; padding: 15px; border-radius: 25px; border: 1px solid var(--border); z-index: 1000; }
-        .nav-btn { background: none; border: none; color: var(--text-sub); font-size: 0.75rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 600; }
-        .nav-btn.active { color: var(--accent); }
-        .nav-btn span { font-size: 1.4rem; }
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        /* DESIGN DA IA - MELHORADO */
-        #ai-layer { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 5000; flex-direction: column; }
-        .ai-header { padding: 30px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: var(--header-bg); }
-        #ai-chat-flow { flex: 1; overflow-y: auto; padding: 25px; display: flex; flex-direction: column; gap: 15px; background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.05), transparent); }
-        .msg { padding: 15px 20px; border-radius: 22px; max-width: 85%; font-size: 0.95rem; line-height: 1.5; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .msg-ai { background: var(--card); color: var(--text-main); border: 1px solid var(--accent); align-self: flex-start; border-bottom-left-radius: 5px; }
-        .msg-user { background: var(--accent); color: white; align-self: flex-end; border-bottom-right-radius: 5px; }
-        .ai-input-bar { padding: 20px; display: flex; gap: 12px; background: var(--header-bg); border-top: 1px solid var(--border); }
-        .ai-input-bar input { flex: 1; background: var(--bg); border: 1px solid var(--border); padding: 15px; border-radius: 15px; color: white; outline: none; }
-        .ai-input-bar button { background: var(--accent); border: none; width: 50px; height: 50px; border-radius: 15px; color: white; font-weight: bold; }
+<style>
+:root {
+    --bg: #020617;
+    --card: #0F172A;
+    --text-main: #E2E8F0;
+    --text-sub: #64748B;
+    --border: #1E293B;
 
-        /* Modal Novo Lançamento */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: flex-end; }
-        .modal-content { background: var(--card); width: 100%; padding: 35px; border-radius: 35px 35px 0 0; border-top: 3px solid var(--accent); animation: slideUp 0.4s ease-out; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        
-        .progress-bar { height: 10px; background: var(--border); border-radius: 5px; margin: 8px 0 18px; overflow: hidden; }
-        .progress-fill { height: 100%; transition: 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    </style>
+    --green: #22C55E;
+    --red: #EF4444;
+}
+
+body {
+    margin:0;
+    background:var(--bg);
+    color:var(--text-main);
+    font-family: Arial;
+}
+
+/* HEADER */
+header {
+    padding:30px;
+    text-align:center;
+}
+
+#saldo {
+    font-size:2.5rem;
+    color:var(--green);
+}
+
+/* CARD */
+.card {
+    background:var(--card);
+    margin:15px;
+    padding:20px;
+    border-radius:15px;
+    border:1px solid var(--border);
+}
+
+/* BOTÃO */
+button {
+    background:var(--green);
+    border:none;
+    padding:12px;
+    border-radius:10px;
+    color:#000;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+/* INPUT */
+input, select {
+    width:100%;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:#000;
+    color:#fff;
+}
+
+/* LISTA */
+.entry {
+    display:flex;
+    justify-content:space-between;
+    padding:10px 0;
+    border-bottom:1px solid var(--border);
+}
+
+/* IA */
+#ai-box {
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:#000;
+    padding:10px;
+}
+
+#chat {
+    max-height:150px;
+    overflow:auto;
+}
+
+.msg-ai { color:#22C55E; margin:5px 0; }
+.msg-user { color:#fff; margin:5px 0; }
+
+</style>
 </head>
+
 <body>
 
-    <!-- CAMADA DA IA -->
-    <div id="ai-layer">
-        <div class="ai-header">
-            <div>
-                <b style="color:var(--accent); font-size: 1.2rem; display: block;">MENTE FINANCEIRA</b>
-                <small style="color:var(--text-sub)">CFO Estratégico ON</small>
-            </div>
-            <button onclick="toggleAI(false)" style="background:var(--border); border:none; color:white; width:40px; height:40px; border-radius:50%; font-size:1.5rem;">&times;</button>
-        </div>
-        <div id="ai-chat-flow"></div>
-        <div class="ai-input-bar">
-            <input type="text" id="ai-query" placeholder="Pergunte sobre sua Gestão...">
-            <button onclick="callGroq()">🚀</button>
-        </div>
-    </div>
+<header>
+    <h1>💰 Finan Pro IA</h1>
+    <div id="saldo">R$ 0</div>
+</header>
 
-    <header class="glass-header">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-            <div style="font-weight:900; color:var(--accent); font-size: 1.1rem; letter-spacing: 1px;">FINAN PRO</div>
-            <button onclick="loginGoogle()" id="btnAuth" style="background:var(--accent); color:white; border:none; padding:10px 20px; border-radius:18px; font-weight:bold; font-size: 0.8rem;">LOGIN</button>
-        </div>
-        <div class="main-balance"><small style="color:var(--text-sub); font-weight: 700; letter-spacing: 2px;">SALDO ATUAL</small><h1 id="saldo">R$ 0,00</h1></div>
-    </header>
+<div class="card">
+    <h3>📊 Movimentos</h3>
+    <div id="lista"></div>
+</div>
 
-    <div class="stats-row">
-        <div class="stat-card"><small style="font-weight: 700; color: var(--text-sub);">RECEITAS</small><b id="res-rec" style="color:var(--green); display:block; font-size: 1.2rem; margin-top: 5px;">R$ 0,00</b></div>
-        <div class="stat-card"><small style="font-weight: 700; color: var(--text-sub);">DESPESAS</small><b id="res-des" style="color:var(--red); display:block; font-size: 1.2rem; margin-top: 5px;">R$ 0,00</b></div>
-    </div>
+<div class="card">
+    <h3>➕ Novo lançamento</h3>
 
-    <main style="margin-top:40px; padding-bottom: 50px;">
-        <div id="aba-dash">
-            <div style="margin: 0 20px; background: var(--card); padding: 25px; border-radius: 30px; border: 1px solid var(--border);"><canvas id="chartJS" style="max-height: 200px;"></canvas></div>
-            <div id="perc-labels" style="padding: 25px;"></div>
-        </div>
-        <div id="aba-extrato" style="display:none;">
-            <div style="padding:0 20px 15px;"><select id="filtroMes" onchange="carregarDados()" style="width: 100%; padding: 15px; border-radius: 15px; background: var(--card); color: white; border: 1px solid var(--border);"></select></div>
-            <div id="lista-transacoes"></div>
-        </div>
-    </main>
+    <input id="desc" placeholder="Descrição"><br><br>
+    <input id="valor" type="number" placeholder="Valor"><br><br>
 
-    <nav class="bottom-nav">
-        <button class="nav-btn active" onclick="showTab('aba-dash', this)"><span>📊</span>DASH</button>
-        <button class="nav-btn" onclick="openModal()"><span>➕</span>NOVO</button>
-        <button class="nav-btn" onclick="toggleAI(true)"><span>🧠</span>IA</button>
-        <button class="nav-btn" onclick="showTab('aba-extrato', this)"><span>📜</span>EXTRATO</button>
-    </nav>
+    <select id="tipo">
+        <option value="entrada">💰 Receita</option>
+        <option value="fixo">🏠 Fixo</option>
+        <option value="lazer">🍔 Lazer</option>
+        <option value="investimento">📈 Investimento</option>
+    </select><br><br>
 
-    <!-- MODAL LANÇAMENTO -->
-    <div class="modal" id="modalLanca">
-        <div class="modal-content">
-            <h3 style="margin-bottom:25px; text-align:center; font-weight: 800;">Novo Movimento</h3>
-            <input type="text" id="desc" placeholder="Ex: Mensalidade Faculdade">
-            <input type="number" id="valor" placeholder="Valor (R$)">
-            <input type="date" id="data">
-            <select id="tipo" style="width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 12px; background: var(--bg); color: white; border: 1px solid var(--border);">
-                <option value="entrada">💰 Receita (Entrada)</option>
-                <option value="fixo">🏠 Custo Fixo</option>
-                <option value="lazer">🍦 Lazer e Estilo de Vida</option>
-                <option value="investimento">📈 Reserva de Valor</option>
-            </select>
-            <button onclick="salvar()" id="btnSalvar" style="width:100%; padding:18px; background:var(--accent); color:white; border:none; border-radius:18px; font-weight:800; font-size: 1rem; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);">CONFIRMAR</button>
-            <button onclick="closeModal()" style="width:100%; background:none; border:none; color:var(--text-sub); margin-top:15px; font-weight: 600;">Fechar</button>
-        </div>
-    </div>
+    <button onclick="salvar()">Salvar</button>
+</div>
 
-    <script>
-        const firebaseConfig = { 
-            apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE", 
-            authDomain: "financaspro-1e0e8.firebaseapp.com", 
-            projectId: "financaspro-1e0e8", 
-            storageBucket: "financaspro-1e0e8.firebasestorage.app", 
-            messagingSenderId: "659521706556", 
-            appId: "1:659521706556:web:86f2174c4c8a89335ac139" 
-        };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        
-        const GROQ_KEY = "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"; 
-        
-        const meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
-        let chart = null;
-        let saldoGlobal = 0;
+<div id="ai-box">
+    <div id="chat"></div>
+    <input id="msg" placeholder="Ex: gastei 50 com pizza">
+    <button onclick="ia()">Enviar</button>
+</div>
 
-        const selectMes = document.getElementById('filtroMes');
-        meses.forEach(m => { const opt = document.createElement('option'); opt.value = m; opt.text = m.charAt(0).toUpperCase() + m.slice(1); selectMes.add(opt); });
-        selectMes.value = meses[new Date().getMonth()];
+<script>
 
-        async function loginGoogle() { try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); } catch(e) { console.error(e); } }
-        
-        function showTab(id, btn) { 
-            document.getElementById('aba-dash').style.display = id === 'aba-dash' ? 'block' : 'none';
-            document.getElementById('aba-extrato').style.display = id === 'aba-extrato' ? 'block' : 'none';
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
+// 🔐 COLE SUA CHAVE AQUI
+const GROQ_KEY = "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";
 
-        function openModal() { document.getElementById('data').value = new Date().toISOString().split('T')[0]; document.getElementById('modalLanca').style.display = 'flex'; }
-        function closeModal() { document.getElementById('modalLanca').style.display = 'none'; }
-        
-        function toggleAI(show) { 
-            const layer = document.getElementById('ai-layer');
-            layer.style.display = show ? 'flex' : 'none'; 
-            if(show && document.getElementById('ai-chat-flow').innerHTML === "") {
-                addMsg("ai", "Fala Henrique! Mente Financeira pronta. Vi o seu fluxo aqui, quer uma análise do 'game' hoje?");
-            }
-        }
+let dados = [];
 
-        async function carregarDados() {
-            if (!auth.currentUser) return;
-            const mesSel = document.getElementById('filtroMes').value;
-            const doc = await db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesSel).get();
-            let sal = 0, ent = 0, sai = 0, f = 0, l = 0, i = 0, html = "";
-            
-            if (doc.exists) {
-                const dados = doc.data().transacoes || [];
-                dados.sort((a,b) => b.timestamp - a.timestamp);
-                dados.forEach(t => {
-                    const v = Number(t.valor);
-                    if (t.tipo === 'entrada') { ent += v; sal += v; }
-                    else { sai += v; sal -= v; if(t.tipo==='fixo') f+=v; else if(t.tipo==='lazer') l+=v; else i+=v; }
-                    html += `<div class="entry-card"><div><b style="font-size:0.95rem;">${t.descricao}</b><br><small style="color:var(--text-sub)">${t.data}</small></div><span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}; font-weight:800;">${v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span></div>`;
-                });
-            }
-            saldoGlobal = sal;
-            document.getElementById('saldo').innerText = sal.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-            document.getElementById('res-rec').innerText = ent.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-            document.getElementById('res-des').innerText = sai.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-            document.getElementById('lista-transacoes').innerHTML = html || "<p style='text-align:center;padding:40px;opacity:0.3;'>Nenhum registro encontrado.</p>";
-            renderChart(f, l, i);
-        }
+// 🎨 EMOJIS
+function emoji(tipo){
+    return {
+        entrada:"💰",
+        fixo:"🏠",
+        lazer:"🍔",
+        investimento:"📈"
+    }[tipo];
+}
 
-        async function salvar() {
-            if (!auth.currentUser) return alert("Por favor, faça login.");
-            const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data').value, tp = document.getElementById('tipo').value;
-            if(!d || !v) return alert("Preencha os campos obrigatórios!");
+// 📊 RENDER
+function render(){
+    let saldo = 0;
+    let html = "";
 
-            const btn = document.getElementById('btnSalvar');
-            btn.disabled = true; btn.innerText = "SINCRONIZANDO...";
+    dados.forEach(t => {
+        if(t.tipo === "entrada") saldo += t.valor;
+        else saldo -= t.valor;
 
-            try {
-                const mesNome = meses[new Date(dt + "T12:00:00").getMonth()];
-                const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesNome);
-                
-                await ref.set({
-                    transacoes: firebase.firestore.FieldValue.arrayUnion({
-                        descricao: d, valor: parseFloat(v), tipo: tp, data: dt, timestamp: Date.now()
-                    })
-                }, { merge: true });
+        html += `
+        <div class="entry">
+            <span>${emoji(t.tipo)} ${t.desc}</span>
+            <span>
+                R$ ${t.valor}
+                <button onclick="del(${t.id})">🗑️</button>
+            </span>
+        </div>`;
+    });
 
-                // Sincronização Instantânea
-                await carregarDados(); 
-                closeModal();
-                
-                toggleAI(true);
-                callGroq(`Henrique, acabei de registrar no seu fluxo: ${d} de R$ ${v} (${tp}). O que você acha disso na nossa estratégia de Gestão Comercial?`);
-                
-            } catch(e) { alert("Erro ao salvar dados."); }
-            finally { btn.disabled = false; btn.innerText = "CONFIRMAR"; document.getElementById('desc').value = ""; document.getElementById('valor').value = ""; }
-        }
+    document.getElementById("saldo").innerText = "R$ " + saldo;
+    document.getElementById("lista").innerHTML = html;
 
-        function addMsg(role, text) {
-            const flow = document.getElementById('ai-chat-flow');
-            flow.innerHTML += `<div class="msg msg-${role}">${text}</div>`;
-            flow.scrollTop = flow.scrollHeight;
-        }
+    // ALERTAS
+    if(saldo < 0){
+        addAI("🚨 Você está no negativo. Corte custos URGENTE.");
+    }
+}
 
-        async function callGroq(manualText = null) {
-            const input = document.getElementById('ai-query');
-            const texto = manualText || input.value;
-            if(!texto) return;
+// 💾 SALVAR
+function salvar(){
+    const desc = document.getElementById("desc").value;
+    const valor = parseFloat(document.getElementById("valor").value);
+    const tipo = document.getElementById("tipo").value;
 
-            if(!manualText) addMsg("user", texto);
-            input.value = "";
+    if(!desc || !valor){
+        alert("Preencha os campos");
+        return;
+    }
 
-            try {
-                const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_KEY}` },
-                    body: JSON.stringify({ 
-                        model: "llama-3.1-8b-instant",
-                        messages: [
-                            { role: "system", content: "Você é a Mente Financeira de Henrique, aluno de Gestão Comercial. Responda como um mentor de negócios experiente. Use termos como 'markup', 'ebitda' e 'fluxo'. Saldo do Henrique agora: R$" + saldoGlobal },
-                            { role: "user", content: texto }
-                        ]
-                    })
-                });
-                const data = await res.json();
-                addMsg("ai", data.choices[0].message.content);
-            } catch(e) { addMsg("ai", "Erro de conexão, mas o foco no lucro não para!"); }
-        }
+    dados.push({
+        id: Date.now(),
+        desc,
+        valor,
+        tipo
+    });
 
-        function renderChart(f, l, i) {
-            const ctx = document.getElementById('chartJS').getContext('2d');
-            if(chart) chart.destroy();
-            chart = new Chart(ctx, {
-                type: 'doughnut',
-                data: { labels: ['Fixos', 'Lazer', 'Invest'], datasets: [{ data: [f||1, l||0, i||0], backgroundColor: ['#EF4444', '#F59E0B', '#6366F1'], borderWidth: 0, hoverOffset: 10 }] },
-                options: { cutout: '80%', plugins: { legend: { display: false } }, animation: { duration: 2000 } }
+    render();
+
+    // ALERTA INTELIGENTE
+    if(tipo === "lazer" && valor > 100){
+        addAI("⚠️ Gasto alto com lazer. Isso impacta sua evolução financeira.");
+    }
+
+    addAI(`✔️ Registrado: ${desc} R$${valor}`);
+}
+
+// 🗑️ DELETAR
+function del(id){
+    dados = dados.filter(t => t.id !== id);
+    render();
+}
+
+// 🤖 CHAT
+function addAI(msg){
+    document.getElementById("chat").innerHTML += `<div class="msg-ai">${msg}</div>`;
+}
+
+function addUser(msg){
+    document.getElementById("chat").innerHTML += `<div class="msg-user">${msg}</div>`;
+}
+
+// 🧠 IA
+async function ia(){
+    const texto = document.getElementById("msg").value;
+
+    if(!texto) return;
+
+    addUser(texto);
+    document.getElementById("msg").value = "";
+
+    // 💥 IA LANÇANDO DESPESA AUTOMÁTICA
+    if(texto.toLowerCase().includes("gastei") || texto.toLowerCase().includes("paguei")){
+        const valorMatch = texto.match(/\d+/);
+        if(valorMatch){
+            const valor = parseFloat(valorMatch[0]);
+            const desc = texto.replace(valorMatch[0], "").replace("gastei","").replace("paguei","");
+
+            dados.push({
+                id: Date.now(),
+                desc: desc.trim(),
+                valor,
+                tipo:"lazer"
             });
-            const total = (f + l + i) || 1;
-            document.getElementById('perc-labels').innerHTML = `
-                <div style="margin-bottom:15px;"><small style="font-weight:700">Custos Essenciais: ${((f/total)*100).toFixed(0)}%</small><div class="progress-bar"><div class="progress-fill" style="width:${(f/total)*100}%; background:var(--red)"></div></div></div>
-                <div><small style="font-weight:700">Reserva/Futuro: ${((i/total)*100).toFixed(0)}%</small><div class="progress-bar"><div class="progress-fill" style="width:${(i/total)*100}%; background:var(--accent)"></div></div></div>
-            `;
-        }
 
-        auth.onAuthStateChanged(user => { if (user) { document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0].toUpperCase(); carregarDados(); } });
-    </script>
+            render();
+            addAI("✔️ Lancei automaticamente pra você.");
+            return;
+        }
+    }
+
+    try {
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json",
+                "Authorization":"Bearer " + GROQ_KEY
+            },
+            body:JSON.stringify({
+                model:"llama-3.1-8b-instant",
+                messages:[
+                    {
+                        role:"system",
+                        content:`Você é um mentor financeiro rígido.
+- Dê bronca quando gastar mal
+- Alerte sobre riscos
+- Fale como gestor profissional`
+                    },
+                    { role:"user", content:texto }
+                ]
+            })
+        });
+
+        const data = await res.json();
+        addAI(data.choices[0].message.content);
+
+    } catch(e){
+        addAI("Erro ao conectar com IA.");
+    }
+}
+
+</script>
+
 </body>
 </html>
