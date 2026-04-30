@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FinançasPRO Premium</title>
+    <title>FinançasPRO AI</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#4F46E5">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -11,94 +11,107 @@
         :root {
             --bg: #F8FAFC; --header-bg: #FFFFFF; --card: #FFFFFF; --text-main: #1E293B;
             --text-sub: #64748B; --border: #E2E8F0; --accent: #4F46E5;
-            --green: #10B981; --orange: #F59E0B; --red: #EF4444;
+            --green: #10B981; --orange: #F59E0B; --red: #EF4444; --ai-gradient: linear-gradient(135.44deg, #4F46E5 0%, #7C3AED 100%);
         }
         body.dark-mode {
             --bg: #0F172A; --header-bg: #1E293B; --card: #1E293B; --text-main: #F1F5F9;
             --text-sub: #94A3B8; --border: #334155; --accent: #6366F1;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: var(--text-main); padding-bottom: 110px; transition: 0.3s; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text-main); padding-bottom: 110px; transition: 0.3s; overflow-x: hidden; }
         
-        /* Header */
-        .glass-header { background: var(--header-bg); padding: 50px 20px 40px; border-radius: 0 0 30px 30px; border-bottom: 1px solid var(--border); text-align: center; }
+        /* Header & Brand */
+        .glass-header { background: var(--header-bg); padding: 50px 20px 40px; border-radius: 0 0 30px 30px; border-bottom: 1px solid var(--border); text-align: center; position: relative; }
         .header-content { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .brand { font-weight: 800; font-size: 1.1rem; } .brand span { color: var(--accent); }
-        .user-pill { background: var(--accent); color: white; border: none; padding: 6px 15px; border-radius: 20px; font-weight: 800; font-size: 0.7rem; cursor: pointer; }
+        .ai-badge { background: var(--ai-gradient); color: white; padding: 5px 12px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; }
         
-        .main-balance h1 { font-size: 2.6rem; font-weight: 800; letter-spacing: -1.5px; }
-        .sparkline-box { height: 40px; width: 120px; margin: 0 auto; }
+        .main-balance h1 { font-size: 2.8rem; font-weight: 800; letter-spacing: -1.5px; }
 
-        /* Stats */
-        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; margin-top: -25px; }
-        .stat-card { background: var(--card); padding: 15px; border-radius: 22px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .stat-card b { display: block; font-size: 1.1rem; margin-top: 3px; }
+        /* Stats Grid */
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; margin-top: -25px; position: relative; z-index: 10; }
+        .stat-card { background: var(--card); padding: 18px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .stat-card b { display: block; font-size: 1.2rem; margin-top: 4px; }
 
-        /* Tabs & Cards */
-        .viz-card { background: var(--card); margin: 20px; padding: 20px; border-radius: 24px; border: 1px solid var(--border); }
+        /* AI Popup Assistant */
+        .ai-popup { display: none; position: fixed; bottom: 100px; left: 20px; right: 20px; background: var(--card); border: 2px solid var(--accent); border-radius: 24px; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); z-index: 3000; animation: popUp 0.4s cubic-bezier(0.17, 0.89, 0.32, 1.27); }
+        @keyframes popUp { from { opacity:0; transform: translateY(20px) scale(0.9); } to { opacity:1; transform: translateY(0) scale(1); } }
+        .ai-avatar { width: 40px; height: 40px; background: var(--ai-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; margin-bottom: 10px; }
+        .ai-message { font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px; font-weight: 500; }
+        .ai-btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 800; font-size: 0.8rem; cursor: pointer; }
+
+        /* Cards & Tabs */
+        .viz-card { background: var(--card); margin: 20px; padding: 22px; border-radius: 28px; border: 1px solid var(--border); }
         .tab-content { display: none; } .tab-content.active { display: block; }
         
-        /* Lista com Botão de Apagar */
-        .entry-card { background: var(--card); padding: 16px; border-radius: 18px; margin: 0 20px 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .btn-del { background: #fee2e2; color: #ef4444; border: none; padding: 6px 10px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; cursor: pointer; }
+        .entry-card { background: var(--card); padding: 18px; border-radius: 22px; margin: 0 20px 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .btn-del { background: #fee2e2; color: #ef4444; border: none; padding: 6px 12px; border-radius: 10px; font-size: 0.7rem; font-weight: 800; cursor: pointer; }
 
-        /* Navigation */
-        .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--header-bg); display: flex; justify-content: space-around; padding: 12px 0 30px; border-top: 1px solid var(--border); z-index: 1000; }
-        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; font-weight: 700; flex: 1; cursor: pointer; }
+        /* Nav & Actions */
+        .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--header-bg); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
+        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; font-weight: 700; flex: 1; cursor: pointer; }
         .nav-btn.active { color: var(--accent); }
-        .nav-btn span { font-size: 1.4rem; margin-bottom: 4px; }
+        .nav-btn span { font-size: 1.5rem; margin-bottom: 5px; }
 
-        .floating-btn { position: fixed; bottom: 95px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 28px; z-index: 999; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .floating-btn { position: fixed; bottom: 105px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--ai-gradient); color: white; border: none; font-size: 30px; z-index: 999; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 20px rgba(79, 70, 229, 0.4); }
 
-        /* Modal */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: flex-end; backdrop-filter: blur(5px); }
-        .modal-sheet { background: var(--card); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; }
-        .input-grid input, .input-grid select { width: 100%; padding: 15px; margin-bottom: 12px; border-radius: 14px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); font-size: 1rem; outline: none; }
+        /* Modal Premium */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); z-index: 4000; align-items: flex-end; backdrop-filter: blur(8px); }
+        .modal-sheet { background: var(--card); width: 100%; border-radius: 35px 35px 0 0; padding: 35px; }
+        .input-grid input, .input-grid select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 16px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); font-size: 1rem; outline: none; }
 
-        .progress-container { background: var(--bg); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 8px; }
-        .bar { height: 100%; transition: 1s ease; }
+        .progress-container { background: var(--bg); height: 10px; border-radius: 5px; overflow: hidden; margin-top: 8px; margin-bottom: 15px; }
+        .bar { height: 100%; transition: 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
     </style>
 </head>
 <body class="dark-mode">
 
+    <div id="ai-assistant" class="ai-popup">
+        <div class="ai-avatar">✨</div>
+        <div class="ai-message" id="ai-text">Analisando suas finanças...</div>
+        <button class="ai-btn" onclick="window.fecharAI()">ENTENDI, OBRIGADO!</button>
+    </div>
+
     <header class="glass-header">
         <div class="header-content">
-            <button onclick="window.toggleTheme()" style="background:none; border:none; font-size:1.4rem; cursor:pointer;">🌓</button>
-            <div class="brand">Finanças<span>PRO</span></div>
+            <button onclick="window.toggleTheme()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">🌓</button>
+            <button class="ai-badge" onclick="window.gerarInsightAI()">✨ IA ASSISTANT</button>
             <button id="btnAuth" class="user-pill" onclick="window.loginGoogle()">ENTRAR</button>
         </div>
         <div class="main-balance">
-            <small style="color: var(--text-sub); font-weight: 700; text-transform: uppercase; font-size: 0.65rem;">Saldo Disponível</small>
+            <small style="color: var(--text-sub); font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px;">Saldo em Carteira</small>
             <h1 id="saldo">R$ 0,00</h1>
-            <div class="sparkline-box"><canvas id="sparklineChart"></canvas></div>
         </div>
     </header>
 
     <div class="stats-row">
         <div class="stat-card">
-            <small>Receitas</small>
+            <small style="color:var(--text-sub); font-weight:700; font-size:0.6rem;">ENTRADAS</small>
             <b id="resumo-receita" style="color: var(--green)">R$ 0,00</b>
         </div>
         <div class="stat-card">
-            <small>Despesas</small>
+            <small style="color:var(--text-sub); font-weight:700; font-size:0.6rem;">SAÍDAS</small>
             <b id="resumo-despesa" style="color: var(--red)">R$ 0,00</b>
         </div>
     </div>
 
     <main>
         <section id="aba-dashboard" class="tab-content active">
-            <div class="viz-card"><canvas id="graficoPizza" style="max-height: 180px;"></canvas></div>
+            <div class="viz-card">
+                <canvas id="graficoPizza" style="max-height: 200px;"></canvas>
+            </div>
             <div id="metas-container" style="padding: 0 20px;"></div>
         </section>
 
         <section id="aba-invest" class="tab-content">
-            <div class="viz-card"><canvas id="graficoBarras" style="max-height: 180px;"></canvas></div>
+            <div class="viz-card">
+                <canvas id="graficoBarras" style="max-height: 200px;"></canvas>
+            </div>
             <div id="lista-invest"></div>
         </section>
 
         <section id="aba-extrato" class="tab-content">
             <div style="padding: 20px;">
-                <select id="filtroMes" class="input-grid" onchange="window.carregarDados()" style="margin-bottom: 10px;">
+                <select id="filtroMes" class="input-grid" onchange="window.carregarDados()">
                     <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
                     <option value="março">Março</option><option value="abril">Abril</option>
                     <option value="maio">Maio</option><option value="junho">Junho</option>
@@ -106,7 +119,6 @@
                     <option value="setembro">Setembro</option><option value="outubro">Outubro</option>
                     <option value="novembro">Novembro</option><option value="dezembro">Dezembro</option>
                 </select>
-                <button onclick="window.exportarCSV()" style="width:100%; padding:10px; background:none; border:1px solid var(--border); color:var(--text-main); border-radius:10px; font-weight:700; cursor:pointer;">📥 Exportar Planilha</button>
             </div>
             <div id="lista-geral"></div>
         </section>
@@ -123,8 +135,8 @@
     <div id="modal" class="modal-overlay" onclick="if(event.target==this) window.fecharModal()">
         <div class="modal-sheet">
             <div class="input-grid">
-                <input type="text" id="desc" placeholder="O que foi?">
-                <input type="number" step="0.01" id="valor" placeholder="Valor 0.00">
+                <input type="text" id="desc" placeholder="Ex: Mercado, Aluguel, Trade...">
+                <input type="number" step="0.01" id="valor" placeholder="Valor R$ 0,00">
                 <input type="date" id="data-reg">
                 <select id="tipo">
                     <option value="fixo">Essencial (50%)</option>
@@ -132,7 +144,7 @@
                     <option value="investimento">Investimento (20%)</option>
                     <option value="entrada">Receita (+)</option>
                 </select>
-                <button onclick="window.salvarRegistro()" style="width:100%; padding:16px; background:var(--accent); color:white; border:none; border-radius:14px; font-weight:800; cursor:pointer;">SALVAR</button>
+                <button onclick="window.salvarRegistro()" style="width:100%; padding:18px; background:var(--accent); color:white; border:none; border-radius:16px; font-weight:800; font-size:1.1rem; cursor:pointer;">CONFIRMAR</button>
             </div>
         </div>
     </div>
@@ -148,28 +160,21 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- FUNÇÕES GLOBAIS ---
+        // --- SISTEMA GLOBAL ---
         window.mesesNomes = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
-        window.chartP = null; window.chartB = null; window.spark = null;
-        window.transacoesCache = [];
+        window.chartP = null; window.chartB = null;
+        window.dadosAI = { f:0, l:0, i:0, rec:0 };
 
         window.loginGoogle = () => signInWithPopup(auth, new GoogleAuthProvider());
-
         window.switchTab = (id, btn) => {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            btn.classList.add('active');
+            document.getElementById(id).classList.add('active'); btn.classList.add('active');
         };
-
-        window.abrirModal = () => {
-            document.getElementById('data-reg').value = new Date().toISOString().split('T')[0];
-            document.getElementById('modal').style.display = 'flex';
-        };
-
+        window.abrirModal = () => { document.getElementById('data-reg').value = new Date().toISOString().split('T')[0]; document.getElementById('modal').style.display = 'flex'; };
         window.fecharModal = () => document.getElementById('modal').style.display = 'none';
-
         window.toggleTheme = () => document.body.classList.toggle('dark-mode');
+        window.fecharAI = () => document.getElementById('ai-assistant').style.display = 'none';
 
         const fmt = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -177,106 +182,112 @@
             if (!auth.currentUser) return;
             const mesSel = document.getElementById('filtroMes').value;
             let investAnual = Array(12).fill(0), saldo = 0, f = 0, l = 0, i = 0, rec = 0;
-            let htmlGeral = "", htmlInvest = "", sparkData = [0];
+            let htmlGeral = "", htmlInvest = "";
 
             const promises = window.mesesNomes.map(m => getDoc(doc(db, "usuarios", auth.currentUser.uid, "meses", m)));
             const snaps = await Promise.all(promises);
 
             snaps.forEach((snap, idx) => {
+                const mesNome = window.mesesNomes[idx];
                 if (snap.exists()) {
                     const trans = snap.data().transacoes || [];
-                    const mesNome = window.mesesNomes[idx];
-                    
-                    if(mesNome === mesSel) window.transacoesCache = trans;
-
                     trans.forEach((t, tIdx) => {
                         const v = parseFloat(t.valor);
                         if (t.tipo === 'investimento') investAnual[idx] += v;
-
                         if (mesNome === mesSel) {
                             if (t.tipo === 'entrada') { saldo += v; rec += v; }
                             else { saldo -= v; if(t.tipo==='fixo') f+=v; else if(t.tipo==='lazer') l+=v; else i+=v; }
-
-                            const itemHtml = `
+                            const item = `
                             <div class="entry-card">
                                 <div><b>${t.descricao}</b><br><small style="color:var(--text-sub)">${t.data.split('-')[2]}/${t.data.split('-')[1]}</small></div>
                                 <div style="text-align:right">
                                     <span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}; font-weight:800">${fmt(v)}</span><br>
-                                    <button class="btn-del" onclick="window.apagar('${mesNome}', ${tIdx})">Apagar</button>
+                                    <button class="btn-del" onclick="window.apagar('${mesNome}', ${tIdx})">Remover</button>
                                 </div>
                             </div>`;
-                            htmlGeral += itemHtml;
-                            if(t.tipo === 'investimento') htmlInvest += itemHtml;
+                            htmlGeral += item; if(t.tipo === 'investimento') htmlInvest += item;
                         }
                     });
                 }
             });
 
+            window.dadosAI = { f, l, i, rec };
             document.getElementById('saldo').innerText = fmt(saldo);
             document.getElementById('resumo-receita').innerText = fmt(rec);
             document.getElementById('resumo-despesa').innerText = fmt(f+l+i);
-            document.getElementById('lista-geral').innerHTML = htmlGeral || '<p style="text-align:center; padding:20px; opacity:0.5">Nenhum registro</p>';
+            document.getElementById('lista-geral').innerHTML = htmlGeral || '<p style="text-align:center; padding:20px; opacity:0.5">Sem registros</p>';
             document.getElementById('lista-invest').innerHTML = htmlInvest || '<p style="text-align:center; padding:20px; opacity:0.5">Sem aportes</p>';
             
             renderCharts(f, l, i, investAnual, rec);
         };
 
+        window.gerarInsightAI = () => {
+            const { f, l, i, rec } = window.dadosAI;
+            const popup = document.getElementById('ai-assistant');
+            const text = document.getElementById('ai-text');
+            popup.style.display = 'block';
+
+            if (rec === 0) {
+                text.innerHTML = "Olá, Henrique! Notei que ainda não temos receitas este mês. Que tal registrar seus ganhos para eu analisar seu perfil de investidor?";
+                return;
+            }
+
+            const pF = (f/rec)*100, pL = (l/rec)*100, pI = (i/rec)*100;
+            
+            if (pI < 20) {
+                text.innerHTML = `Henrique, seus investimentos estão em **${pI.toFixed(1)}%**. Para atingir a liberdade financeira, tente reduzir os gastos de Lazer (hoje em ${pL.toFixed(1)}%) e chegar nos 20% de aporte!`;
+            } else if (pF > 50) {
+                text.innerHTML = `Cuidado! Seus custos fixos ocupam **${pF.toFixed(1)}%** da renda. O ideal é 50%. Tente renegociar contratos ou reduzir contas fixas para ter mais oxigênio financeiro.`;
+            } else {
+                text.innerHTML = `Excelente gestão! Você está com **${pI.toFixed(1)}%** em aportes e custos controlados. Continue assim para potencializar seus juros compostos.`;
+            }
+        };
+
         function renderCharts(f, l, i, barras, rec) {
-            // Pizza
             const ctxP = document.getElementById('graficoPizza').getContext('2d');
             if(window.chartP) window.chartP.destroy();
             window.chartP = new Chart(ctxP, { type:'doughnut', data:{ labels:['Fixo','Lazer','Invest'], datasets:[{ data:[f||1, l, i], backgroundColor:['#EF4444','#F59E0B','#4F46E5'], borderWidth:0 }] }, options:{ cutout:'80%', plugins:{ legend:{ display:false } } } });
 
-            // Barras
             const ctxB = document.getElementById('graficoBarras').getContext('2d');
             if(window.chartB) window.chartB.destroy();
-            window.chartB = new Chart(ctxB, { type:'bar', data:{ labels:['J','F','M','A','M','J','J','A','S','O','N','D'], datasets:[{ data:barras, backgroundColor:'#4F46E5', borderRadius:5 }] }, options:{ plugins:{ legend:{display:false} }, scales:{ y:{display:false}, x:{grid:{display:false}} } } });
+            window.chartB = new Chart(ctxB, { type:'bar', data:{ labels:['J','F','M','A','M','J','J','A','S','O','N','D'], datasets:[{ data:barras, backgroundColor:'#4F46E5', borderRadius:8 }] }, options:{ plugins:{ legend:{display:false} }, scales:{ y:{display:false}, x:{grid:{display:false}, ticks:{color:'#94A3B8'}} } } });
 
-            // Metas Progress
             const base = rec || (f+l+i) || 1;
             const pct = (v) => Math.min(((v/base)*100), 100).toFixed(0);
             document.getElementById('metas-container').innerHTML = `
-                <small>Essencial (${pct(f)}%)</small><div class="progress-container"><div class="bar" style="width:${pct(f)}%; background:var(--red)"></div></div>
-                <small>Lazer (${pct(l)}%)</small><div class="progress-container"><div class="bar" style="width:${pct(l)}%; background:var(--orange)"></div></div>
-                <small>Investimento (${pct(i)}%)</small><div class="progress-container"><div class="bar" style="width:${pct(i)}%; background:var(--accent)"></div></div>
+                <div style="display:flex; justify-content:space-between;"><small style="font-weight:700">Essencial</small> <small style="font-weight:800">${pct(f)}%</small></div>
+                <div class="progress-container"><div class="bar" style="width:${pct(f)}%; background:var(--red)"></div></div>
+                <div style="display:flex; justify-content:space-between;"><small style="font-weight:700">Lazer</small> <small style="font-weight:800">${pct(l)}%</small></div>
+                <div class="progress-container"><div class="bar" style="width:${pct(l)}%; background:var(--orange)"></div></div>
+                <div style="display:flex; justify-content:space-between;"><small style="font-weight:700">Investimento</small> <small style="font-weight:800">${pct(i)}%</small></div>
+                <div class="progress-container"><div class="bar" style="width:${pct(i)}%; background:var(--accent)"></div></div>
             `;
         }
 
         window.salvarRegistro = async () => {
             const v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value;
-            if(!v || !dt) return alert("Preencha valor e data!");
+            if(!v || !dt) return alert("Valor e data são obrigatórios!");
             const mes = window.mesesNomes[parseInt(dt.split('-')[1]) - 1];
             const ref = doc(db, "usuarios", auth.currentUser.uid, "meses", mes);
             const snap = await getDoc(ref);
             let lista = snap.exists() ? snap.data().transacoes : [];
             lista.push({ descricao: document.getElementById('desc').value || "Gasto", valor: parseFloat(v), tipo: document.getElementById('tipo').value, data: dt });
-            await setDoc(ref, { transacoes: lista });
-            window.fecharModal(); window.carregarDados();
+            await setDoc(ref, { transacoes: lista }); window.fecharModal(); window.carregarDados();
         };
 
         window.apagar = async (mes, idx) => {
-            if(!confirm("Remover este item?")) return;
+            if(!confirm("Deseja apagar?")) return;
             const ref = doc(db, "usuarios", auth.currentUser.uid, "meses", mes);
             const snap = await getDoc(ref);
-            let lista = snap.data().transacoes;
-            lista.splice(idx, 1);
-            await setDoc(ref, { transacoes: lista });
-            window.carregarDados();
-        };
-
-        window.exportarCSV = () => {
-            let csv = "Data,Descricao,Tipo,Valor\n";
-            window.transacoesCache.forEach(t => csv += `${t.data},${t.descricao},${t.tipo},${t.valor}\n`);
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = 'extrato.csv'; a.click();
+            let lista = snap.data().transacoes; lista.splice(idx, 1);
+            await setDoc(ref, { transacoes: lista }); window.carregarDados();
         };
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0];
+                document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0].toUpperCase();
                 document.getElementById('filtroMes').value = window.mesesNomes[new Date().getMonth()];
-                window.carregarDados();
+                window.carregarDados().then(() => setTimeout(window.gerarInsightAI, 1500));
             }
         });
     </script>
