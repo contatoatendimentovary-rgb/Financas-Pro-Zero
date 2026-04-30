@@ -1,12 +1,12 @@
 {
   "name": "FinançasPRO",
-  "short_name": "FinançasPRO",
-  "description": "Gestão financeira inteligente e rápida",
+  "short_name": "FinanPro",
+  "description": "Gestão financeira inteligente",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#000000",
+  "background_color": "#050505",
   "theme_color": "#EAB308",
   "icons": [
     {
@@ -21,12 +21,5 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ],
-  "share_target": {
-    "action": "./index.html",
-    "method": "GET",
-    "params": {
-      "text": "text"
-    }
-  }
+  ]
 }
