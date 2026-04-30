@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finan Pro - Groq Cloud</title>
+    <title>Finan Pro - CFO Inteligente</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -23,90 +23,73 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: var(--text-main); padding-bottom: 110px; transition: 0.3s; overflow-x: hidden; }
-        
         .glass-header { background: var(--header-bg); padding: 50px 20px 40px; border-radius: 0 0 30px 30px; border-bottom: 1px solid var(--border); text-align: center; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .theme-toggle { background: var(--card); border: 1px solid var(--border); color: var(--text-main); padding: 8px 12px; border-radius: 12px; cursor: pointer; }
         .user-pill { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 800; cursor: pointer; font-size: 0.8rem; }
         .main-balance h1 { font-size: 2.8rem; font-weight: 800; letter-spacing: -1px; margin: 5px 0; }
-        
         .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; margin-top: -25px; position: relative; z-index: 10; }
         .stat-card { background: var(--card); padding: 18px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        
-        .viz-card { background: var(--card); margin: 20px; padding: 22px; border-radius: 28px; border: 1px solid var(--border); }
-        .tab-content { display: none; } .tab-content.active { display: block; }
-        
-        .entry-card { background: var(--card); padding: 16px; border-radius: 20px; margin: 0 20px 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        
-        .ai-popup { display: none; position: fixed; bottom: 100px; left: 15px; right: 15px; background: var(--card); border: 1px solid var(--accent); border-radius: 28px; padding: 22px; z-index: 3000; flex-direction: column; max-height: 70vh; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        .chat-area { flex: 1; overflow-y: auto; margin: 15px 0; font-size: 0.9rem; min-height: 200px; }
-        .chat-bubble { margin-bottom: 10px; padding: 12px; border-radius: 16px; max-width: 85%; line-height: 1.4; }
-        .ai-bubble { background: rgba(16, 185, 129, 0.1); color: var(--text-main); border-bottom-left-radius: 4px; }
+        .ai-popup { display: none; position: fixed; bottom: 100px; left: 15px; right: 15px; background: var(--card); border: 2px solid var(--green); border-radius: 28px; padding: 22px; z-index: 3000; flex-direction: column; max-height: 75vh; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        .chat-area { flex: 1; overflow-y: auto; margin: 15px 0; font-size: 0.85rem; min-height: 250px; scroll-behavior: smooth; }
+        .chat-bubble { margin-bottom: 12px; padding: 14px; border-radius: 18px; max-width: 90%; line-height: 1.5; font-weight: 500; }
+        .ai-bubble { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: var(--text-main); border-bottom-left-radius: 4px; }
         .user-bubble { background: var(--accent); color: white; margin-left: auto; border-bottom-right-radius: 4px; }
-        
         .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--header-bg); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
         .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; flex: 1; cursor: pointer; }
         .nav-btn.active { color: var(--accent); }
-        .nav-btn span { font-size: 1.4rem; margin-bottom: 4px; }
-        
-        .floating-btn { position: fixed; bottom: 115px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--ai-gradient); color: white; border: none; font-size: 24px; z-index: 999; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); z-index: 4000; align-items: flex-end; backdrop-filter: blur(4px); }
-        .modal-sheet { background: var(--card); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; border-top: 2px solid var(--accent); }
-        .input-grid input, .input-grid select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 15px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); outline: none; }
-        
-        .progress-container { background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; margin: 6px 0 12px; }
-        .bar { height: 100%; transition: 0.8s; }
+        .floating-btn { position: fixed; bottom: 115px; right: 20px; width: 65px; height: 65px; border-radius: 50%; background: var(--ai-gradient); color: white; border: none; font-size: 28px; z-index: 999; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4); }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 4000; align-items: flex-end; backdrop-filter: blur(8px); }
+        .modal-sheet { background: var(--card); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; border-top: 3px solid var(--green); }
+        .input-grid input, .input-grid select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 15px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); outline: none; font-size: 1rem; }
+        .progress-container { background: var(--border); height: 10px; border-radius: 5px; overflow: hidden; margin: 8px 0 15px; }
+        .bar { height: 100%; transition: 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     </style>
 </head>
 <body>
 
-    <!-- MODAL IA -->
     <div id="ai-modal" class="ai-popup">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <b style="color:var(--green); font-size: 0.8rem;">⚡ CONSULTOR GROQ PRO</b>
-            <button onclick="fecharAI()" style="background:none; border:none; font-size:1.5rem; color:var(--text-sub);">&times;</button>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:1.2rem;">🤖</span>
+                <b style="color:var(--green); font-size: 0.85rem; letter-spacing: 1px;">CFO VIRTUAL - FINAN PRO</b>
+            </div>
+            <button onclick="fecharAI()" style="background:none; border:none; font-size:1.8rem; color:var(--text-sub);">&times;</button>
         </div>
         <div class="chat-area" id="chat-historico">
-            <div class="chat-bubble ai-bubble">Olá Henrique! Analisando seu saldo via GroqCloud. Em que posso ajudar?</div>
+            <div class="chat-bubble ai-bubble">Henrique, sistema de Gestão Comercial ativo. Analisando seu ROI pessoal e margens de segurança...</div>
         </div>
-        <div style="display:flex; gap:8px;">
-            <input type="text" id="ai-input" placeholder="Perguntar..." style="flex:1; padding:12px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text-main);">
-            <button onclick="perguntarIA()" style="background:var(--accent); color:white; border:none; padding:0 15px; border-radius:12px; font-weight:bold;">OK</button>
+        <div style="display:flex; gap:8px; background:var(--bg); padding:8px; border-radius:15px; border:1px solid var(--border);">
+            <input type="text" id="ai-input" placeholder="Analisar fluxo de caixa..." style="flex:1; border:none; background:none; color:var(--text-main); outline:none; padding:8px;">
+            <button onclick="perguntarIA()" style="background:var(--green); color:white; border:none; padding:10px 20px; border-radius:10px; font-weight:bold; cursor:pointer;">ENVIAR</button>
         </div>
     </div>
 
     <header class="glass-header">
         <div class="header-top">
-            <button class="theme-toggle" onclick="toggleTheme()">☀️</button>
-            <div style="font-weight: 800; color: var(--accent);">Finan Pro</div>
-            <button id="btnAuth" class="user-pill" onclick="loginGoogle()">ENTRAR</button>
+            <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+            <div style="font-weight: 800; color: var(--accent); letter-spacing: 1px;">FINAN PRO</div>
+            <button id="btnAuth" class="user-pill" onclick="loginGoogle()">LOGIN</button>
         </div>
-        <div class="main-balance"><h1 id="saldo">R$ 0,00</h1><small style="color: var(--text-sub); font-weight: 700;">SALDO TOTAL</small></div>
+        <div class="main-balance"><h1 id="saldo">R$ 0,00</h1><small style="color: var(--text-sub); font-weight: 700; text-transform: uppercase;">Fluxo de Caixa Total</small></div>
     </header>
 
     <div class="stats-row">
-        <div class="stat-card"><small style="color:var(--text-sub); font-size: 0.6rem;">ENTRADAS</small><b id="resumo-receita" style="color: var(--green); display:block;">R$ 0,00</b></div>
-        <div class="stat-card"><small style="color:var(--text-sub); font-size: 0.6rem;">SAÍDAS</small><b id="resumo-despesa" style="color: var(--red); display:block;">R$ 0,00</b></div>
+        <div class="stat-card"><small style="color:var(--text-sub); font-size: 0.65rem; font-weight:800;">RECEITAS</small><b id="resumo-receita" style="color: var(--green); display:block; font-size: 1.1rem;">R$ 0,00</b></div>
+        <div class="stat-card"><small style="color:var(--text-sub); font-size: 0.65rem; font-weight:800;">DESPESAS</small><b id="resumo-despesa" style="color: var(--red); display:block; font-size: 1.1rem;">R$ 0,00</b></div>
     </div>
 
     <main>
         <section id="aba-dashboard" class="tab-content active">
-            <div class="viz-card"><canvas id="graficoPizza" style="max-height: 180px;"></canvas></div>
+            <div style="padding: 25px 20px 0; color: var(--text-sub); font-size: 0.75rem; font-weight: 800; display:flex; justify-content:space-between;">
+                <span>SAÚDE FINANCEIRA (50/30/20)</span>
+                <span id="label-meta-reserva" style="color:var(--accent);">Meta Reserva: R$ 1.000</span>
+            </div>
+            <div class="viz-card"><canvas id="graficoPizza" style="max-height: 200px;"></canvas></div>
             <div id="metas-container" style="padding: 0 20px;"></div>
         </section>
-        
         <section id="aba-extrato" class="tab-content">
-            <div style="padding: 20px;">
-                <select id="filtroMes" class="input-grid" onchange="carregarDados()">
-                    <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
-                    <option value="março">Março</option><option value="abril">Abril</option>
-                    <option value="maio">Maio</option><option value="junho">Junho</option>
-                    <option value="julho">Julho</option><option value="agosto">Agosto</option>
-                    <option value="setembro">Setembro</option><option value="outubro">Outubro</option>
-                    <option value="novembro">Novembro</option><option value="dezembro">Dezembro</option>
-                </select>
-            </div>
+            <div style="padding: 20px;"><select id="filtroMes" class="input-grid" onchange="carregarDados()"><option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option><option value="março">Março</option><option value="abril">Abril</option><option value="maio">Maio</option><option value="junho">Junho</option><option value="julho">Julho</option><option value="agosto">Agosto</option><option value="setembro">Setembro</option><option value="outubro">Outubro</option><option value="novembro">Novembro</option><option value="dezembro">Dezembro</option></select></div>
             <div id="lista-geral"></div>
         </section>
     </main>
@@ -116,43 +99,36 @@
     <nav class="bottom-tab-bar">
         <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active"><span>📊</span>DASH</button>
         <button onclick="abrirModalLançamento()" class="nav-btn"><span>➕</span>NOVO</button>
-        <button onclick="switchTab('aba-extrato', this)" class="nav-btn"><span>📜</span>EXTRATO</button>
+        <button onclick="switchTab('aba-extrato', this)" class="nav-btn"><span>📜</span>HISTÓRICO</button>
     </nav>
 
     <div id="modal" class="modal-overlay" onclick="if(event.target==this) fecharModal()">
         <div class="modal-sheet">
-            <h3 style="margin-bottom: 20px; text-align: center;">Novo Registro</h3>
+            <h3 style="margin-bottom: 25px; text-align: center; color:var(--text-main);">Lançamento Estratégico</h3>
             <div class="input-grid">
-                <input type="text" id="desc" placeholder="Descrição">
+                <input type="text" id="desc" placeholder="Ex: Investimento em Curso">
                 <input type="number" id="valor" placeholder="Valor R$">
                 <input type="date" id="data-reg">
                 <select id="tipo">
-                    <option value="fixo">Essencial (50%)</option>
-                    <option value="lazer">Lazer (30%)</option>
-                    <option value="investimento">Reserva (20%)</option>
-                    <option value="entrada">Receita (+)</option>
+                    <option value="fixo">Essencial (Sobrevivência)</option>
+                    <option value="lazer">Lazer (Qualidade de Vida)</option>
+                    <option value="investimento">Reserva (Futuro/ROI)</option>
+                    <option value="entrada">Receita (Aporte)</option>
                 </select>
-                <button onclick="salvarRegistro()" style="width:100%; padding:18px; background:var(--accent); color:white; border:none; border-radius:16px; font-weight:bold;">SALVAR</button>
+                <button onclick="salvarRegistro()" style="width:100%; padding:20px; background:var(--green); color:white; border:none; border-radius:18px; font-weight:800; font-size:1.1rem; cursor:pointer; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);">CONFIRMAR OPERAÇÃO</button>
             </div>
         </div>
     </div>
 
     <script>
-        // CONFIGURAÇÕES FIREBASE
-        const firebaseConfig = { 
-            apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE", 
-            authDomain: "financaspro-1e0e8.firebaseapp.com", 
-            projectId: "financaspro-1e0e8", 
-            storageBucket: "financaspro-1e0e8.firebasestorage.app", 
-            messagingSenderId: "659521706556", 
-            appId: "1:659521706556:web:86f2174c4c8a89335ac139" 
-        };
+        const firebaseConfig = { apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE", authDomain: "financaspro-1e0e8.firebaseapp.com", projectId: "financaspro-1e0e8", storageBucket: "financaspro-1e0e8.firebasestorage.app", messagingSenderId: "659521706556", appId: "1:659521706556:web:86f2174c4c8a89335ac139" };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
         
-        // CHAVE SOLICITADA
+        // CONFIGURAÇÃO GROQCLOUD
         const GROQ_API_KEY = "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"; 
+        const META_RESERVA_MENSAL = 1000.00;
 
         let chartP = null;
         let dadosFinanceiros = { rec:0, f:0, l:0, i:0, saldo:0 };
@@ -177,65 +153,80 @@
                     const v = parseFloat(t.valor);
                     if (t.tipo === 'entrada') { s += v; r += v; }
                     else { s -= v; if(t.tipo==='fixo') f+=v; else if(t.tipo==='lazer') l+=v; else i+=v; }
-                    html += `<div class="entry-card"><b>${t.descricao}</b> <span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">${v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span></div>`;
+                    html += `<div class="entry-card"><div><b>${t.descricao}</b><br><small style="color:var(--text-sub)">${t.data}</small></div> <span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}; font-weight:800;">${v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span></div>`;
                 });
             }
             dadosFinanceiros = { rec:r, f, l, i, saldo:s };
             document.getElementById('saldo').innerText = s.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
             document.getElementById('resumo-receita').innerText = r.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
             document.getElementById('resumo-despesa').innerText = (f+l+i).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-            document.getElementById('lista-geral').innerHTML = html || "<p style='text-align:center;padding:40px;opacity:0.5'>Sem registros.</p>";
+            document.getElementById('lista-geral').innerHTML = html || "<p style='text-align:center;padding:40px;opacity:0.5'>Nenhuma operação registrada.</p>";
             renderCharts(f, l, i);
         }
 
         async function salvarRegistro() {
             if (!auth.currentUser) return;
-            const v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value;
+            const v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value, ds = document.getElementById('desc').value, tp = document.getElementById('tipo').value;
+            if(!v || !ds) return alert("Preencha os dados!");
             const mes = mesesNomes[parseInt(dt.split('-')[1]) - 1];
             const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mes);
             const snap = await ref.get();
             let lista = snap.exists ? snap.data().transacoes : [];
-            lista.push({ descricao: document.getElementById('desc').value || "S/N", valor: v, tipo: document.getElementById('tipo').value, data: dt });
+            lista.push({ descricao: ds, valor: v, tipo: tp, data: dt });
             await ref.set({ transacoes: lista });
-            fecharModal(); carregarDados();
+            fecharModal(); 
+            await carregarDados();
+            
+            // DISPARO PROATIVO DA IA APÓS SALVAR
+            if(tp !== 'entrada') analiseProativa(ds, v);
         }
 
-        // IA VIA GROQCLOUD - LLAMA 3.1 8B (VERSÃO ESTÁVEL)
-        async function perguntarIA() {
+        async function analiseProativa(item, valor) {
+            abrirAI();
+            const chat = document.getElementById('chat-historico');
+            chat.innerHTML += `<div class="chat-bubble ai-bubble" style="border-left:4px solid var(--orange)">🔄 Analisando impacto de: <b>${item} (R$ ${valor})</b>...</div>`;
+            perguntarIA(`Acabei de gastar R$ ${valor} com ${item}. Isso prejudica minha meta de reserva de R$ ${META_RESERVA_MENSAL}? Analise meu 50/30/20 atual.`);
+        }
+
+        async function perguntarIA(perguntaCustom = null) {
             const input = document.getElementById('ai-input');
             const chat = document.getElementById('chat-historico');
-            if(!input.value) return;
+            const textoUser = perguntaCustom || input.value;
+            if(!textoUser) return;
             
-            const textoUser = input.value;
-            chat.innerHTML += `<div class="chat-bubble user-bubble">${textoUser}</div>`;
-            input.value = "";
+            if(!perguntaCustom) {
+                chat.innerHTML += `<div class="chat-bubble user-bubble">${textoUser}</div>`;
+                input.value = "";
+            }
             chat.scrollTop = chat.scrollHeight;
 
             try {
-                const promptSystem = `Você é o assistente financeiro do app Finan Pro. Henrique é estudante de Gestão Comercial. Responda de forma breve. Saldo: R$${dadosFinanceiros.saldo}. Gastos: Fixo R$${dadosFinanceiros.f}, Lazer R$${dadosFinanceiros.l}, Reserva R$${dadosFinanceiros.i}.`;
+                const promptSystem = `
+                    Você é o Diretor Financeiro (CFO) do Henrique, estudante de Gestão Comercial.
+                    CONTEXTO ATUAL: Saldo R$${dadosFinanceiros.saldo}, Essencial R$${dadosFinanceiros.f}, Lazer R$${dadosFinanceiros.l}, Reserva R$${dadosFinanceiros.i}.
+                    META DE RESERVA: R$${META_RESERVA_MENSAL}.
+                    REGRAS: 
+                    - Se o Henrique gastar em Lazer e ultrapassar 30% dos gastos totais, dê um "puxão de orelha" técnico.
+                    - Use termos: ROI, Fluxo de Caixa, Margem de Segurança, Gestão de Ativos.
+                    - Seja motivador se ele estiver perto da meta de reserva.
+                    - Responda em no máximo 3 parágrafos curtos.
+                `;
                 
                 const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${GROQ_API_KEY}`
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
                     body: JSON.stringify({ 
                         model: "llama-3.1-8b-instant",
-                        messages: [
-                            { role: "system", content: promptSystem },
-                            { role: "user", content: textoUser }
-                        ]
+                        messages: [{ role: "system", content: promptSystem }, { role: "user", content: textoUser }],
+                        temperature: 0.6
                     })
                 });
 
                 const data = await response.json();
-                if(data.error) throw new Error(data.error.message);
-
                 const botResposta = data.choices[0].message.content;
                 chat.innerHTML += `<div class="chat-bubble ai-bubble">${botResposta}</div>`;
             } catch (e) {
-                chat.innerHTML += `<div class="chat-bubble ai-bubble" style="color:var(--red)">Erro: Chave GROQ inválida ou limite atingido.</div>`;
+                chat.innerHTML += `<div class="chat-bubble ai-bubble" style="color:var(--red)">Erro na GroqCloud. Verifique sua cota ou chave API.</div>`;
             }
             chat.scrollTop = chat.scrollHeight;
         }
@@ -243,13 +234,23 @@
         function renderCharts(f, l, i) {
             const ctx = document.getElementById('graficoPizza').getContext('2d');
             if(chartP) chartP.destroy();
-            chartP = new Chart(ctx, { type:'doughnut', data:{ labels:['Fixo','Lazer','Reserva'], datasets:[{ data:[f||1, l||0, i||0], backgroundColor:['#EF4444','#F59E0B','#6366F1'], borderWidth:0 }] }, options:{ cutout:'80%', plugins:{legend:{display:false}} }});
+            chartP = new Chart(ctx, { type:'doughnut', data:{ labels:['Essencial','Lazer','Reserva'], datasets:[{ data:[f||1, l||0, i||0], backgroundColor:['#EF4444','#F59E0B','#6366F1'], borderWidth:0, hoverOffset: 10 }] }, options:{ cutout:'75%', plugins:{legend:{display:false}} }});
+            
             const totalGasto = (f+l+i) || 1;
             const pct = (v) => ((v/totalGasto)*100).toFixed(0);
+            const pctReservaMeta = ((i / META_RESERVA_MENSAL) * 100).toFixed(0);
+
             document.getElementById('metas-container').innerHTML = `
-                <div style="margin-top:15px;"><small>Essencial: ${pct(f)}%</small><div class="progress-container"><div class="bar" style="width:${pct(f)}%;background:var(--red)"></div></div>
-                <small>Lazer: ${pct(l)}%</small><div class="progress-container"><div class="bar" style="width:${pct(l)}%;background:var(--orange)"></div></div>
-                <small>Reserva: ${pct(i)}%</small><div class="progress-container"><div class="bar" style="width:${pct(i)}%;background:var(--accent)"></div></div></div>`;
+                <div style="margin-top:20px;">
+                    <div style="display:flex; justify-content:space-between;"><small>ESSENCIAL (Meta 50%)</small><b>${pct(f)}%</b></div>
+                    <div class="progress-container"><div class="bar" style="width:${pct(f)}%;background:var(--red)"></div></div>
+                    
+                    <div style="display:flex; justify-content:space-between;"><small>LAZER (Meta 30%)</small><b>${pct(l)}%</b></div>
+                    <div class="progress-container"><div class="bar" style="width:${pct(l)}%;background:var(--orange)"></div></div>
+                    
+                    <div style="display:flex; justify-content:space-between;"><small>PROGRESSO RESERVA (Meta R$${META_RESERVA_MENSAL})</small><b>${pctReservaMeta}%</b></div>
+                    <div class="progress-container"><div class="bar" style="width:${Math.min(pctReservaMeta, 100)}%;background:var(--green);box-shadow: 0 0 10px var(--green)"></div></div>
+                </div>`;
         }
 
         auth.onAuthStateChanged(user => { if (user) { document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0].toUpperCase(); document.getElementById('filtroMes').value = mesesNomes[new Date().getMonth()]; carregarDados(); } });
