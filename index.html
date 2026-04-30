@@ -19,19 +19,20 @@
             --bg: #0a0a0a;
             --card: #161616;
             --text: #ffffff;
-            --accent: #00e676;
-            --secondary: #2979ff;
+            --accent: #00e676; /* Verde Trader */
+            --essential: #f44336;
+            --lifestyle: #ffeb3b;
+            --invest: #2979ff;
         }
 
         body {
             margin: 0;
             background-color: var(--bg);
             color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Header Estilo App */
         header {
             background: var(--card);
             padding: env(safe-area-inset-top) 20px 15px 20px;
@@ -44,19 +45,9 @@
             border-bottom: 1px solid #222;
         }
 
-        .user-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            border: 2px solid var(--accent);
-            cursor: pointer;
-        }
+        .user-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--accent); }
 
-        .container {
-            padding: 20px;
-            max-width: 500px;
-            margin: auto;
-        }
+        .container { padding: 20px; max-width: 500px; margin: auto; }
 
         .card {
             background: var(--card);
@@ -66,84 +57,80 @@
             box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
 
-        /* Botão de Login Google */
-        .btn-google {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            background: white;
-            color: black;
-            border: none;
-            padding: 12px;
-            border-radius: 12px;
-            width: 100%;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* Utilitários */
-        .hidden { display: none !important; }
-        .balance { font-size: 2.2rem; font-weight: 800; color: var(--accent); margin: 10px 0; }
+        /* Dashboard e Barras */
+        .balance { font-size: 2.2rem; font-weight: 800; color: var(--accent); margin: 5px 0; }
         
+        .progress-container {
+            height: 10px;
+            display: flex;
+            border-radius: 5px;
+            overflow: hidden;
+            background: #333;
+            margin: 15px 0;
+        }
+        .progress-bar { height: 100%; transition: width 0.5s ease; }
+
+        /* Estilos de Input e Botões */
         input, select {
-            width: 100%;
-            padding: 14px;
-            margin: 8px 0;
-            border-radius: 12px;
-            border: 1px solid #333;
-            background: #222;
-            color: white;
-            box-sizing: border-box;
+            width: 100%; padding: 14px; margin: 8px 0; border-radius: 12px;
+            border: 1px solid #333; background: #222; color: white; box-sizing: border-box;
         }
 
         .btn-main {
-            background: var(--accent);
-            color: black;
-            border: none;
-            padding: 15px;
-            border-radius: 12px;
-            width: 100%;
-            font-weight: bold;
-            font-size: 1rem;
-            box-shadow: 0 4px 14px rgba(0, 230, 118, 0.3);
+            background: var(--accent); color: black; border: none; padding: 15px;
+            border-radius: 12px; width: 100%; font-weight: bold; font-size: 1rem;
+            cursor: pointer; margin-top: 10px;
         }
+
+        /* Chat IA */
+        .chat-box {
+            height: 200px; overflow-y: auto; background: #000;
+            padding: 10px; border-radius: 12px; border: 1px solid #222;
+            font-size: 0.9rem; margin-bottom: 10px;
+        }
+        .msg-user { color: var(--accent); margin-bottom: 8px; }
+        .msg-ai { color: #ccc; margin-bottom: 12px; border-bottom: 1px solid #222; padding-bottom: 5px; }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
 <header>
-    <div id="auth-status">
-        <span class="material-icons" id="login-icon">account_circle</span>
-    </div>
-    <div style="text-align: center;">
-        <strong style="letter-spacing: 1px;">FINAN PRO</strong>
-    </div>
-    <button onclick="toggleTheme()" style="background:none; border:none; color:white;">
-        <span class="material-icons">dark_mode</span>
+    <div id="auth-status"><span class="material-icons">account_circle</span></div>
+    <strong>FINAN PRO</strong>
+    <button onclick="auth.signOut()" style="background:none; border:none; color:white;">
+        <span class="material-icons">logout</span>
     </button>
 </header>
 
 <div class="container">
     <div id="login-screen" class="card">
-        <h2 style="text-align:center">Bem-vindo</h2>
-        <p style="text-align:center; color:#888;">Acesse sua conta para sincronizar seus dados financeiros.</p>
-        <button class="btn-google" onclick="loginGoogle()">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
+        <h2 style="text-align:center">Olá, Henrique</h2>
+        <button class="btn-main" style="background:white" onclick="loginGoogle()">
             Entrar com Google
         </button>
     </div>
 
     <div id="main-app" class="hidden">
         <div class="card" style="text-align: center;">
-            <small style="color: #888; text-transform: uppercase;">Saldo Disponível</small>
+            <small style="color: #888;">SALDO TOTAL ATUAL</small>
             <div class="balance" id="display-saldo">R$ 0,00</div>
+            
+            <div class="progress-container">
+                <div id="b-ess" class="progress-bar" style="background: var(--essential);"></div>
+                <div id="b-des" class="progress-bar" style="background: var(--lifestyle);"></div>
+                <div id="b-inv" class="progress-bar" style="background: var(--invest);"></div>
+            </div>
+            <div style="display:flex; justify-content:space-around; font-size:0.7rem;">
+                <span>🔴 50%</span><span>🟡 30%</span><span>🔵 20%</span>
+            </div>
         </div>
 
         <div class="card">
             <h3>Lançamento Rápido</h3>
-            <input type="text" id="desc" placeholder="O que você comprou/vendeu?">
-            <input type="number" id="valor" placeholder="Valor (0,00)" step="0.01">
+            <input type="text" id="desc" placeholder="Descrição">
+            <input type="number" id="valor" placeholder="Valor R$" step="0.01">
             <select id="cat">
                 <option value="50">Essencial (50%)</option>
                 <option value="30">Desejos (30%)</option>
@@ -151,11 +138,22 @@
             </select>
             <button class="btn-main" onclick="salvarOperacao()">Adicionar</button>
         </div>
+
+        <div class="card">
+            <h3>Assistente de Gestão</h3>
+            <div id="chat-box" class="chat-box"></div>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="ia-prompt" placeholder="Perguntar sobre margem ou mercado...">
+                <button onclick="perguntarIA()" style="width:50px; background:var(--accent); border-radius:12px; border:none;">
+                    <span class="material-icons" style="vertical-align:middle">send</span>
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-    // --- SUA CONFIGURAÇÃO DO FIREBASE ---
+    // --- CONFIGURAÇÃO FIREBASE ---
     const firebaseConfig = {
         apiKey: "SUA_API_KEY",
         authDomain: "SEU_DOMINIO.firebaseapp.com",
@@ -165,81 +163,97 @@
         appId: "SEU_APP_ID"
     };
 
-    // Inicialização
+    const GEMINI_KEY = "AQ.Ab8RN6I0HBcnj_r4GU5euHnkGszaF6janYmUoxfyF_lKvbQteg";
+
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // --- LÓGICA DE AUTH REFEITA ---
-    
-    // 1. Função de Login com Redirecionamento (Melhor para PWA/Mobile)
+    // --- AUTH ---
     function loginGoogle() {
         const provider = new firebase.auth.GoogleAuthProvider();
-        // Usar signInWithPopup para desktop ou signInWithRedirect para mobile
-        auth.signInWithPopup(provider).catch(err => alert("Erro ao logar: " + err.message));
+        auth.signInWithPopup(provider);
     }
 
-    // 2. Observador de Estado (O Coração do App)
     auth.onAuthStateChanged(user => {
-        const loginScreen = document.getElementById('login-screen');
-        const mainApp = document.getElementById('main-app');
-        const authStatus = document.getElementById('auth-status');
-
         if (user) {
-            // Usuário Logado
-            loginScreen.classList.add('hidden');
-            mainApp.classList.remove('hidden');
-            authStatus.innerHTML = `<img src="${user.photoURL}" class="user-avatar" onclick="logout()">`;
-            
-            // Iniciar escuta de dados em tempo real
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            document.getElementById('auth-status').innerHTML = `<img src="${user.photoURL}" class="user-avatar">`;
             syncDados(user.uid);
         } else {
-            // Usuário Deslogado
-            loginScreen.classList.remove('hidden');
-            mainApp.classList.add('hidden');
-            authStatus.innerHTML = `<span class="material-icons">account_circle</span>`;
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('main-app').classList.add('hidden');
+            document.getElementById('auth-status').innerHTML = `<span class="material-icons">account_circle</span>`;
         }
     });
 
-    function logout() {
-        if(confirm("Deseja sair da conta?")) auth.signOut();
-    }
-
-    // --- LÓGICA DE DADOS (FIRESTORE) ---
-
+    // --- DADOS ---
     function salvarOperacao() {
         const user = auth.currentUser;
-        if (!user) return;
+        const desc = document.getElementById('desc').value;
+        const valor = parseFloat(document.getElementById('valor').value);
+        const cat = document.getElementById('cat').value;
 
-        const dados = {
-            descricao: document.getElementById('desc').value,
-            valor: parseFloat(document.getElementById('valor').value),
-            categoria: document.getElementById('cat').value,
-            data: firebase.firestore.FieldValue.serverTimestamp()
-        };
+        if(!desc || isNaN(valor)) return;
 
-        if(!dados.descricao || isNaN(dados.valor)) return alert("Preencha os campos corretamente");
-
-        db.collection("users").doc(user.uid).collection("financas").add(dados)
-            .then(() => {
-                document.getElementById('desc').value = "";
-                document.getElementById('valor').value = "";
-            });
+        db.collection("users").doc(user.uid).collection("financas").add({
+            desc, valor, cat, data: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+            document.getElementById('desc').value = "";
+            document.getElementById('valor').value = "";
+        });
     }
 
     function syncDados(uid) {
         db.collection("users").doc(uid).collection("financas")
             .orderBy("data", "desc")
             .onSnapshot(snapshot => {
-                let total = 0;
+                let total = 0, e = 0, d = 0, i = 0;
                 snapshot.forEach(doc => {
-                    total += doc.data().valor;
+                    const data = doc.data();
+                    total += data.valor;
+                    if(data.cat === "50") e += data.valor;
+                    if(data.cat === "30") d += data.valor;
+                    if(data.cat === "20") i += data.valor;
                 });
-                document.getElementById('display-saldo').innerText = 
-                    total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+                document.getElementById('display-saldo').innerText = total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+                
+                if(total > 0) {
+                    document.getElementById('b-ess').style.width = (e/total*100) + "%";
+                    document.getElementById('b-des').style.width = (d/total*100) + "%";
+                    document.getElementById('b-inv').style.width = (i/total*100) + "%";
+                }
             });
     }
-</script>
 
+    // --- IA GEMINI ---
+    async function perguntarIA() {
+        const prompt = document.getElementById('ia-prompt').value;
+        const box = document.getElementById('chat-box');
+        if(!prompt) return;
+
+        box.innerHTML += `<div class="msg-user"><b>Você:</b> ${prompt}</div>`;
+        document.getElementById('ia-prompt').value = "";
+
+        const context = `Contexto: Usuário Henrique, estudante de Gestão Comercial e Trader. 
+                         Saldo atual: ${document.getElementById('display-saldo').innerText}. 
+                         Pergunta: ${prompt}`;
+
+        try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {
+                method: "POST",
+                body: JSON.stringify({ contents: [{ parts: [{ text: context }] }] })
+            });
+            const data = await res.json();
+            const text = data.candidates[0].content.parts[0].text;
+            box.innerHTML += `<div class="msg-ai"><b>Finan Pro:</b> ${text}</div>`;
+            box.scrollTop = box.scrollHeight;
+        } catch (e) {
+            box.innerHTML += `<div class="msg-ai">Erro ao conectar com a IA.</div>`;
+        }
+    }
+</script>
 </body>
 </html>
