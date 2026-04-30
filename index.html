@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finan Pro - Gestão Comercial</title>
+    <title>Finan Pro - CFO Digital</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -18,37 +18,49 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: var(--text-main); padding-bottom: 100px; }
+        
+        /* Header & Stats */
         .glass-header { background: var(--header-bg); padding: 40px 20px; border-radius: 0 0 30px 30px; text-align: center; border-bottom: 1px solid var(--border); }
         .main-balance h1 { font-size: 2.5rem; margin: 10px 0; }
         .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 20px; margin-top: -20px; }
         .stat-card { background: var(--card); padding: 15px; border-radius: 20px; border: 1px solid var(--border); }
+        
+        /* UI Elements */
         .entry-card { background: var(--card); padding: 15px; border-radius: 15px; margin: 0 20px 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--header-bg); display: flex; justify-content: space-around; padding: 15px 0 30px; border-top: 1px solid var(--border); }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--header-bg); display: flex; justify-content: space-around; padding: 15px 0 30px; border-top: 1px solid var(--border); z-index: 1000; }
         .nav-btn { background: none; border: none; color: var(--text-sub); font-size: 0.7rem; cursor: pointer; }
         .nav-btn.active { color: var(--accent); }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: flex-end; }
-        .modal-content { background: var(--card); width: 100%; padding: 30px; border-radius: 30px 30px 0 0; }
-        input, select { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: white; }
+        
+        /* Modais */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: flex-end; }
+        .modal-content { background: var(--card); width: 100%; padding: 30px; border-radius: 30px 30px 0 0; border-top: 2px solid var(--accent); }
+        input, select { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: white; outline: none; }
+        
+        /* Chat IA Corrigido */
+        .ai-window { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 3000; flex-direction: column; padding: 20px; }
+        .chat-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+        #chat-flow { flex: 1; overflow-y: auto; padding: 20px 0; display: flex; flex-direction: column; gap: 10px; }
+        .bubble { padding: 12px 16px; border-radius: 18px; max-width: 85%; font-size: 0.95rem; line-height: 1.4; }
+        .ai-msg { background: var(--card); color: var(--text-main); border: 1px solid var(--accent); align-self: flex-start; border-bottom-left-radius: 4px; }
+        .user-msg { background: var(--accent); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .chat-input-area { display: flex; gap: 10px; padding: 10px 0; }
+        
         .progress-bar { height: 8px; background: var(--border); border-radius: 4px; margin: 5px 0 15px; overflow: hidden; }
         .progress-fill { height: 100%; transition: 0.5s; }
-        .ai-popup { display: none; position: fixed; bottom: 100px; left: 15px; right: 15px; background: var(--card); border: 1px solid var(--accent); border-radius: 28px; padding: 22px; z-index: 3000; flex-direction: column; max-height: 70vh; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
-        .chat-area { flex: 1; overflow-y: auto; margin: 15px 0; font-size: 0.9rem; min-height: 200px; }
-        .chat-bubble { margin-bottom: 12px; padding: 14px; border-radius: 18px; max-width: 90%; line-height: 1.4; }
-        .ai-bubble { background: rgba(99, 102, 241, 0.1); color: var(--text-main); border-bottom-left-radius: 4px; }
-        .user-bubble { background: var(--accent); color: white; margin-left: auto; border-bottom-right-radius: 4px; }
     </style>
 </head>
 <body>
 
-    <div id="ai-modal" class="ai-popup">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <b style="color:var(--accent);">Mente Financeira</b>
-            <button onclick="fecharAI()" style="background:none; border:none; font-size:1.8rem; color:var(--text-sub);">&times;</button>
+    <!-- Janela de Chat IA -->
+    <div id="ai-window" class="ai-window">
+        <div class="chat-header">
+            <b style="color:var(--accent);">MENTE FINANCEIRA</b>
+            <button onclick="fecharAI()" style="background:none; border:none; color:white; font-size:1.5rem;">&times;</button>
         </div>
-        <div class="chat-area" id="chat-historico"></div>
-        <div style="display:flex; gap:8px;">
-            <input type="text" id="ai-input" placeholder="Dúvida sobre o fluxo?" style="flex:1;">
-            <button onclick="perguntarIA()" style="background:var(--accent); color:white; border:none; padding:10px; border-radius:10px; font-weight:bold;">IR</button>
+        <div id="chat-flow"></div>
+        <div class="chat-input-area">
+            <input type="text" id="ai-pergunta" placeholder="Pergunte sobre seu saldo..." style="margin:0;">
+            <button onclick="enviarParaIA()" style="background:var(--accent); border:none; padding:15px; border-radius:12px; color:white; font-weight:bold;">IR</button>
         </div>
     </div>
 
@@ -57,7 +69,7 @@
             <div style="font-weight:800; color:var(--accent)">FINAN PRO</div>
             <button onclick="loginGoogle()" id="btnAuth" style="background:var(--accent); color:white; border:none; padding:8px 15px; border-radius:15px; font-weight:bold;">LOGIN</button>
         </div>
-        <div class="main-balance"><small>SALDO TOTAL</small><h1 id="saldo">R$ 0,00</h1></div>
+        <div class="main-balance"><small>FLUXO DE CAIXA</small><h1 id="saldo">R$ 0,00</h1></div>
     </header>
 
     <div class="stats-row">
@@ -82,20 +94,21 @@
         <button class="nav-btn" onclick="showTab('aba-extrato', this)">📜 EXTRATO</button>
     </div>
 
+    <!-- Modal Lançamento -->
     <div class="modal" id="modalLanca">
         <div class="modal-content">
-            <h3 style="margin-bottom:20px; text-align:center;">Novo Lançamento</h3>
-            <input type="text" id="desc" placeholder="Ex: Almoço">
+            <h3 style="margin-bottom:20px; text-align:center;">Novo Registro</h3>
+            <input type="text" id="desc" placeholder="O que você comprou/recebeu?">
             <input type="number" id="valor" placeholder="Valor">
             <input type="date" id="data">
             <select id="tipo">
                 <option value="entrada">💰 Receita</option>
-                <option value="fixo">🏠 Fixo</option>
+                <option value="fixo">🏠 Custo Fixo</option>
                 <option value="lazer">🍦 Lazer</option>
                 <option value="investimento">📈 Reserva</option>
             </select>
-            <button onclick="salvar()" id="btnSalvar" style="width:100%; padding:15px; background:var(--accent); color:white; border:none; border-radius:12px; font-weight:bold;">CONFIRMAR</button>
-            <button onclick="closeModal()" style="width:100%; background:none; border:none; color:var(--text-sub); margin-top:10px;">Voltar</button>
+            <button onclick="salvar()" id="btnSalvar" style="width:100%; padding:15px; background:var(--accent); color:white; border:none; border-radius:12px; font-weight:bold;">SALVAR AGORA</button>
+            <button onclick="closeModal()" style="width:100%; background:none; border:none; color:var(--text-sub); margin-top:10px;">Cancelar</button>
         </div>
     </div>
 
@@ -112,28 +125,30 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
         
-        // CHAVE API INSERIDA AQUI
+        // SUA CHAVE CONFIGURADA
         const GROQ_API_KEY = "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"; 
         
         const meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
         let meuGrafico = null;
-        let resumoGlobal = { saldo: 0 };
+        let saldoAtual = 0;
 
         const selectMes = document.getElementById('filtroMes');
         meses.forEach(m => { const opt = document.createElement('option'); opt.value = m; opt.text = m.charAt(0).toUpperCase() + m.slice(1); selectMes.add(opt); });
         selectMes.value = meses[new Date().getMonth()];
 
         async function loginGoogle() { try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); } catch(e) { console.error(e); } }
+        
         function showTab(id, btn) { 
             document.getElementById('aba-dash').style.display = id === 'aba-dash' ? 'block' : 'none';
             document.getElementById('aba-extrato').style.display = id === 'aba-extrato' ? 'block' : 'none';
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
         }
+
         function openModal() { document.getElementById('data').value = new Date().toISOString().split('T')[0]; document.getElementById('modalLanca').style.display = 'flex'; }
         function closeModal() { document.getElementById('modalLanca').style.display = 'none'; }
-        function abrirAI() { document.getElementById('ai-modal').style.display = 'flex'; }
-        function fecharAI() { document.getElementById('ai-modal').style.display = 'none'; }
+        function abrirAI() { document.getElementById('ai-window').style.display = 'flex'; }
+        function fecharAI() { document.getElementById('ai-window').style.display = 'none'; }
 
         async function carregarDados() {
             if (!auth.currentUser) return;
@@ -151,18 +166,18 @@
                     html += `<div class="entry-card"><div><b>${t.descricao}</b><br><small>${t.data}</small></div><span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">${v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span></div>`;
                 });
             }
-            resumoGlobal.saldo = sal;
+            saldoAtual = sal;
             document.getElementById('saldo').innerText = sal.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
             document.getElementById('res-rec').innerText = ent.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
             document.getElementById('res-des').innerText = sai.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-            document.getElementById('lista-transacoes').innerHTML = html || "<p style='text-align:center;padding:20px;opacity:0.5;'>Vazio.</p>";
+            document.getElementById('lista-transacoes').innerHTML = html || "<p style='text-align:center;padding:20px;opacity:0.5;'>Nenhum dado este mês.</p>";
             atualizarGrafico(f, l, i);
         }
 
         async function salvar() {
-            if (!auth.currentUser) return alert("Logue primeiro!");
+            if (!auth.currentUser) return alert("Faça login primeiro!");
             const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data').value, tp = document.getElementById('tipo').value;
-            if(!d || !v || !dt) return alert("Preencha tudo!");
+            if(!d || !v) return alert("Preencha descrição e valor!");
 
             const btn = document.getElementById('btnSalvar');
             btn.disabled = true; btn.innerText = "GRAVANDO...";
@@ -178,30 +193,40 @@
 
                 closeModal();
                 await carregarDados(); 
+                
+                // GATILHO IA AUTOMÁTICO
                 abrirAI();
-                perguntarIA(tp === 'entrada' ? `Henrique, entrou R$ ${v} de ${d}.` : `Gastei R$ ${v} com ${d}.`);
-            } catch(e) { console.error(e); }
-            finally { btn.disabled = false; btn.innerText = "CONFIRMAR"; document.getElementById('desc').value = ""; document.getElementById('valor').value = ""; }
+                const promptIA = tp === 'entrada' ? `Henrique, acabei de registrar um ganho de R$ ${v} com ${d}. Como isso ajuda no meu fluxo?` : `Henrique, gastei R$ ${v} com ${d}. Esse gasto de ${tp} está dentro do esperado?`;
+                enviarParaIA(promptIA);
+
+            } catch(e) { alert("Erro ao salvar no banco."); }
+            finally { btn.disabled = false; btn.innerText = "SALVAR AGORA"; document.getElementById('desc').value = ""; document.getElementById('valor').value = ""; }
         }
 
-        async function perguntarIA(perguntaExtra = null) {
-            const input = document.getElementById('ai-input'), chat = document.getElementById('chat-historico');
-            const texto = perguntaExtra || input.value;
+        async function enviarParaIA(promptManual = null) {
+            const input = document.getElementById('ai-pergunta'), chat = document.getElementById('chat-flow');
+            const texto = promptManual || input.value;
             if(!texto) return;
-            if(!perguntaExtra) { chat.innerHTML += `<div class="chat-bubble user-bubble">${texto}</div>`; input.value = ""; }
-            
+
+            if(!promptManual) { chat.innerHTML += `<div class="bubble user-msg">${texto}</div>`; input.value = ""; }
+            chat.scrollTop = chat.scrollHeight;
+
             try {
-                const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
                     body: JSON.stringify({ 
                         model: "llama-3.1-8b-instant",
-                        messages: [{ role: "system", content: "Você é o parceiro de negócios do Henrique. Ele estuda Gestão Comercial. Seja direto, humano e use termos como 'fluxo' e 'game'. Saldo: R$" + resumoGlobal.saldo }, { role: "user", content: texto }]
+                        messages: [
+                            { role: "system", content: "Você é o mentor financeiro do Henrique. Ele é estudante de Gestão Comercial. Seja direto, use termos de negócios e ajude-o a manter o foco no lucro e na reserva. Saldo atual: R$" + saldoAtual },
+                            { role: "user", content: texto }
+                        ]
                     })
                 });
-                const data = await res.json();
-                chat.innerHTML += `<div class="chat-bubble ai-bubble">${data.choices[0].message.content}</div>`;
-            } catch(e) { chat.innerHTML += `<div class="chat-bubble ai-bubble">Bora focar no jogo, a IA deu um soluço aqui.</div>`; }
+                const data = await response.json();
+                const respostaIA = data.choices[0].message.content;
+                chat.innerHTML += `<div class="bubble ai-msg">${respostaIA}</div>`;
+            } catch(e) { chat.innerHTML += `<div class="bubble ai-msg">Erro na conexão com a mente digital. Tente novamente!</div>`; }
             chat.scrollTop = chat.scrollHeight;
         }
 
@@ -215,7 +240,7 @@
             });
             const total = (f + l + i) || 1;
             document.getElementById('perc-labels').innerHTML = `
-                <small>Fixos: ${((f/total)*100).toFixed(0)}%</small><div class="progress-bar"><div class="progress-fill" style="width:${(f/total)*100}%; background:var(--red)"></div></div>
+                <small>Essencial: ${((f/total)*100).toFixed(0)}%</small><div class="progress-bar"><div class="progress-fill" style="width:${(f/total)*100}%; background:var(--red)"></div></div>
                 <small>Lazer: ${((l/total)*100).toFixed(0)}%</small><div class="progress-bar"><div class="progress-fill" style="width:${(l/total)*100}%; background:var(--orange)"></div></div>
             `;
         }
