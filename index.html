@@ -281,31 +281,4 @@
         }
 
         window.salvarRegistro = async () => {
-            const v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value;
-            if(!v || !dt) return alert("Preencha todos os campos!");
-            const mes = window.mesesNomes[parseInt(dt.split('-')[1]) - 1];
-            const ref = doc(db, "usuarios", auth.currentUser.uid, "meses", mes);
-            const snap = await getDoc(ref);
-            let lista = snap.exists() ? snap.data().transacoes : [];
-            lista.push({ descricao: document.getElementById('desc').value || "Movimentação", valor: parseFloat(v), tipo: document.getElementById('tipo').value, data: dt });
-            await setDoc(ref, { transacoes: lista }); window.fecharModal(); window.carregarDados();
-        };
-
-        window.apagar = async (mes, idx) => {
-            if(!confirm("Remover este registro?")) return;
-            const ref = doc(db, "usuarios", auth.currentUser.uid, "meses", mes);
-            const snap = await getDoc(ref);
-            let lista = snap.data().transacoes; lista.splice(idx, 1);
-            await setDoc(ref, { transacoes: lista }); window.carregarDados();
-        };
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0].toUpperCase();
-                document.getElementById('filtroMes').value = window.mesesNomes[new Date().getMonth()];
-                window.carregarDados();
-            }
-        });
-    </script>
-</body>
-</html>
+            const v = document.getElementById('valor').value, dt = document.getElementById('data-r
