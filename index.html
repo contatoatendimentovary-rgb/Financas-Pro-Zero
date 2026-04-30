@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FinançasPRO | Henrique</title>
+    <title>FinançasPRO | Finan</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#EAB308">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -13,8 +13,9 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: var(--text); padding-bottom: 120px; transition: 0.3s; overflow-x: hidden; }
         
-        #loader { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; font-weight: 800; color: var(--accent); }
-        .hidden { display: none !important; }
+        /* Loader Corrigido - Não bloqueia cliques */
+        #loader { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999; font-weight: 800; color: var(--accent); pointer-events: none; transition: opacity 0.5s; }
+        .hidden { opacity: 0 !important; display: none !important; }
 
         .glass-header { padding: 40px 20px 30px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; }
         .viz-card { background: var(--card); margin: 15px; padding: 22px; border-radius: 28px; border: 1px solid var(--border); }
@@ -24,36 +25,35 @@
         .bar-bg { background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 12px; }
         .bar-fill { height: 100%; transition: 0.5s; }
 
-        .invest-summary { display: flex; justify-content: space-between; margin: 0 15px 15px; gap: 10px; }
-        .invest-stat { background: var(--card); flex: 1; padding: 15px; border-radius: 20px; border: 1px solid var(--border); text-align: center; }
-        .invest-stat span { display: block; font-size: 0.65rem; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 5px; }
-
         .entry-card { background: var(--card); padding: 16px; border-radius: 18px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .btn-del { color: var(--red); background: none; border: none; font-weight: 800; padding: 10px; font-size: 1.1rem; }
+        .btn-del { color: var(--red); background: none; border: none; font-weight: 800; padding: 10px; }
 
         .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--bg); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid var(--border); z-index: 1000; }
-        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-weight: 700; font-size: 0.75rem; gap: 4px; }
+        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-weight: 700; font-size: 0.75rem; gap: 4px; cursor: pointer; }
         .nav-btn.active { color: var(--accent); }
         
-        .floating-btn { position: fixed; bottom: 110px; right: 20px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); border: none; font-size: 30px; font-weight: 800; z-index: 999; color: #000; }
-        
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: flex-end; }
-        .modal-sheet { background: var(--bg); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; border-top: 1px solid var(--border); animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        /* Botões Flutuantes */
+        .floating-btn { position: fixed; bottom: 110px; right: 20px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); border: none; font-size: 30px; font-weight: 800; z-index: 999; color: #000; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .ia-btn { position: fixed; bottom: 110px; left: 20px; width: 60px; height: 60px; border-radius: 20px; background: #2563eb; border: none; font-size: 24px; z-index: 999; color: #fff; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
 
-        .input-grid input, .input-grid select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 14px; border: 1px solid var(--border); background: var(--card); color: var(--text); outline: none; font-size: 1rem; }
-        .btn-save { width: 100%; padding: 18px; background: var(--accent); border: none; border-radius: 16px; font-weight: 800; color: #000; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: flex-end; }
+        .modal-sheet { background: var(--bg); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; border-top: 1px solid var(--border); }
+
+        .input-grid input, .input-grid select { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 14px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 1rem; }
+        .btn-save { width: 100%; padding: 18px; background: var(--accent); border: none; border-radius: 16px; font-weight: 800; color: #000; cursor: pointer; }
         
         .tab-content { display: none; } .tab-content.active { display: block; }
 
-        /* Estilo Chat IA */
-        .chat-container { margin: 15px; background: #000; border-radius: 20px; padding: 15px; border: 1px solid #222; }
-        #chat-output { height: 100px; overflow-y: auto; font-size: 0.85rem; color: #ccc; margin-bottom: 10px; }
+        /* Modal Finan IA */
+        #chat-content { height: 300px; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 15px; }
+        .msg { padding: 10px 15px; border-radius: 12px; max-width: 85%; font-size: 0.9rem; }
+        .msg.ia { background: #1e293b; color: #fff; align-self: flex-start; }
+        .msg.user { background: var(--accent); color: #000; align-self: flex-end; font-weight: 600; }
     </style>
 </head>
 <body>
 
-    <div id="loader">SINCRONIZANDO...</div>
+    <div id="loader">CARREGANDO...</div>
 
     <header class="glass-header">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
@@ -69,52 +69,15 @@
             <div class="viz-card">
                 <canvas id="graficoPizza" style="max-height: 180px;"></canvas>
                 <div class="progress-box">
-                    <div class="prog-item">
-                        <div class="prog-label"><span>Essencial</span><span id="txt-fixo">0%</span></div>
-                        <div class="bar-bg"><div id="bar-fixo" class="bar-fill" style="background:#EF4444; width:0%"></div></div>
-                    </div>
-                    <div class="prog-item">
-                        <div class="prog-label"><span>Lazer</span><span id="txt-lazer">0%</span></div>
-                        <div class="bar-bg"><div id="bar-lazer" class="bar-fill" style="background:#F97316; width:0%"></div></div>
-                    </div>
-                    <div class="prog-item">
-                        <div class="prog-label"><span>Investimento</span><span id="txt-invest">0%</span></div>
-                        <div class="bar-bg"><div id="bar-invest" class="bar-fill" style="background:#FDE047; width:0%"></div></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="chat-container">
-                <div id="chat-output">Olá Henrique! Como posso ajudar na sua gestão hoje?</div>
-                <div style="display:flex; gap:5px;">
-                    <input type="text" id="ia-input" placeholder="Perguntar à IA..." style="flex:1; background:#111; border:1px solid #333; color:white; padding:10px; border-radius:10px; outline:none;">
-                    <button onclick="window.perguntarIA()" style="background:var(--accent); border:none; padding:10px; border-radius:10px; font-weight:bold;">OK</button>
+                    <div class="prog-item"><div class="prog-label"><span>Essencial</span><span id="txt-fixo">0%</span></div><div class="bar-bg"><div id="bar-fixo" class="bar-fill" style="background:#EF4444; width:0%"></div></div></div>
+                    <div class="prog-item"><div class="prog-label"><span>Lazer</span><span id="txt-lazer">0%</span></div><div class="bar-bg"><div id="bar-lazer" class="bar-fill" style="background:#F97316; width:0%"></div></div></div>
+                    <div class="prog-item"><div class="prog-label"><span>Investimento</span><span id="txt-invest">0%</span></div><div class="bar-bg"><div id="bar-invest" class="bar-fill" style="background:#FDE047; width:0%"></div></div></div>
                 </div>
             </div>
         </section>
 
-        <section id="aba-aportes" class="tab-content">
-            <div class="invest-summary">
-                <div class="invest-stat"><span>Anual</span><b id="total-anual-invest">R$ 0,00</b></div>
-                <div class="invest-stat"><span>Média</span><b id="media-invest">R$ 0,00</b></div>
-            </div>
-            <div class="viz-card"><canvas id="graficoBarrasAnual" style="max-height: 200px;"></canvas></div>
-            <div id="lista-investimentos" style="padding: 0 20px;"></div>
-        </section>
-
-        <section id="aba-extrato" class="tab-content">
-            <div style="padding: 10px 20px;">
-                <select id="filtroMes" class="input-grid" onchange="window.carregarDados()">
-                    <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
-                    <option value="março">Março</option><option value="abril">Abril</option>
-                    <option value="maio">Maio</option><option value="junho">Junho</option>
-                    <option value="julho">Julho</option><option value="agosto">Agosto</option>
-                    <option value="setembro">Setembro</option><option value="outubro">Outubro</option>
-                    <option value="novembro">Novembro</option><option value="dezembro">Dezembro</option>
-                </select>
-            </div>
-            <div id="lista-geral" style="padding: 0 20px;"></div>
-        </section>
+        <section id="aba-aportes" class="tab-content"><div id="lista-investimentos" style="padding: 20px;"></div></section>
+        <section id="aba-extrato" class="tab-content"><div id="lista-geral" style="padding: 20px;"></div></section>
     </main>
 
     <nav class="bottom-tab-bar">
@@ -123,24 +86,37 @@
         <button onclick="window.switchTab('aba-extrato', this)" class="nav-btn">📜 Extrato</button>
     </nav>
 
-    <button onclick="abrirModal()" class="floating-btn">+</button>
+    <button onclick="window.abrirIA()" class="ia-btn">🤖</button>
+    <button onclick="window.abrirModal()" class="floating-btn">+</button>
 
     <div id="modal" class="modal-overlay">
         <div class="modal-sheet">
-            <h3 style="margin-bottom:20px; font-weight:800;">Novo Registro</h3>
+            <h3 style="margin-bottom:20px; font-weight:800;">Novo Lançamento</h3>
             <div class="input-grid">
                 <input type="text" id="desc" placeholder="Descrição">
-                <input type="number" step="0.01" id="valor" placeholder="R$ 0,00">
+                <input type="number" id="valor" placeholder="R$ 0,00">
                 <input type="date" id="data-reg">
                 <select id="tipo">
-                    <option value="lazer">Lazer (-)</option>
-                    <option value="fixo">Essencial (-)</option>
-                    <option value="entrada">Receita (+)</option>
-                    <option value="investimento">Investimento (-)</option>
+                    <option value="fixo">Essencial</option><option value="lazer">Lazer</option>
+                    <option value="investimento">Investimento</option><option value="entrada">Receita</option>
                 </select>
             </div>
             <button onclick="window.salvarRegistro()" class="btn-save">SALVAR</button>
-            <button onclick="fecharModal()" style="width:100%; background:none; border:none; color:var(--text-sub); padding:20px;">CANCELAR</button>
+            <button onclick="window.fecharModal()" style="width:100%; border:none; background:none; color:#888; padding:15px;">FECHAR</button>
+        </div>
+    </div>
+
+    <div id="modalIA" class="modal-overlay">
+        <div class="modal-sheet">
+            <h3 style="margin-bottom:15px; font-weight:800;">Falar com <span style="color:#2563eb">Finan</span></h3>
+            <div id="chat-content">
+                <div class="msg ia">Olá Henrique! Sou o Finan. Como posso te ajudar com seus trades ou sua gestão hoje?</div>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="ia-input" placeholder="Diga algo..." style="flex:1; background:#111; border:1px solid #333; color:white; padding:15px; border-radius:12px; outline:none;">
+                <button onclick="window.perguntarIA()" style="background:#2563eb; color:white; border:none; padding:15px; border-radius:12px; font-weight:bold;">ENVIAR</button>
+            </div>
+            <button onclick="window.fecharIA()" style="width:100%; border:none; background:none; color:#888; padding:15px;">FECHAR</button>
         </div>
     </div>
 
@@ -150,7 +126,6 @@
         import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // CONFIGURAÇÃO DO HENRIQUE
         const firebaseConfig = {
             apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE",
             authDomain: "financaspro-1e0e8.firebaseapp.com",
@@ -164,40 +139,32 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Globais para o restante dos scripts
-        window.auth = auth;
-        window.db = db;
+        window.auth = auth; window.db = db;
         window.f_doc = doc; window.f_setDoc = setDoc; window.f_getDoc = getDoc;
         window.mesesNomes = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
 
-        // Motor de Auth v10
         setPersistence(auth, browserLocalPersistence).then(() => {
-            getRedirectResult(auth).catch(e => console.log("Erro Redirect:", e));
+            getRedirectResult(auth).catch(e => console.log("Erro Auth:", e));
         });
 
         onAuthStateChanged(auth, (user) => {
             document.getElementById('loader').classList.add('hidden');
             if (user) {
                 document.getElementById('btnAuth').innerText = user.displayName.split(' ')[0].toUpperCase();
-                document.getElementById('filtroMes').value = window.mesesNomes[new Date().getMonth()];
                 window.carregarDados();
             } else {
                 document.getElementById('btnAuth').innerText = "ENTRAR";
-                document.getElementById('saldo').innerText = "R$ 0,00";
             }
         });
 
         window.gerenciarAuth = () => {
-            if (auth.currentUser) {
-                if (confirm("Sair do FinançasPRO?")) signOut(auth);
-            } else {
-                signInWithRedirect(auth, new GoogleAuthProvider());
-            }
+            if (auth.currentUser) { signOut(auth); }
+            else { signInWithRedirect(auth, new GoogleAuthProvider()); }
         };
     </script>
-    
+
     <script>
-        let chartP, chartB;
+        let chartP;
 
         window.switchTab = (id, btn) => {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -206,115 +173,70 @@
             btn.classList.add('active');
         };
 
-        window.carregarDados = async function() {
+        window.carregarDados = async () => {
             const user = window.auth.currentUser; if (!user) return;
-            const mesSel = document.getElementById('filtroMes').value;
-            let investMeses = Array(12).fill(0), totalAnualI = 0, saldoM = 0, fixo = 0, lazer = 0, invest = 0, totalReceita = 0;
-            let htmlGeral = "", htmlInvest = "";
-
-            const promises = window.mesesNomes.map(m => window.f_getDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", m)));
-            const snapshots = await Promise.all(promises);
-
-            snapshots.forEach((snap, i) => {
-                const mesNome = window.mesesNomes[i];
-                if (snap.exists()) {
-                    const transacoes = snap.data().transacoes || [];
-                    transacoes.forEach((t, idx) => {
-                        const v = parseFloat(t.valor);
-                        if (t.tipo === 'investimento') { investMeses[i] += v; totalAnualI += v; }
-                        if (mesNome === mesSel) {
-                            if (t.tipo === 'entrada') { saldoM += v; totalReceita += v; }
-                            else { 
-                                saldoM -= v; 
-                                if(t.tipo === 'fixo') fixo += v; 
-                                else if(t.tipo === 'lazer') lazer += v; 
-                                else invest += v;
-                            }
-                            const card = `<div class="entry-card">
-                                <div><b>${t.descricao}</b><br><small>${t.data.split('-').reverse().join('/')}</small></div>
-                                <div style="display:flex; align-items:center;">
-                                    <b style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}">R$ ${v.toFixed(2)}</b>
-                                    <button class="btn-del" onclick="window.apagarRegistro('${mesNome}', ${idx})">×</button>
-                                </div>
-                            </div>`;
-                            htmlGeral += card; if(t.tipo === 'investimento') htmlInvest += card;
-                        }
-                    });
-                }
-            });
-
-            document.getElementById('saldo').innerText = saldoM.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
-            document.getElementById('total-anual-invest').innerText = totalAnualI.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
-            document.getElementById('media-invest').innerText = (totalAnualI/12).toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
-            document.getElementById('lista-geral').innerHTML = htmlGeral || '<p style="text-align:center; color:#555">Nenhuma transação.</p>';
-            document.getElementById('lista-investimentos').innerHTML = htmlInvest || '<p style="text-align:center; color:#555">Sem aportes.</p>';
+            let saldoM = 0, fixo = 0, lazer = 0, invest = 0;
+            const mesAtual = window.mesesNomes[new Date().getMonth()];
+            const snap = await window.f_getDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", mesAtual));
             
-            renderPizza(fixo, lazer, invest);
-            renderBarras(investMeses);
-            atualizarRegra503020(fixo, lazer, invest, totalReceita);
-        };
-
-        function atualizarRegra503020(f, l, i, receita) {
-            const total = receita || (f + l + i);
-            const pF = total ? Math.min((f/total)*100, 100) : 0;
-            const pL = total ? Math.min((l/total)*100, 100) : 0;
-            const pI = total ? Math.min((i/total)*100, 100) : 0;
-            document.getElementById('bar-fixo').style.width = pF + '%';
-            document.getElementById('txt-fixo').innerText = pF.toFixed(0) + '% / 50%';
-            document.getElementById('bar-lazer').style.width = pL + '%';
-            document.getElementById('txt-lazer').innerText = pL.toFixed(0) + '% / 30%';
-            document.getElementById('bar-invest').style.width = pI + '%';
-            document.getElementById('txt-invest').innerText = pI.toFixed(0) + '% / 20%';
-        }
-
-        window.apagarRegistro = async (mes, index) => {
-            if(!confirm("Apagar?")) return;
-            const user = window.auth.currentUser;
-            const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mes);
-            const snap = await window.f_getDoc(ref);
-            if(snap.exists()){
-                let lista = snap.data().transacoes;
-                lista.splice(index, 1);
-                await window.f_setDoc(ref, { transacoes: lista });
-                window.carregarDados();
+            if (snap.exists()) {
+                snap.data().transacoes.forEach(t => {
+                    const v = parseFloat(t.valor);
+                    if (t.tipo === 'entrada') saldoM += v;
+                    else {
+                        saldoM -= v;
+                        if(t.tipo === 'fixo') fixo += v;
+                        else if(t.tipo === 'lazer') lazer += v;
+                        else invest += v;
+                    }
+                });
             }
-        };
-
-        window.salvarRegistro = async () => {
-            const user = window.auth.currentUser;
-            const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value, t = document.getElementById('tipo').value;
-            if(!dt || !v) return alert("Preencha Valor e Data");
-            const mesAlvo = window.mesesNomes[parseInt(dt.split('-')[1]) - 1];
-            const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mesAlvo);
-            const snap = await window.f_getDoc(ref);
-            let lista = snap.exists() ? snap.data().transacoes : [];
-            lista.push({ descricao: d || "Gasto", valor: v, tipo: t, data: dt });
-            await window.f_setDoc(ref, { transacoes: lista });
-            fecharModal(); window.carregarDados();
+            document.getElementById('saldo').innerText = saldoM.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+            renderPizza(fixo, lazer, invest);
         };
 
         function renderPizza(f, l, i) {
             const ctx = document.getElementById('graficoPizza').getContext('2d');
             if(chartP) chartP.destroy();
-            chartP = new Chart(ctx, { type: 'doughnut', data: { labels: ['Essencial', 'Lazer', 'Invest'], datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }] }, options: { cutout: '75%', plugins: { legend: { display: false } } } });
+            chartP = new Chart(ctx, { type: 'doughnut', data: { datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F97316', '#FDE047'], borderWidth: 0 }] }, options: { cutout: '80%' } });
         }
 
-        function renderBarras(dados) {
-            const ctx = document.getElementById('graficoBarrasAnual').getContext('2d');
-            if(chartB) chartB.destroy();
-            chartB = new Chart(ctx, { type: 'bar', data: { labels: ['J','F','M','A','M','J','J','A','S','O','N','D'], datasets: [{ data: dados, backgroundColor: '#FDE047', borderRadius: 4 }] }, options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } } });
-        }
+        window.salvarRegistro = async () => {
+            const user = window.auth.currentUser;
+            const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value, t = document.getElementById('tipo').value;
+            if(!v || !dt) return alert("Dados incompletos");
+            const mesAlvo = window.mesesNomes[parseInt(dt.split('-')[1]) - 1];
+            const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mesAlvo);
+            const snap = await window.f_getDoc(ref);
+            let lista = snap.exists() ? snap.data().transacoes : [];
+            lista.push({ descricao: d, valor: v, tipo: t, data: dt });
+            await window.f_setDoc(ref, { transacoes: lista });
+            window.fecharModal(); window.carregarDados();
+        };
 
         window.perguntarIA = async () => {
             const prompt = document.getElementById('ia-input').value;
-            const out = document.getElementById('chat-output');
+            const chat = document.getElementById('chat-content');
             if(!prompt) return;
-            out.innerText = "Pensando...";
+            chat.innerHTML += `<div class="msg user">${prompt}</div>`;
+            document.getElementById('ia-input').value = "";
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AQ.Ab8RN6I0HBcnj_r4GU5euHnkGszaF6janYmUoxfyF_lKvbQteg`, {
                     method: "POST", headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ contents: [{ parts: [{ text: `Analise para o Henrique (Gestor Comercial/Trader): ${prompt}. Saldo: ${document.getElementById('saldo').innerText}` }] }] })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt + " (Responda como Finan, o assistente do Henrique)" }] }] })
                 });
                 const data = await res.json();
-                out.innerText = data.candidates[0].content.parts[0].text;
-            } catch (e) { out
+                chat.innerHTML += `<div class="msg ia">${data.candidates[0].content.parts[0].text}</div>`;
+            } catch (e) { chat.innerHTML += `<div class="msg ia">Erro na conexão.</div>`; }
+            chat.scrollTop = chat.scrollHeight;
+        };
+
+        window.abrirModal = () => document.getElementById('modal').style.display = 'flex';
+        window.fecharModal = () => document.getElementById('modal').style.display = 'none';
+        window.abrirIA = () => document.getElementById('modalIA').style.display = 'flex';
+        window.fecharIA = () => document.getElementById('modalIA').style.display = 'none';
+        window.toggleTheme = () => document.body.classList.toggle('light-mode');
+    </script>
+</body>
+</html>
+
