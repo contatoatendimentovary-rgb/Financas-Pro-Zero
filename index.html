@@ -70,22 +70,22 @@
     <div id="ai-modal" class="ai-popup">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <b style="font-size:0.9rem; color:var(--accent)">✨ GEMINI ASSISTENTE</b>
-            <button onclick="window.fecharAI()" style="background:none; border:none; font-size:1.8rem; color:var(--text-sub); cursor:pointer;">&times;</button>
+            <button onclick="fecharAI()" style="background:none; border:none; font-size:1.8rem; color:var(--text-sub); cursor:pointer;">&times;</button>
         </div>
         <div class="chat-area" id="chat-historico">
-            <div class="chat-bubble ai-bubble">Olá! Sou o Gemini, integrado ao Finan Pro. Como posso ajudar com seus relatórios comerciais ou distribuição 50/30/20 hoje?</div>
+            <div class="chat-bubble ai-bubble">Olá! Sou o Gemini, integrado ao Finan Pro. Como posso ajudar com a gestão das finanças hoje?</div>
         </div>
         <div style="display:flex; gap:10px;">
             <input type="text" id="ai-input" placeholder="Pergunte sobre gestão..." style="flex:1; padding:15px; border-radius:15px; border:1px solid var(--border); background:var(--bg); color:var(--text-main); outline:none;">
-            <button onclick="window.perguntarIA()" style="background:var(--accent); color:white; border:none; padding:0 20px; border-radius:15px; font-weight:800; cursor:pointer;">ENVIAR</button>
+            <button onclick="perguntarIA()" style="background:var(--accent); color:white; border:none; padding:0 20px; border-radius:15px; font-weight:800; cursor:pointer;">ENVIAR</button>
         </div>
     </div>
 
     <header class="glass-header">
         <div class="header-top">
-            <button class="theme-toggle" onclick="window.toggleTheme()" id="btn-theme">☀️</button>
+            <button class="theme-toggle" onclick="toggleTheme()" id="btn-theme">☀️</button>
             <div style="font-size: 1.2rem; font-weight: 800; color: var(--accent);">Finan Pro</div>
-            <button id="btnAuth" class="user-pill" onclick="window.loginGoogle()">ENTRAR</button>
+            <button id="btnAuth" class="user-pill" onclick="loginGoogle()">ENTRAR</button>
         </div>
         <div class="main-balance">
             <small style="color: var(--text-sub); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Saldo Disponível</small>
@@ -110,12 +110,13 @@
                 <p style="font-size: 0.8rem; font-weight: 700; margin-bottom: 15px; color: var(--text-sub);">DISTRIBUIÇÃO (50/30/20)</p>
                 <canvas id="graficoPizza" style="max-height: 180px;"></canvas>
             </div>
-            <div id="metas-container" style="padding: 0 20px;"></div>
+            <div id="metas-container" style="padding: 0 20px;">
+                </div>
         </section>
 
         <section id="aba-extrato" class="tab-content">
             <div style="padding: 20px;">
-                <select id="filtroMes" class="input-grid" onchange="window.carregarDados()" style="margin-bottom: 0;">
+                <select id="filtroMes" class="input-grid" onchange="carregarDados()" style="margin-bottom: 0;">
                     <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
                     <option value="março">Março</option><option value="abril">Abril</option>
                     <option value="maio">Maio</option><option value="junho">Junho</option>
@@ -128,15 +129,15 @@
         </section>
     </main>
 
-    <button class="floating-btn" onclick="window.abrirAI()">✨</button>
+    <button class="floating-btn" onclick="abrirAI()">✨</button>
 
     <nav class="bottom-tab-bar">
-        <button onclick="window.switchTab('aba-dashboard', this)" class="nav-btn active"><span>📊</span>DASH</button>
-        <button onclick="window.abrirModalLançamento()" class="nav-btn"><span>➕</span>NOVO</button>
-        <button onclick="window.switchTab('aba-extrato', this)" class="nav-btn"><span>📜</span>EXTRATO</button>
+        <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active"><span>📊</span>DASH</button>
+        <button onclick="abrirModalLançamento()" class="nav-btn"><span>➕</span>NOVO</button>
+        <button onclick="switchTab('aba-extrato', this)" class="nav-btn"><span>📜</span>EXTRATO</button>
     </nav>
 
-    <div id="modal" class="modal-overlay" onclick="if(event.target==this) window.fecharModal()">
+    <div id="modal" class="modal-overlay" onclick="if(event.target==this) fecharModal()">
         <div class="modal-sheet">
             <h3 style="margin-bottom: 20px; text-align: center;">Novo Registro</h3>
             <div class="input-grid">
@@ -149,17 +150,17 @@
                     <option value="investimento">Reserva / Investimento (20%)</option>
                     <option value="entrada">Receita / Faturamento (+)</option>
                 </select>
-                <button onclick="window.salvarRegistro()" style="width:100%; padding:18px; background:var(--accent); color:white; border:none; border-radius:16px; font-weight:800; cursor:pointer; margin-top: 10px;">SALVAR</button>
+                <button onclick="salvarRegistro()" style="width:100%; padding:18px; background:var(--accent); color:white; border:none; border-radius:16px; font-weight:800; cursor:pointer; margin-top: 10px;">SALVAR</button>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
+    <script>
         // FIREBASE CONFIG
         const firebaseConfig = { 
             apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE", 
@@ -170,14 +171,9 @@
             appId: "1:659521706556:web:86f2174c4c8a89335ac139" 
         };
         
-        let app, auth, db;
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-        } catch (e) {
-            console.error("Erro ao iniciar Firebase:", e);
-        }
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
         // GEMINI KEY
         const Gemini_Key = "AIzaSyAr3RLlLHop8BnGRUr-bMQV7mCSLIcsKgM"; 
@@ -186,8 +182,11 @@
         let chartP = null;
         let dadosFinanceiros = { rec:0, f:0, l:0, i:0, saldo:0 };
 
-        // TEMA CLARO/ESCURO
-        window.toggleTheme = () => {
+        // ==========================
+        // FUNÇÕES DE INTERFACE (UI)
+        // ==========================
+        
+        function toggleTheme() {
             const body = document.body;
             const btn = document.getElementById('btn-theme');
             if (body.getAttribute('data-theme') === 'light') {
@@ -197,60 +196,62 @@
                 body.setAttribute('data-theme', 'light');
                 btn.innerText = '🌙';
             }
-            if(chartP) chartP.update(); // Atualiza gráfico com novas cores
-        };
+            if(chartP) chartP.update(); 
+        }
 
-        // UI FUNCTIONS
-        window.abrirAI = () => document.getElementById('ai-modal').style.display = 'flex';
-        window.fecharAI = () => document.getElementById('ai-modal').style.display = 'none';
-        window.fecharModal = () => document.getElementById('modal').style.display = 'none';
-        window.abrirModalLançamento = () => {
+        function abrirAI() { document.getElementById('ai-modal').style.display = 'flex'; }
+        function fecharAI() { document.getElementById('ai-modal').style.display = 'none'; }
+        function fecharModal() { document.getElementById('modal').style.display = 'none'; }
+        
+        function abrirModalLançamento() {
             document.getElementById('data-reg').value = new Date().toISOString().split('T')[0];
             document.getElementById('modal').style.display = 'flex';
-        };
+        }
 
-        window.switchTab = (id, btn) => {
+        function switchTab(id, btn) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             btn.classList.add('active');
-        };
+        }
 
         const fmt = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-        // GOOGLE LOGIN COM TRATAMENTO DE ERRO
-        window.loginGoogle = async () => {
+        // ==========================
+        // LÓGICA E BANCO DE DADOS
+        // ==========================
+
+        async function loginGoogle() {
             if(window.location.protocol === 'file:') {
-                alert("ERRO: O Login do Google bloqueia acessos locais (file:///). Hospede o código no Vercel ou use um Live Server.");
-                return;
+                alert("O login do Google não funciona abrindo o arquivo duas vezes (file:///). O App ainda funcionará visualmente, mas sem salvar online. Para salvar, suba no Vercel.");
             }
             try {
-                await signInWithPopup(auth, new GoogleAuthProvider());
+                const provider = new firebase.auth.GoogleAuthProvider();
+                await auth.signInWithPopup(provider);
             } catch (error) {
                 console.error(error);
-                alert("Falha ao logar: " + error.message);
+                alert("Aviso de Login: " + error.message);
             }
-        };
+        }
 
-        // CARREGAR DADOS
-        window.carregarDados = async () => {
+        async function carregarDados() {
             if (!auth.currentUser) return;
             try {
                 const mesSel = document.getElementById('filtroMes').value;
                 let saldoTotal = 0, f = 0, l = 0, i = 0, rec = 0;
                 let htmlGeral = "";
 
-                const ref = doc(db, "usuarios", auth.currentUser.uid, "meses", mesSel);
-                const snap = await getDoc(ref);
+                const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesSel);
+                const snap = await ref.get();
 
-                if (snap.exists()) {
+                if (snap.exists) {
                     const trans = snap.data().transacoes || [];
                     trans.forEach((t, tIdx) => {
                         const v = parseFloat(t.valor);
                         if (t.tipo === 'entrada') { saldoTotal += v; rec += v; }
                         else { saldoTotal -= v; if(t.tipo==='fixo') f+=v; else if(t.tipo==='lazer') l+=v; else i+=v; }
                         
-                        htmlGeral += `<div class="entry-card"><div><b>${t.descricao}</b><br><small>${t.data.split('-').reverse().join('/')}</small></div><div style="text-align:right"><span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}; font-weight:800">${fmt(v)}</span><br><button onclick="window.apagarRegistro('${mesSel}', ${tIdx})" style="border:none; background:none; color:var(--red); font-size:0.6rem; cursor:pointer; font-weight:bold; margin-top:5px;">EXCLUIR</button></div></div>`;
+                        htmlGeral += `<div class="entry-card"><div><b>${t.descricao}</b><br><small>${t.data.split('-').reverse().join('/')}</small></div><div style="text-align:right"><span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}; font-weight:800">${fmt(v)}</span><br><button onclick="apagarRegistro('${mesSel}', ${tIdx})" style="border:none; background:none; color:var(--red); font-size:0.6rem; cursor:pointer; font-weight:bold; margin-top:5px;">EXCLUIR</button></div></div>`;
                     });
                 }
 
@@ -263,21 +264,19 @@
                 renderCharts(f, l, i);
             } catch (error) {
                 console.error(error);
-                alert("Erro ao buscar dados do banco. Verifique as regras de segurança do Firestore.");
             }
-        };
+        }
 
-        // SALVAR DADOS
-        window.salvarRegistro = async () => {
-            if (!auth.currentUser) return alert("Faça login primeiro!");
+        async function salvarRegistro() {
+            if (!auth.currentUser) return alert("Faça login no botão ENTRAR primeiro!");
             const v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value;
             if(!v || !dt) return alert("Preencha valor e data!");
             
             try {
                 const mes = mesesNomes[parseInt(dt.split('-')[1]) - 1];
-                const ref = doc(db, "usuarios", auth.currentUser.uid, "meses", mes);
-                const snap = await getDoc(ref);
-                let lista = snap.exists() ? snap.data().transacoes : [];
+                const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mes);
+                const snap = await ref.get();
+                let lista = snap.exists ? snap.data().transacoes : [];
                 
                 lista.push({ 
                     descricao: document.getElementById('desc').value || "Não especificado", 
@@ -286,34 +285,35 @@
                     data: dt 
                 });
 
-                await setDoc(ref, { transacoes: lista });
-                window.fecharModal();
-                window.carregarDados();
+                await ref.set({ transacoes: lista });
+                fecharModal();
+                carregarDados();
                 
                 document.getElementById('desc').value = ""; document.getElementById('valor').value = "";
             } catch (error) {
                 console.error(error);
-                alert("Erro ao salvar. Banco de dados pode estar bloqueado.");
+                alert("Erro ao salvar no banco. Verifique as regras do Firestore.");
             }
-        };
+        }
 
-        // APAGAR DADOS
-        window.apagarRegistro = async (mes, idx) => {
+        async function apagarRegistro(mes, idx) {
             if(!confirm("Deletar este registro?")) return;
             try {
-                const ref = doc(db, "usuarios", auth.currentUser.uid, "meses", mes);
-                const snap = await getDoc(ref);
+                const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mes);
+                const snap = await ref.get();
                 let lista = snap.data().transacoes; 
                 lista.splice(idx, 1);
-                await setDoc(ref, { transacoes: lista });
-                window.carregarDados();
+                await ref.set({ transacoes: lista });
+                carregarDados();
             } catch(e) {
-                alert("Erro ao apagar: " + e.message);
+                console.error(e);
             }
-        };
+        }
 
+        // ==========================
         // IA GEMINI INTEGRADA
-        window.perguntarIA = async () => {
+        // ==========================
+        async function perguntarIA() {
             const input = document.getElementById('ai-input');
             const pergunta = input.value;
             const historico = document.getElementById('chat-historico');
@@ -337,4 +337,8 @@
                 if(!resp.ok) throw new Error("Falha na API da IA");
                 
                 const data = await resp.json();
-                const respostaIA =                                                             
+                const respostaIA = data.candidates[0].content.parts[0].text;
+                historico.innerHTML += `<div class="chat-bubble ai-bubble">${respostaIA}</div>`;
+                historico.scrollTop = historico.scrollHeight;
+            } catch (e) {
+                                                                      
