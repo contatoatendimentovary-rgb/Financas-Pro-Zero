@@ -17,89 +17,98 @@
             --bg: #0F172A; --header-bg: #1E293B; --card: #1E293B; --text-main: #F1F5F9;
             --text-sub: #94A3B8; --border: #334155; --accent: #6366F1;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: 0.3s; }
-        body { background: var(--bg); color: var(--text-main); padding-bottom: 100px; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); color: var(--text-main); padding-bottom: 110px; overflow-x: hidden; transition: background 0.3s; }
         
-        /* Header & Balance */
-        .glass-header { background: var(--header-bg); padding: 30px 20px 50px; border-radius: 0 0 30px 30px; border-bottom: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .header-content { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .brand { font-weight: 800; font-size: 1.2rem; } .brand span { color: var(--accent); }
-        .main-balance { text-align: center; }
-        .main-balance h1 { font-size: 2.4rem; font-weight: 800; letter-spacing: -1.5px; }
+        .glass-header { background: var(--header-bg); padding: 50px 20px 40px; border-radius: 0 0 30px 30px; border-bottom: 1px solid var(--border); text-align: center; transition: 0.3s; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .user-pill { background: var(--accent); color: white; border: none; padding: 6px 15px; border-radius: 20px; font-weight: 800; font-size: 0.7rem; }
         
-        /* Stats Cards */
-        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; margin-top: -30px; }
-        .stat-card { background: var(--card); padding: 15px; border-radius: 20px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 5px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
-        .stat-card small { font-weight: 700; font-size: 0.7rem; text-transform: uppercase; color: var(--text-sub); }
-        .stat-card b { font-size: 1.1rem; }
-        .stat-card.incoming b { color: var(--green); }
-        .stat-card.outgoing b { color: var(--red); }
+        .main-balance { position: relative; }
+        .main-balance h1 { font-size: 2.6rem; font-weight: 800; letter-spacing: -1.5px; margin: 5px 0; transition: color 0.3s; }
+        .sparkline-box { height: 40px; width: 120px; margin: 0 auto; opacity: 0.8; }
+        .run-rate-alert { display: none; background: rgba(239, 68, 68, 0.15); color: var(--red); font-size: 0.7rem; font-weight: 800; padding: 4px 10px; border-radius: 12px; width: max-content; margin: 10px auto 0; }
+        
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; margin-top: -25px; }
+        .stat-card { background: var(--card); padding: 15px; border-radius: 22px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: 0.3s; }
+        .stat-card small { font-weight: 700; color: var(--text-sub); font-size: 0.65rem; text-transform: uppercase; }
+        .stat-card b { display: block; font-size: 1.15rem; margin-top: 3px; }
 
-        /* General Layout */
-        .viz-card { background: var(--card); margin: 20px; padding: 20px; border-radius: 24px; border: 1px solid var(--border); }
-        .tab-content { display: none; } .tab-content.active { display: block; }
+        .viz-card { background: var(--card); margin: 20px; padding: 20px; border-radius: 24px; border: 1px solid var(--border); transition: 0.3s; }
         
-        /* Timeline/Entries */
-        .timeline-list { padding: 0 20px; }
-        .entry-card { background: var(--card); padding: 16px; border-radius: 18px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .badge-dia { background: var(--accent); color: white; font-size: 0.65rem; padding: 2px 8px; border-radius: 6px; margin-right: 8px; font-weight: 800; }
+        /* SWIPE TO DELETE CSS */
+        .swipe-wrapper { overflow-x: auto; scroll-snap-type: x mandatory; display: flex; scrollbar-width: none; border-radius: 18px; margin: 0 20px 10px; border: 1px solid var(--border); background: var(--red); }
+        .swipe-wrapper::-webkit-scrollbar { display: none; }
+        .entry-card { flex: 1 0 100%; scroll-snap-align: start; padding: 16px; background: var(--card); display: flex; justify-content: space-between; align-items: center; border: none; margin: 0; border-radius: 18px; transition: 0.3s; }
+        .delete-action { flex: 0 0 75px; scroll-snap-align: end; background: var(--red); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border-radius: 0 18px 18px 0; cursor: pointer; }
         
-        /* Bottom Nav */
-        .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--header-bg); display: flex; justify-content: space-around; padding: 15px 0 30px; border-top: 1px solid var(--border); z-index: 1000; }
-        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; font-weight: 700; gap: 4px; flex: 1; cursor: pointer; }
-        .nav-btn.active { color: var(--accent); }
-        .nav-btn span { font-size: 1.4rem; }
-        .floating-btn { position: fixed; bottom: 90px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 28px; z-index: 999; box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .badge-dia { background: var(--accent); color: white; font-size: 0.65rem; padding: 3px 8px; border-radius: 8px; font-weight: 800; margin-right: 8px; }
 
-        /* Modal Sheet */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: flex-end; backdrop-filter: blur(4px); }
-        .modal-sheet { background: var(--card); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; animation: slideUp 0.3s ease-out; }
+        .bottom-tab-bar { position: fixed; bottom: 0; width: 100%; background: var(--header-bg); display: flex; justify-content: space-around; padding: 12px 0 30px; border-top: 1px solid var(--border); z-index: 1000; transition: 0.3s; }
+        .nav-btn { background: none; border: none; color: var(--text-sub); display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; font-weight: 700; flex: 1; transition: 0.2s; }
+        .nav-btn.active { color: var(--accent); transform: translateY(-3px); }
+        .nav-btn span { font-size: 1.4rem; margin-bottom: 4px; transition: 0.2s; }
+
+        .floating-btn { position: fixed; bottom: 95px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 28px; box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4); z-index: 999; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+        .floating-btn:active { transform: scale(0.9); }
+
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: flex-end; backdrop-filter: blur(5px); }
+        .modal-sheet { background: var(--card); width: 100%; border-radius: 30px 30px 0 0; padding: 30px; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         
-        /* Progress Bars */
-        .progress-container { background: var(--bg); height: 10px; border-radius: 5px; overflow: hidden; margin-top: 10px; }
-        .bar { height: 100%; border-radius: 5px; transition: 1s ease-in-out; }
+        .input-grid input, .input-grid select { width: 100%; padding: 15px; margin-bottom: 12px; border-radius: 14px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); font-size: 1rem; transition: 0.3s; outline: none; }
+        .input-grid input:focus { border-color: var(--accent); }
+
+        .tab-content { display: none; animation: fadeSlide 0.4s ease; } .tab-content.active { display: block; }
+        @keyframes fadeSlide { from { opacity: 0; transform: translateX(15px); } to { opacity: 1; transform: translateX(0); } }
         
-        .loading { opacity: 0.5; pointer-events: none; }
+        .progress-container { background: var(--bg); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+        .bar { height: 100%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        .btn-export { width: 100%; background: var(--card); border: 1px solid var(--border); color: var(--text-main); padding: 12px; border-radius: 12px; font-weight: 700; margin-bottom: 15px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
     </style>
 </head>
-<body>
+<body class="dark-mode">
 
     <header class="glass-header">
         <div class="header-content">
-            <button onclick="toggleTheme()" class="theme-switch">🌓</button>
-            <div class="brand">Finanças<span>PRO</span></div>
+            <button onclick="toggleTheme()" style="background:none; border:none; font-size:1.4rem; cursor:pointer;">🌓</button>
+            <div class="brand" style="font-weight: 800; font-size: 1.1rem;">Finanças<span>PRO</span></div>
             <button id="btnAuth" class="user-pill" onclick="loginGoogle()">ENTRAR</button>
         </div>
         <div class="main-balance">
-            <small style="color: var(--text-sub); font-weight: 700; text-transform: uppercase;">Saldo Atual</small>
+            <small style="color: var(--text-sub); font-weight: 700; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px;">Saldo Disponível</small>
             <h1 id="saldo">R$ 0,00</h1>
+            <div class="sparkline-box"><canvas id="sparklineChart"></canvas></div>
+            <div id="alerta-ritmo" class="run-rate-alert">⚠️ Ritmo de queima acelerado</div>
         </div>
     </header>
 
     <div class="stats-row">
-        <div class="stat-card incoming">
+        <div class="stat-card">
             <small>Receitas</small>
-            <b id="resumo-receita">R$ 0</b>
+            <b id="resumo-receita" style="color: var(--green)">R$ 0,00</b>
         </div>
-        <div class="stat-card outgoing">
+        <div class="stat-card">
             <small>Despesas</small>
-            <b id="resumo-despesa">R$ 0</b>
+            <b id="resumo-despesa" style="color: var(--red)">R$ 0,00</b>
         </div>
     </div>
 
     <main>
         <section id="aba-dashboard" class="tab-content active">
-            <div class="viz-card">
-                <canvas id="graficoPizza" style="max-height: 220px;"></canvas>
-            </div>
-            <div class="meta-container" id="metas-rapidas">
-                </div>
+            <div class="viz-card"><canvas id="graficoPizza" style="max-height: 200px;"></canvas></div>
+            <div id="metas-container" style="padding: 0 20px;"></div>
+        </section>
+
+        <section id="aba-invest" class="tab-content">
+            <div class="viz-card"><canvas id="graficoBarras" style="max-height: 200px;"></canvas></div>
+            <div id="lista-invest"></div>
         </section>
 
         <section id="aba-extrato" class="tab-content">
-            <div style="padding: 20px;">
-                <select id="filtroMes" class="input-grid" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); color: var(--text-main);" onchange="carregarDados()">
+            <div style="padding: 20px 20px 5px;">
+                <select id="filtroMes" class="input-grid" onchange="carregarDados()">
                     <option value="janeiro">Janeiro</option><option value="fevereiro">Fevereiro</option>
                     <option value="março">Março</option><option value="abril">Abril</option>
                     <option value="maio">Maio</option><option value="junho">Junho</option>
@@ -107,8 +116,9 @@
                     <option value="setembro">Setembro</option><option value="outubro">Outubro</option>
                     <option value="novembro">Novembro</option><option value="dezembro">Dezembro</option>
                 </select>
+                <button class="btn-export" onclick="exportarCSV()">📥 Exportar para Planilha (.csv)</button>
             </div>
-            <div id="lista" class="timeline-list"></div>
+            <div id="lista-geral"></div>
         </section>
     </main>
 
@@ -116,16 +126,15 @@
 
     <nav class="bottom-tab-bar">
         <button onclick="switchTab('aba-dashboard', this)" class="nav-btn active"><span>📊</span>Dashboard</button>
+        <button onclick="switchTab('aba-invest', this)" class="nav-btn"><span>📈</span>Aportes</button>
         <button onclick="switchTab('aba-extrato', this)" class="nav-btn"><span>📜</span>Extrato</button>
-        <button onclick="window.location.reload()" class="nav-btn"><span>🔄</span>Sinc</button>
     </nav>
 
     <div id="modal" class="modal-overlay" onclick="if(event.target==this) fecharModal()">
         <div class="modal-sheet">
-            <h3 style="margin-bottom: 20px; text-align: center;">Novo Lançamento</h3>
             <div class="input-grid">
-                <input type="text" id="desc" placeholder="Descrição (Ex: Aluguel)">
-                <input type="number" id="valor" placeholder="Valor R$ 0,00">
+                <input type="text" id="desc" placeholder="Descrição do lançamento">
+                <input type="number" step="0.01" id="valor" placeholder="Valor R$ 0,00">
                 <input type="date" id="data-reg">
                 <select id="tipo">
                     <option value="fixo">Essencial (50%)</option>
@@ -133,9 +142,8 @@
                     <option value="investimento">Investimento (20%)</option>
                     <option value="entrada">Receita (+)</option>
                 </select>
+                <button onclick="salvarRegistro()" style="width:100%; padding:16px; background:var(--accent); color:white; border:none; border-radius:14px; font-weight:800; font-size:1.1rem; cursor:pointer;">SALVAR</button>
             </div>
-            <button class="btn-confirm" onclick="salvarRegistro()">CONFIRMAR</button>
-            <button class="btn-abort" onclick="fecharModal()">CANCELAR</button>
         </div>
     </div>
 
@@ -145,18 +153,8 @@
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE",
-            authDomain: "financaspro-1e0e8.firebaseapp.com",
-            projectId: "financaspro-1e0e8",
-            storageBucket: "financaspro-1e0e8.firebasestorage.app",
-            messagingSenderId: "659521706556",
-            appId: "1:659521706556:web:86f2174c4c8a89335ac139"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        window.auth = getAuth(app);
-        window.db = getFirestore(app);
+        const firebaseConfig = { apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE", authDomain: "financaspro-1e0e8.firebaseapp.com", projectId: "financaspro-1e0e8", storageBucket: "financaspro-1e0e8.firebasestorage.app", messagingSenderId: "659521706556", appId: "1:659521706556:web:86f2174c4c8a89335ac139" };
+        const app = initializeApp(firebaseConfig); window.auth = getAuth(app); window.db = getFirestore(app);
         window.f_doc = doc; window.f_setDoc = setDoc; window.f_getDoc = getDoc;
         window.mesesNomes = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
 
@@ -167,117 +165,125 @@
                 carregarDados();
             }
         });
-
         window.loginGoogle = () => signInWithPopup(window.auth, new GoogleAuthProvider());
     </script>
 
     <script>
-        let currentChart;
+        let chartP, chartB, sparkline;
+        window.transacoesExportacao = [];
+
+        function fmt(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
         async function carregarDados() {
             const user = window.auth.currentUser; if (!user) return;
             const mesSel = document.getElementById('filtroMes').value;
-            const ref = window.f_doc(window.db, "usuarios", user.uid, "meses", mesSel);
-            const snap = await window.f_getDoc(ref);
+            let investAnual = Array(12).fill(0), saldoM = 0, f = 0, l = 0, i = 0, rec = 0;
+            let htmlGeral = "", htmlInvest = "";
+            let historicoSaldo = [0]; 
 
-            let r = 0, f = 0, l = 0, i = 0, html = "";
-            let trans = snap.exists() ? snap.data().transacoes : [];
+            const promises = window.mesesNomes.map(m => window.f_getDoc(window.f_doc(window.db, "usuarios", user.uid, "meses", m)));
+            const snaps = await Promise.all(promises);
 
-            trans.sort((a, b) => new Date(b.data) - new Date(a.data));
+            snaps.forEach((snap, idx) => {
+                const mesNome = window.mesesNomes[idx];
+                if (snap.exists()) {
+                    let trans = snap.data().transacoes || [];
+                    trans.sort((a,b) => new Date(b.data) - new Date(a.data));
+                    
+                    if(mesNome === mesSel) window.transacoesExportacao = trans;
 
-            trans.forEach((t, idx) => {
-                const v = parseFloat(t.valor);
-                if (t.tipo === 'entrada') r += v;
-                else { if(t.tipo === 'fixo') f += v; else if(t.tipo === 'lazer') l += v; else i += v; }
-                
-                const dia = t.data.split('-')[2];
-                html += `
-                <div class="entry-card">
-                    <div>
-                        <span class="badge-dia">${dia}</span>
-                        <b>${t.descricao}</b><br>
-                        <small style="color:var(--text-sub)">${t.tipo}</small>
-                    </div>
-                    <div style="text-align:right">
-                        <span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}; font-weight:800">
-                            ${t.tipo==='entrada'?'+':'-'} R$ ${v.toFixed(2)}
-                        </span><br>
-                        <button class="btn-del" onclick="apagar('${mesSel}', ${idx})">Remover</button>
-                    </div>
-                </div>`;
+                    // Reverter para calcular saldo cumulativo cronológico (para o sparkline)
+                    let transCronologicas = [...trans].reverse();
+
+                    trans.forEach((t, tIdx) => {
+                        const v = parseFloat(t.valor);
+                        if (t.tipo === 'investimento') investAnual[idx] += v;
+                        
+                        if (mesNome === mesSel) {
+                            if (t.tipo === 'entrada') { saldoM += v; rec += v; }
+                            else { saldoM -= v; if(t.tipo === 'fixo') f += v; else if(t.tipo === 'lazer') l += v; else i += v; }
+
+                            const swipeCard = `
+                            <div class="swipe-wrapper">
+                                <div class="entry-card">
+                                    <div><span class="badge-dia">${t.data.split('-')[2]}</span><b>${t.descricao}</b></div>
+                                    <span style="color:${t.tipo==='entrada'?'var(--green)':'var(--red)'}; font-weight:800">${fmt(v)}</span>
+                                </div>
+                                <div class="delete-action" onclick="apagar('${mesNome}', ${tIdx})">🗑️</div>
+                            </div>`;
+                            htmlGeral += swipeCard; if(t.tipo === 'investimento') htmlInvest += swipeCard;
+                        }
+                    });
+
+                    // Construir Sparkline (Ação do Preço da Carteira)
+                    if(mesNome === mesSel) {
+                        let saldoAcumulado = 0;
+                        transCronologicas.forEach(tc => {
+                            saldoAcumulado += (tc.tipo === 'entrada' ? parseFloat(tc.valor) : -parseFloat(tc.valor));
+                            historicoSaldo.push(saldoAcumulado);
+                        });
+                    }
+                }
             });
 
-            document.getElementById('saldo').innerText = `R$ ${(r - (f+l+i)).toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
-            document.getElementById('resumo-receita').innerText = `R$ ${r.toFixed(0)}`;
-            document.getElementById('resumo-despesa').innerText = `R$ ${(f+l+i).toFixed(0)}`;
-            document.getElementById('lista').innerHTML = html || '<p style="text-align:center; padding:40px; opacity:0.5">Sem registros</p>';
+            // Inteligência de Run Rate (Dia Atual vs Gasto)
+            const diaHoje = new Date().getDate(); 
+            const limiteSeguro = (rec * 0.8) / 30; // Considerando mês de 30 dias
+            const ritmoAtual = (f + l) / diaHoje;
+            document.getElementById('alerta-ritmo').style.display = (ritmoAtual > limiteSeguro && rec > 0) ? 'block' : 'none';
+
+            // UI Updates
+            const h1Saldo = document.getElementById('saldo');
+            h1Saldo.innerText = fmt(saldoM);
+            h1Saldo.style.color = saldoM >= 0 ? "var(--text-main)" : "var(--red)";
             
-            renderPizza(f, l, i);
-            updateMetas(r, f, l, i);
+            document.getElementById('resumo-receita').innerText = fmt(rec);
+            document.getElementById('resumo-despesa').innerText = fmt(f + l + i);
+            document.getElementById('lista-geral').innerHTML = htmlGeral || '<p style="text-align:center; opacity:0.5; padding:20px">Vazio</p>';
+            document.getElementById('lista-invest').innerHTML = htmlInvest || '<p style="text-align:center; opacity:0.5; padding:20px">Sem aportes</p>';
+            
+            renderPizza(f, l, i); renderBarras(investAnual); renderSparkline(historicoSaldo); renderMetas(f, l, i, rec);
+        }
+
+        function renderSparkline(dados) {
+            const ctx = document.getElementById('sparklineChart').getContext('2d');
+            if(sparkline) sparkline.destroy();
+            sparkline = new Chart(ctx, {
+                type: 'line',
+                data: { labels: dados.map((_, i) => i), datasets: [{ data: dados, borderColor: '#10B981', borderWidth: 2, tension: 0.4, pointRadius: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: false }, y: { display: false } }, layout: { padding: 0 } }
+            });
         }
 
         function renderPizza(f, l, i) {
             const ctx = document.getElementById('graficoPizza').getContext('2d');
-            if (currentChart) currentChart.destroy();
-            currentChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Fixo', 'Lazer', 'Invest'],
-                    datasets: [{ data: [f, l, i], backgroundColor: ['#EF4444', '#F59E0B', '#4F46E5'], borderWidth: 0 }]
-                },
-                options: { cutout: '85%', plugins: { legend: { display: false } } }
-            });
+            if(chartP) chartP.destroy();
+            chartP = new Chart(ctx, { type: 'doughnut', data: { labels:['Fixo','Lazer','Invest'], datasets:[{ data:[f||1, l, i], backgroundColor:['#EF4444','#F59E0B','#4F46E5'], borderWidth:0 }] }, options: { cutout:'85%', plugins:{ legend:{ display:false } } } });
         }
 
-        function updateMetas(r, f, l, i) {
-            const total = r || (f+l+i) || 1;
-            const metasHTML = `
-                <div class="meta-item">
-                    <div style="display:flex; justify-content:space-between"><small>Essencial</small> <small>${((f/total)*100).toFixed(0)}%</small></div>
-                    <div class="progress-container"><div class="bar g-orange" style="width:${(f/total)*100}%"></div></div>
-                </div>
-                <div class="meta-item">
-                    <div style="display:flex; justify-content:space-between"><small>Lazer</small> <small>${((l/total)*100).toFixed(0)}%</small></div>
-                    <div class="progress-container"><div class="bar g-green" style="width:${(l/total)*100}%"></div></div>
-                </div>
-            `;
-            document.getElementById('metas-rapidas').innerHTML = metasHTML;
+        function renderBarras(dados) {
+            const ctx = document.getElementById('graficoBarras').getContext('2d');
+            if(chartB) chartB.destroy();
+            chartB = new Chart(ctx, { type: 'bar', data: { labels: ['J','F','M','A','M','J','J','A','S','O','N','D'], datasets: [{ data: dados, backgroundColor: '#4F46E5', borderRadius: 5 }] }, options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } } });
         }
+
+        function renderMetas(f, l, i, rec) {
+            const base = rec > 0 ? rec : (f+l+i || 1); const calc = (v) => ((v/base)*100).toFixed(0);
+            document.getElementById('metas-container').innerHTML = `
+                <div style="margin-bottom:15px; background:var(--card); padding:10px 15px; border-radius:12px; border:1px solid var(--border);"><div style="display:flex; justify-content:space-between"><small style="font-weight:700">Essencial</small><small style="font-weight:800">${calc(f)}%</small></div><div class="progress-container"><div class="bar" style="width:${Math.min(calc(f), 100)}%; background:var(--red)"></div></div></div>
+                <div style="margin-bottom:15px; background:var(--card); padding:10px 15px; border-radius:12px; border:1px solid var(--border);"><div style="display:flex; justify-content:space-between"><small style="font-weight:700">Lazer</small><small style="font-weight:800">${calc(l)}%</small></div><div class="progress-container"><div class="bar" style="width:${Math.min(calc(l), 100)}%; background:var(--orange)"></div></div></div>
+                <div style="background:var(--card); padding:10px 15px; border-radius:12px; border:1px solid var(--border);"><div style="display:flex; justify-content:space-between"><small style="font-weight:700">Investimento</small><small style="font-weight:800">${calc(i)}%</small></div><div class="progress-container"><div class="bar" style="width:${Math.min(calc(i), 100)}%; background:var(--accent)"></div></div></div>`;
+        }
+
+        window.exportarCSV = () => {
+            if(window.transacoesExportacao.length === 0) return alert("Sem dados para exportar.");
+            let csv = "Data,Descricao,Categoria,Valor\n";
+            window.transacoesExportacao.forEach(t => { csv += `${t.data},${t.descricao},${t.tipo},${t.valor}\n`; });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob); link.download = `FinancasPRO_${document.getElementById('filtroMes').value}.csv`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        };
 
         async function salvarRegistro() {
-            const d = document.getElementById('desc').value, v = document.getElementById('valor').value, dt = document.getElementById('data-reg').value, t = document.getElementById('tipo').value;
-            if(!v || !dt) return alert("Preencha os campos!");
-            const mes = window.mesesNomes[parseInt(dt.split('-')[1]) - 1];
-            const ref = window.f_doc(window.db, "usuarios", window.auth.currentUser.uid, "meses", mes);
-            const snap = await window.f_getDoc(ref);
-            let trans = snap.exists() ? snap.data().transacoes : [];
-            trans.push({ descricao: d || "Gasto", valor: parseFloat(v), tipo: t, data: dt });
-            await window.f_setDoc(ref, { transacoes: trans });
-            fecharModal(); carregarDados();
-        }
-
-        async function apagar(mes, idx) {
-            if(!confirm("Remover?")) return;
-            const ref = window.f_doc(window.db, "usuarios", window.auth.currentUser.uid, "meses", mes);
-            const snap = await window.f_getDoc(ref);
-            let trans = snap.data().transacoes; trans.splice(idx, 1);
-            await window.f_setDoc(ref, { transacoes: trans });
-            carregarDados();
-        }
-
-        function switchTab(id, btn) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            btn.classList.add('active');
-        }
-
-        function abrirModal() { 
-            document.getElementById('data-reg').value = new Date().toISOString().split('T')[0];
-            document.getElementById('modal').style.display = 'flex'; 
-        }
-        function fecharModal() { document.getElementById('modal').style.display = 'none'; }
-        function toggleTheme() { document.body.classList.toggle('dark-mode'); }
-    </script>
-</body>
-</html>
+     
