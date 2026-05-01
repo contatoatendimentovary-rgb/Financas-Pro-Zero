@@ -65,27 +65,27 @@
 
     <div id="ai-modal" class="panel">
         <div style="padding:25px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-            <b style="color:var(--accent)">✨ ASSISTENTE FINANPRO</b>
+            <b style="color:var(--accent)">✨ INTELIGÊNCIA FINANCEIRA</b>
             <button onclick="toggleIA()" style="background:none; border:none; color:#fff; font-size:2rem;">&times;</button>
         </div>
         <div id="chat-box" class="chat-area"></div>
         <div style="padding:25px; display:flex; gap:12px; background:var(--card);">
-            <input type="text" id="ai-input" placeholder="Diga algo..." style="flex:1; padding:18px; border-radius:15px; border:1px solid var(--border); background:#000; color:#fff; outline:none;">
-            <button onclick="processarIA()" style="background:var(--accent); border:none; padding:0 25px; border-radius:15px; font-weight:900;">OK</button>
+            <input type="text" id="ai-input" placeholder="Ex: Gastei 25 no mercado" style="flex:1; padding:18px; border-radius:15px; border:1px solid var(--border); background:#000; color:#fff; outline:none;">
+            <button onclick="processarIA()" style="background:var(--accent); border:none; padding:0 25px; border-radius:15px; font-weight:900; color:#000;">OK</button>
         </div>
     </div>
 
     <header class="header">
         <div class="nav-top">
             <b>FINANÇAS<span style="color:var(--accent)">PRO</span></b>
-            <div id="user-display" class="user-badge" onclick="login()">LOGIN</div>
+            <div id="user-badge" class="user-badge" onclick="login()">Henrique</div>
         </div>
         <div class="month-bar" id="month-list"></div>
     </header>
 
     <div id="v-home">
         <div class="hero">
-            <span>Saldo Acumulado</span>
+            <span>Saldo Atual Acumulado</span>
             <h1 id="main-balance">R$ 0,00</h1>
         </div>
         <div class="mini-stats">
@@ -94,7 +94,7 @@
         </div>
         <div class="chart-box">
             <div class="chart-container"><canvas id="myChart"></canvas></div>
-            <p style="margin-top:15px; font-size:0.7rem; font-weight:800; color:var(--subtext);">SAÚDE DO MÊS</p>
+            <p style="margin-top:15px; font-size:0.7rem; font-weight:800; color:var(--subtext);">RESUMO DE DISTRIBUIÇÃO</p>
         </div>
     </div>
 
@@ -130,116 +130,105 @@
                 };
                 mCont.appendChild(d);
             });
-            auth.onAuthStateChanged(u => { if(u){ document.getElementById('user-display').innerText = u.displayName.split(' ')[0]; sync(); } });
+            auth.onAuthStateChanged(u => { if(u){ sync(); } else { login(); } });
         }
 
         async function login() { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
 
-        // --- LÓGICA DE CÁLCULO ACUMULADO ---
         async function sync() {
             if(!auth.currentUser) return;
             
-            let saldoAcumuladoAnterior = 0;
+            // BUSCA SALDO DE TODOS OS MESES ATÉ O ATUAL PARA O CÁLCULO DA CALCULADORA
+            let saldoGeralAcumulado = 0;
             let indexMesAtivo = MESES.indexOf(mesAtivo);
+            let recMes = 0, gasMes = 0, html = "";
 
-            // 1. Calcula o saldo acumulado de todos os meses anteriores
-            for (let i = 0; i < indexMesAtivo; i++) {
+            // Loop para somar TUDO desde Janeiro até o mês selecionado
+            for (let i = 0; i <= indexMesAtivo; i++) {
                 const snap = await db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(MESES[i]).get();
                 if (snap.exists) {
                     const trans = snap.data().transacoes || [];
                     trans.forEach(t => {
                         const val = parseFloat(t.valor) || 0;
-                        const type = t.tipo.toLowerCase();
-                        if (type.includes('entrada') || type.includes('receita')) saldoAcumuladoAnterior += val;
-                        else saldoAcumuladoAnterior -= val;
+                        const isEntrada = t.tipo.toLowerCase().includes('entrada') || t.tipo.toLowerCase().includes('receita');
+                        
+                        if (isEntrada) {
+                            saldoGeralAcumulado += val;
+                            if (i === indexMesAtivo) recMes += val;
+                        } else {
+                            saldoGeralAcumulado -= val;
+                            if (i === indexMesAtivo) gasMes += val;
+                        }
+
+                        // Só monta o HTML se for o mês que estamos visualizando
+                        if (i === indexMesAtivo) {
+                            html += `<div class="t-row">
+                                <div class="t-info">
+                                    <div class="t-emoji">${isEntrada ? '💵' : '🍿'}</div>
+                                    <div class="t-details"><b>${t.descricao}</b><span>${t.tipo}</span></div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <b style="color:${isEntrada ? 'var(--green)' : '#fff'}">R$ ${val.toFixed(2)}</b>
+                                    <button class="btn-del" onclick="del(${trans.indexOf(t)})">🗑️</button>
+                                </div>
+                            </div>`;
+                        }
                     });
                 }
             }
 
-            // 2. Escuta o mês atual para atualizar a UI em tempo real
-            db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo)
-            .onSnapshot(doc => {
-                let recMes = 0, gasMes = 0, html = "";
-                const data = doc.exists ? doc.data().transacoes || [] : [];
-                
-                data.forEach((t, i) => {
-                    const val = parseFloat(t.valor) || 0;
-                    const isEntrada = t.tipo.toLowerCase().includes('entrada') || t.tipo.toLowerCase().includes('receita');
-                    if(isEntrada) recMes += val; else gasMes += val;
+            // Atualiza a UI com o Saldo Acumulado (Igual sua calculadora)
+            const balanceEl = document.getElementById('main-balance');
+            balanceEl.innerText = saldoGeralAcumulado.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            balanceEl.style.color = saldoGeralAcumulado < 0 ? 'var(--red)' : '#fff';
 
-                    html += `<div class="t-row">
-                        <div class="t-info">
-                            <div class="t-emoji">${isEntrada ? '💵' : '🍿'}</div>
-                            <div class="t-details"><b>${t.descricao}</b><span>${t.tipo}</span></div>
-                        </div>
-                        <div style="display:flex; align-items:center; gap:12px;">
-                            <b style="color:${isEntrada ? 'var(--green)' : '#fff'}">R$ ${val.toFixed(2)}</b>
-                            <button class="btn-del" onclick="del(${i})">🗑️</button>
-                        </div>
-                    </div>`;
-                });
-
-                // CÁLCULO FINAL DA CONTA
-                const saldoFinal = saldoAcumuladoAnterior + recMes - gasMes;
-
-                document.getElementById('main-balance').innerText = saldoFinal.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-                document.getElementById('main-balance').style.color = saldoFinal < 0 ? 'var(--red)' : '#fff';
-                document.getElementById('st-rec').innerText = `R$ ${recMes.toFixed(2)}`;
-                document.getElementById('st-gas').innerText = `R$ ${gasMes.toFixed(2)}`;
-                document.getElementById('cont-lista').innerHTML = html || "<p style='text-align:center; opacity:0.2;'>Sem registros.</p>";
-                
-                render(recMes, gasMes, saldoAcumuladoAnterior);
-            });
+            document.getElementById('st-rec').innerText = `R$ ${recMes.toFixed(2)}`;
+            document.getElementById('st-gas').innerText = `R$ ${gasMes.toFixed(2)}`;
+            document.getElementById('cont-lista').innerHTML = html || "<p style='text-align:center; opacity:0.2;'>Sem registros.</p>";
+            
+            renderChart(recMes, gasMes);
         }
 
-        function render(r, g, anterior) {
+        function renderChart(r, g) {
             const ctx = document.getElementById('myChart').getContext('2d');
             if(chart) chart.destroy();
-            
-            // Gráfico foca no uso da receita DO MÊS + SALDO ANTERIOR (se positivo)
-            const baseDisponivel = (anterior > 0 ? anterior : 0) + r;
-            const saldoGrafico = baseDisponivel > g ? baseDisponivel - g : 0;
-
             chart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     datasets: [{
-                        data: [g || 0.1, saldoGrafico],
-                        backgroundColor: [g > baseDisponivel ? '#EF4444' : '#EF4444', '#EAB308'],
+                        data: [g || 0.1, r > g ? r - g : 0.1],
+                        backgroundColor: [g > r ? 'var(--red)' : 'var(--red)', 'var(--accent)'],
                         borderWidth: 0
                     }]
                 },
-                options: { cutout: '85%', plugins: { legend: { display: false } }, animation: { duration: 800 } }
+                options: { cutout: '85%', plugins: { legend: { display: false } } }
             });
         }
 
         async function processarIA() {
             const inp = document.getElementById('ai-input'), box = document.getElementById('chat-box');
-            const txt = inp.value; if(!txt) return;
-            box.innerHTML += `<div class="msg msg-user">${txt}</div>`;
-            inp.value = "";
+            if(!inp.value) return;
+            box.innerHTML += `<div class="msg msg-user">${inp.value}</div>`;
+            const prompt = inp.value; inp.value = "";
 
             try {
                 const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method:'POST', headers:{'Authorization':'Bearer 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','Content-Type':'application/json'},
                     body:JSON.stringify({
                         model:"llama-3.1-8b-instant",
-                        messages:[
-                            {role:"system", content:"Retorne JSON: {\"is_launch\":true, \"desc\":\"\", \"valor\":0.0, \"tipo\":\"entrada/fixo/lazer\"}. Se for ganho/pix/recebi/rendimento, tipo é entrada."},
-                            {role:"user", content:txt}
-                        ], response_format:{"type":"json_object"}
+                        messages:[{role:"system", content:"Retorne JSON: {\"desc\":\"\", \"valor\":0.0, \"tipo\":\"entrada/fixo/lazer\"}"},{role:"user", content:prompt}],
+                        response_format:{"type":"json_object"}
                     })
                 });
                 const r = JSON.parse((await res.json()).choices[0].message.content);
-                if(r.is_launch) {
-                    const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo);
-                    const snap = await ref.get();
-                    let list = snap.exists ? snap.data().transacoes || [] : [];
-                    list.push({ descricao: r.desc, valor: r.valor, tipo: r.tipo, data: new Date().toISOString() });
-                    await ref.set({ transacoes: list });
-                    box.innerHTML += `<div class="msg msg-ai">✅ Lançado: ${r.desc} (R$ ${r.valor})</div>`;
-                }
-            } catch(e) { box.innerHTML += `<div class="msg msg-ai">Erro ao processar.</div>`; }
+                const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo);
+                const snap = await ref.get();
+                let list = snap.exists ? snap.data().transacoes || [] : [];
+                list.push({ ...r, data: new Date().toISOString() });
+                await ref.set({ transacoes: list });
+                box.innerHTML += `<div class="msg msg-ai">✅ Lançado: ${r.desc} (R$ ${r.valor})</div>`;
+                sync();
+            } catch(e) { box.innerHTML += `<div class="msg msg-ai">Erro ao lançar.</div>`; }
         }
 
         async function del(idx) {
@@ -248,6 +237,7 @@
             let list = snap.data().transacoes;
             list.splice(idx, 1);
             await ref.set({ transacoes: list });
+            sync();
         }
 
         function tab(t, b) {
