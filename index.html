@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#EAB308">
     <link rel="manifest" href="manifest.json">
-    <title>Finan Pro | Final</title>
+    <title>Finan Pro | Final Fix</title>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -23,14 +23,14 @@
 
         .header { padding: 50px 20px 20px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
         .nav-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .user-badge { background: var(--accent); color: #000; padding: 6px 14px; border-radius: 10px; font-size: 0.7rem; font-weight: 800; }
+        .user-badge { background: var(--accent); color: #000; padding: 6px 14px; border-radius: 10px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
 
-        .month-bar { display: flex; overflow-x: auto; gap: 8px; scrollbar-width: none; }
+        .month-bar { display: flex; overflow-x: auto; gap: 8px; scrollbar-width: none; padding-bottom: 5px; }
         .m-item { padding: 10px 16px; border-radius: 12px; background: #1A1A1A; border: 1px solid var(--border); color: var(--subtext); font-size: 0.75rem; white-space: nowrap; cursor: pointer; }
         .m-item.active { background: var(--accent); color: #000; font-weight: 800; border-color: var(--accent); }
 
-        .hero { text-align: center; padding: 30px 20px; }
-        .hero h1 { font-size: 2.6rem; font-weight: 900; letter-spacing: -1.5px; }
+        .hero { text-align: center; padding: 35px 20px; }
+        .hero h1 { font-size: 2.8rem; font-weight: 900; letter-spacing: -1.5px; }
 
         .stat-card { background: var(--card); padding: 18px; border-radius: 20px; border: 1px solid var(--border); margin: 0 20px 15px; display: flex; justify-content: space-between; text-align: center; }
         .stat-card small { font-size: 0.6rem; color: var(--subtext); text-transform: uppercase; font-weight: 800; display: block; margin-bottom: 5px; }
@@ -48,7 +48,7 @@
         .ai-fab { position: fixed; bottom: 105px; right: 20px; width: 65px; height: 65px; border-radius: 22px; background: var(--accent); border: none; font-size: 30px; z-index: 999; box-shadow: 0 10px 25px rgba(234, 179, 8, 0.4); }
         .panel { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 5000; flex-direction: column; }
         .chat-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .msg { max-width: 85%; padding: 14px 18px; border-radius: 20px; font-size: 0.95rem; }
+        .msg { max-width: 85%; padding: 14px 18px; border-radius: 20px; font-size: 0.95rem; line-height: 1.4; }
         .msg-ai { align-self: flex-start; background: var(--card); border: 1px solid var(--border); }
         .msg-user { align-self: flex-end; background: var(--accent); color: #000; font-weight: 800; }
 
@@ -66,7 +66,7 @@
         </div>
         <div id="chat-box" class="chat-area"></div>
         <div style="padding:15px; display:flex; gap:10px; background:var(--card);">
-            <input type="text" id="ai-input" placeholder="Lançar gasto ou entrada..." style="flex:1; padding:18px; border-radius:15px; border:1px solid var(--border); background:#000; color:#fff; outline:none; font-size:1rem;">
+            <input type="text" id="ai-input" placeholder="O que você gastou ou recebeu?" style="flex:1; padding:18px; border-radius:15px; border:1px solid var(--border); background:#000; color:#fff; outline:none; font-size:1rem;">
             <button onclick="processarIA()" style="background:var(--accent); border:none; padding:0 20px; border-radius:15px; font-weight:900;">OK</button>
         </div>
     </div>
@@ -74,18 +74,19 @@
     <header class="header">
         <div class="nav-top">
             <b style="font-size:1.2rem;">FINANÇAS<span style="color:var(--accent)">PRO</span></b>
-            <div id="user-display" class="user-badge" onclick="login()">LOGIN</div>
+            <div id="user-display" class="user-badge" onclick="login()">CONECTAR</div>
         </div>
         <div class="month-bar" id="month-list"></div>
     </header>
 
     <div id="v-home">
         <div class="hero">
-            <small style="letter-spacing:1px; opacity:0.6;">SALDO DISPONÍVEL</small>
+            <small style="letter-spacing:1px; opacity:0.6;">SALDO ATUAL</small>
             <h1 id="main-balance">R$ 0,00</h1>
         </div>
         <div class="stat-card">
             <div><small>RECEITAS</small><b id="st-rec" style="color:var(--green)">R$ 0,00</b></div>
+            <div style="width:1px; background:var(--border); height:30px; align-self:center;"></div>
             <div><small>DESPESAS</small><b id="st-gas" style="color:var(--red)">R$ 0,00</b></div>
         </div>
         <div class="chart-box"><div class="chart-container"><canvas id="myChart"></canvas></div></div>
@@ -96,7 +97,7 @@
     <button class="ai-fab" onclick="toggleIA()">✨</button>
 
     <nav class="nav-bot">
-        <button class="n-btn active" onclick="tab('home', this)">INÍCIO</button>
+        <button class="n-btn active" onclick="tab('home', this)">RESUMO</button>
         <button class="n-btn" onclick="tab('lista', this)">EXTRATO</button>
     </nav>
 
@@ -123,50 +124,50 @@
 
         async function login() { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
 
-        // AJUSTE DE CONTABILIZAÇÃO PRECISA
         async function sync() {
             if(!auth.currentUser) return;
             db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo)
             .onSnapshot(doc => {
-                let rec = 0, gas = 0, html = "";
+                // Reinicia acumuladores com Zero absoluto para evitar erros de soma
+                let somarRec = 0, somarGas = 0, html = "";
                 let cats = { fixo: 0, lazer: 0, invest: 0, outros: 0 };
                 const trans = doc.exists ? doc.data().transacoes || [] : [];
                 
                 trans.forEach((t, i) => {
-                    const v = Math.abs(parseFloat(t.valor)) || 0; // Sempre positivo para cálculo manual
-                    const tp = t.tipo.toLowerCase();
+                    const valorNum = Number(t.valor) || 0;
+                    const tipoLimpo = t.tipo.toLowerCase().trim();
                     
-                    if(tp === 'entrada') {
-                        rec += v;
+                    if(tipoLimpo === 'entrada') {
+                        somarRec += valorNum;
                     } else {
-                        gas += v;
-                        if(tp.includes('fixo')) cats.fixo += v;
-                        else if(tp.includes('lazer')) cats.lazer += v;
-                        else if(tp.includes('invest')) cats.invest += v;
-                        else cats.outros += v;
+                        somarGas += valorNum;
+                        if(tipoLimpo.includes('fixo')) cats.fixo += valorNum;
+                        else if(tipoLimpo.includes('lazer')) cats.lazer += valorNum;
+                        else if(tipoLimpo.includes('invest')) cats.invest += valorNum;
+                        else cats.outros += valorNum;
                     }
 
                     html += `
                         <div class="t-row">
-                            <div class="t-info"><b>${t.descricao}</b><small>${t.tipo}</small></div>
+                            <div class="t-info"><b>${t.descricao}</b><small>${t.tipo.toUpperCase()}</small></div>
                             <div class="t-actions">
-                                <b style="color:${tp === 'entrada'?'var(--green)':'#fff'}">R$ ${v.toFixed(2)}</b>
+                                <b style="color:${tipoLimpo === 'entrada'?'var(--green)':'#fff'}">R$ ${valorNum.toFixed(2)}</b>
                                 <button class="btn-del" onclick="apagar(${i})">✕</button>
                             </div>
                         </div>`;
                 });
 
-                const total = rec - gas;
-                document.getElementById('main-balance').innerText = total.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
-                document.getElementById('st-rec').innerText = `R$ ${rec.toFixed(2)}`;
-                document.getElementById('st-gas').innerText = `R$ ${gas.toFixed(2)}`;
-                document.getElementById('cont-lista').innerHTML = html || '<p style="text-align:center; opacity:0.3; margin-top:50px;">Nenhum lançamento.</p>';
-                renderChart(cats, total);
+                const saldoFinal = somarRec - somarGas;
+                document.getElementById('main-balance').innerText = saldoFinal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+                document.getElementById('st-rec').innerText = `R$ ${somarRec.toFixed(2)}`;
+                document.getElementById('st-gas').innerText = `R$ ${somarGas.toFixed(2)}`;
+                document.getElementById('cont-lista').innerHTML = html || '<p style="text-align:center; opacity:0.3; margin-top:50px;">Nenhum registro.</p>';
+                renderChart(cats, saldoFinal);
             });
         }
 
         async function apagar(idx) {
-            if(!confirm("Deseja apagar este registro?")) return;
+            if(!confirm("Apagar registro?")) return;
             const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo);
             const s = await ref.get();
             let l = s.data().transacoes;
@@ -194,8 +195,8 @@
         async function processarIA() {
             const inp = document.getElementById('ai-input'), box = document.getElementById('chat-box');
             if(!inp.value || !auth.currentUser) return;
-            const uText = inp.value;
-            box.innerHTML += `<div class="msg msg-user">${uText}</div>`;
+            const userMsg = inp.value;
+            box.innerHTML += `<div class="msg msg-user">${userMsg}</div>`;
             inp.value = ""; box.scrollTop = box.scrollHeight;
 
             try {
@@ -205,25 +206,26 @@
                         model:"llama-3.1-8b-instant",
                         messages:[{
                             role:"system", 
-                            content: "Você é o FinanPro AI. Se o usuário informar um valor, responda APENAS o JSON: {\"is_launch\":true,\"desc\":\"...\",\"valor\":0.0,\"tipo\":\"entrada/fixo/lazer/invest/outros\"}. REGRAS: Gasto/Pagamento = tipo fixo, lazer, invest ou outros. Ganho/Recebimento = tipo entrada. Use sempre valores positivos no JSON. Se for só conversa, use emojis 🚀💰."
-                        }, {role:"user", content: uText}]
+                            content: "Você é o FinanPro AI. Se o usuário quiser lançar algo, responda APENAS o JSON: {\"is_launch\":true,\"desc\":\"...\",\"valor\":0.0,\"tipo\":\"entrada/fixo/lazer/invest/outros\"}. REGRAS: Ganhos/Recebimentos = tipo entrada. Gastos/Pagos = escolha entre fixo, lazer, invest ou outros. Use sempre valores POSITIVOS no JSON. Se for conversa, use emojis 💸🚀."
+                        }, {role:"user", content: userMsg}]
                     })
                 });
                 const d = await res.json();
-                const ai = d.choices[0].message.content;
+                const aiMsg = d.choices[0].message.content;
 
-                if(ai.includes("{")) {
-                    const r = JSON.parse(ai.substring(ai.indexOf("{"), ai.lastIndexOf("}") + 1));
+                if(aiMsg.includes("{")) {
+                    const r = JSON.parse(aiMsg.substring(aiMsg.indexOf("{"), aiMsg.lastIndexOf("}") + 1));
                     const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo);
                     const s = await ref.get();
                     let list = s.exists ? s.data().transacoes || [] : [];
-                    list.push({ descricao: r.desc, valor: r.valor, tipo: r.tipo });
+                    // Garante que o valor salvo seja um número puro
+                    list.push({ descricao: r.desc, valor: Number(r.valor), tipo: r.tipo });
                     await ref.set({ transacoes: list });
-                    box.innerHTML += `<div class="msg msg-ai">✅ Entendido! Lançamento de ${r.desc} realizado. 🚀</div>`;
+                    box.innerHTML += `<div class="msg msg-ai">✅ Tudo certo! Lançamento de "${r.desc}" registrado. 📈</div>`;
                 } else {
-                    box.innerHTML += `<div class="msg msg-ai">${ai}</div>`;
+                    box.innerHTML += `<div class="msg msg-ai">${aiMsg}</div>`;
                 }
-            } catch(e) { box.innerHTML += `<div class="msg msg-ai">Tive um probleminha aqui. Pode repetir? 😅</div>`; }
+            } catch(e) { box.innerHTML += `<div class="msg msg-ai">Tive um pequeno erro técnico. Tenta de novo? 😅</div>`; }
             box.scrollTop = box.scrollHeight;
         }
 
