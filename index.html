@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#EAB308">
     <link rel="manifest" href="manifest.json">
-    <title>Finan Pro | Master Fix</title>
+    <title>Finan Pro | Master Final</title>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -30,7 +30,7 @@
         .m-item.active { background: var(--accent); color: #000; font-weight: 800; border-color: var(--accent); }
 
         .hero { text-align: center; padding: 35px 20px; }
-        .hero h1 { font-size: 2.8rem; font-weight: 900; letter-spacing: -1.5px; transition: 0.3s; }
+        .hero h1 { font-size: 2.8rem; font-weight: 900; letter-spacing: -1.5px; }
 
         .stat-card { background: var(--card); padding: 18px; border-radius: 20px; border: 1px solid var(--border); margin: 0 20px 15px; display: flex; justify-content: space-between; text-align: center; }
         .stat-card small { font-size: 0.6rem; color: var(--subtext); text-transform: uppercase; font-weight: 800; display: block; margin-bottom: 5px; }
@@ -66,7 +66,7 @@
         </div>
         <div id="chat-box" class="chat-area"></div>
         <div style="padding:15px; display:flex; gap:10px; background:var(--card);">
-            <input type="text" id="ai-input" placeholder="O que você gastou ou recebeu?" style="flex:1; padding:18px; border-radius:15px; border:1px solid var(--border); background:#000; color:#fff; outline:none; font-size:1rem;">
+            <input type="text" id="ai-input" placeholder="O que deseja lançar?" style="flex:1; padding:18px; border-radius:15px; border:1px solid var(--border); background:#000; color:#fff; outline:none; font-size:1rem;">
             <button onclick="processarIA()" style="background:var(--accent); border:none; padding:0 20px; border-radius:15px; font-weight:900;">OK</button>
         </div>
     </div>
@@ -109,6 +109,7 @@
         const MESES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
         let mesAtivo = MESES[new Date().getMonth()];
         let chart = null;
+        let unsubscribe = null; // Para gerenciar a escuta do Firebase
 
         function init() {
             const mCont = document.getElementById('month-list');
@@ -116,7 +117,12 @@
                 const d = document.createElement('div');
                 d.className = `m-item ${m === mesAtivo ? 'active' : ''}`;
                 d.innerText = m.charAt(0).toUpperCase() + m.slice(1);
-                d.onclick = () => { document.querySelectorAll('.m-item').forEach(x => x.classList.remove('active')); d.classList.add('active'); mesAtivo = m; sync(); };
+                d.onclick = () => { 
+                    document.querySelectorAll('.m-item').forEach(x => x.classList.remove('active')); 
+                    d.classList.add('active'); 
+                    mesAtivo = m; 
+                    sync(); 
+                };
                 mCont.appendChild(d);
             });
             auth.onAuthStateChanged(u => { if(u){ document.getElementById('user-display').innerText = u.displayName.split(' ')[0]; sync(); } });
@@ -124,15 +130,15 @@
 
         async function login() { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
 
-        // --- LÓGICA DE CÁLCULO MESTRE: CORREÇÃO DE MÊS PARA MÊS ---
         async function sync() {
             if(!auth.currentUser) return;
+            if(unsubscribe) unsubscribe(); // Para a escuta anterior para não duplicar
+
             const uid = auth.currentUser.uid;
-            
-            // 1. Descobrir saldo dos meses anteriores
             let saldoAnterior = 0;
             const idxAtual = MESES.indexOf(mesAtivo);
             
+            // Soma saldo acumulado dos meses que ficaram para trás
             for (let i = 0; i < idxAtual; i++) {
                 const mDoc = await db.collection("usuarios").doc(uid).collection("meses").doc(MESES[i]).get();
                 if (mDoc.exists) {
@@ -145,8 +151,7 @@
                 }
             }
 
-            // 2. Escutar o mês atual
-            db.collection("usuarios").doc(uid).collection("meses").doc(mesAtivo)
+            unsubscribe = db.collection("usuarios").doc(uid).collection("meses").doc(mesAtivo)
             .onSnapshot(doc => {
                 let recMes = 0, gasMes = 0, html = "";
                 let cats = { fixo: 0, lazer: 0, invest: 0, outros: 0 };
@@ -155,17 +160,14 @@
                 trans.forEach((t, i) => {
                     const v = Number(t.valor) || 0;
                     const tp = t.tipo.toLowerCase().trim();
-                    
-                    if(tp === 'entrada') {
-                        recMes += v;
-                    } else {
+                    if(tp === 'entrada') recMes += v;
+                    else {
                         gasMes += v;
                         if(tp.includes('fixo')) cats.fixo += v;
                         else if(tp.includes('lazer')) cats.lazer += v;
                         else if(tp.includes('invest')) cats.invest += v;
                         else cats.outros += v;
                     }
-
                     html += `
                         <div class="t-row">
                             <div class="t-info"><b>${t.descricao}</b><small>${t.tipo.toUpperCase()}</small></div>
@@ -176,26 +178,19 @@
                         </div>`;
                 });
 
-                // CÁLCULO FINAL: Saldo Anterior + Receitas do Mês - Despesas do Mês
                 const saldoTotalFinal = saldoAnterior + recMes - gasMes;
-                
                 document.getElementById('main-balance').innerText = saldoTotalFinal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
                 document.getElementById('st-rec').innerText = `R$ ${recMes.toFixed(2)}`;
                 document.getElementById('st-gas').innerText = `R$ ${gasMes.toFixed(2)}`;
                 
-                if (saldoAnterior !== 0) {
-                    html = `<div style="padding:10px 25px; font-size:0.7rem; color:var(--accent); font-weight:800; opacity:0.8;"> 
-                             Saldo vindo de meses anteriores: R$ ${saldoAnterior.toFixed(2)} 
-                            </div>` + html;
-                }
-
-                document.getElementById('cont-lista').innerHTML = html || '<p style="text-align:center; opacity:0.3; margin-top:50px;">Nenhum registro.</p>';
+                let headerLista = saldoAnterior !== 0 ? `<div style="padding:10px 25px; font-size:0.7rem; color:var(--accent); font-weight:800; opacity:0.8;">Saldo acumulado anterior: R$ ${saldoAnterior.toFixed(2)}</div>` : "";
+                document.getElementById('cont-lista').innerHTML = headerLista + (html || '<p style="text-align:center; opacity:0.3; margin-top:50px;">Sem registros neste mês.</p>');
                 renderChart(cats, saldoTotalFinal);
             });
         }
 
         async function apagar(idx) {
-            if(!confirm("Apagar registro?")) return;
+            if(!confirm("Excluir este lançamento?")) return;
             const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo);
             const s = await ref.get();
             let l = s.data().transacoes;
@@ -220,6 +215,7 @@
             });
         }
 
+        // --- AJUSTE NA IA: LANÇAMENTO NO MÊS SELECIONADO ---
         async function processarIA() {
             const inp = document.getElementById('ai-input'), box = document.getElementById('chat-box');
             if(!inp.value || !auth.currentUser) return;
@@ -234,7 +230,7 @@
                         model:"llama-3.1-8b-instant",
                         messages:[{
                             role:"system", 
-                            content: "Você é o FinanPro AI. Se o usuário quiser lançar algo, responda APENAS o JSON: {\"is_launch\":true,\"desc\":\"...\",\"valor\":0.0,\"tipo\":\"entrada/fixo/lazer/invest/outros\"}. Regra: Gastos = fixo, lazer, invest ou outros. Ganhos = entrada. Use sempre valores positivos. Se for conversa, use emojis 💸🚀."
+                            content: "Você é o FinanPro AI. Se o usuário quiser lançar algo, retorne APENAS o JSON: {\"is_launch\":true,\"desc\":\"...\",\"valor\":0.0,\"tipo\":\"entrada/fixo/lazer/invest/outros\"}. Ganhos = entrada. Gastos = fixo, lazer, invest ou outros. Sempre use valores positivos. Conversas use emojis."
                         }, {role:"user", content: userMsg}]
                     })
                 });
@@ -243,16 +239,17 @@
 
                 if(aiMsg.includes("{")) {
                     const r = JSON.parse(aiMsg.substring(aiMsg.indexOf("{"), aiMsg.lastIndexOf("}") + 1));
+                    // Aqui forçamos o salvamento no mesAtivo que está na tela
                     const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo);
                     const s = await ref.get();
                     let list = s.exists ? s.data().transacoes || [] : [];
                     list.push({ descricao: r.desc, valor: Number(r.valor), tipo: r.tipo });
                     await ref.set({ transacoes: list });
-                    box.innerHTML += `<div class="msg msg-ai">✅ Feito! Lançamento de "${r.desc}" registrado. Seu saldo acumulado foi atualizado! 📈</div>`;
+                    box.innerHTML += `<div class="msg msg-ai">✅ Confirmado! Lançamento de "${r.desc}" feito no mês de ${mesAtivo.toUpperCase()}. 🚀</div>`;
                 } else {
                     box.innerHTML += `<div class="msg msg-ai">${aiMsg}</div>`;
                 }
-            } catch(e) { box.innerHTML += `<div class="msg msg-ai">Tive um probleminha. Pode repetir? 😅</div>`; }
+            } catch(e) { box.innerHTML += `<div class="msg msg-ai">Ops, erro técnico. Tente novamente! 😅</div>`; }
             box.scrollTop = box.scrollHeight;
         }
 
