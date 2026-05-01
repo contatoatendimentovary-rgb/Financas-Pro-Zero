@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#EAB308">
     <link rel="manifest" href="manifest.json">
-    <title>Finan Pro Final</title>
+    <title>Finan Pro | IA Edition</title>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -19,115 +19,95 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 120px; overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 140px; overflow-x: hidden; }
 
         .header { padding: 50px 20px 20px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
         .nav-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .user-badge { background: var(--accent); color: #000; padding: 6px 14px; border-radius: 10px; font-size: 0.7rem; font-weight: 800; }
+        .user-badge { background: var(--accent); color: #000; padding: 6px 14px; border-radius: 10px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
 
         .month-bar { display: flex; overflow-x: auto; gap: 8px; scrollbar-width: none; }
-        .m-item { padding: 10px 16px; border-radius: 12px; background: #1A1A1A; border: 1px solid var(--border); color: var(--subtext); font-size: 0.75rem; white-space: nowrap; }
-        .m-item.active { background: var(--accent); color: #000; font-weight: 800; }
+        .m-item { padding: 10px 16px; border-radius: 12px; background: #1A1A1A; border: 1px solid var(--border); color: var(--subtext); font-size: 0.75rem; white-space: nowrap; cursor: pointer; transition: 0.3s; }
+        .m-item.active { background: var(--accent); color: #000; font-weight: 800; border-color: var(--accent); }
 
-        .hero { text-align: center; padding: 30px 20px; }
-        .hero h1 { font-size: 2.5rem; font-weight: 900; letter-spacing: -1px; }
+        .hero { text-align: center; padding: 35px 20px; }
+        .hero h1 { font-size: 2.8rem; font-weight: 900; letter-spacing: -1.5px; }
 
-        .stat-card { background: var(--card); padding: 15px; border-radius: 18px; border: 1px solid var(--border); margin: 0 20px 10px; display: flex; justify-content: space-between; text-align: center; }
-        .stat-card small { font-size: 0.6rem; color: var(--subtext); text-transform: uppercase; display: block; font-weight: 800; }
+        .stat-card { background: var(--card); padding: 18px; border-radius: 20px; border: 1px solid var(--border); margin: 0 20px 15px; display: flex; justify-content: space-between; text-align: center; }
+        .stat-card small { font-size: 0.6rem; color: var(--subtext); text-transform: uppercase; font-weight: 800; margin-bottom: 4px; display: block; }
         
-        /* CORREÇÃO DE LAYOUT DO EXTRATO */
-        .t-row { 
-            background: var(--card); 
-            padding: 16px; 
-            border-radius: 20px; 
-            margin: 0 20px 12px; 
-            border: 1px solid var(--border); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-        }
-        .t-info { flex: 1; }
-        .t-info b { display: block; font-size: 0.95rem; margin-bottom: 2px; }
-        .t-info small { color: var(--subtext); font-size: 0.65rem; text-transform: uppercase; font-weight: 700; }
+        .chart-box { background: var(--card); border-radius: 28px; border: 1px solid var(--border); margin: 5px 20px 20px; padding: 25px; display: flex; justify-content: center; }
+        .chart-container { width: 160px; height: 160px; }
+
+        /* LISTA DE EXTRATO MELHORADA */
+        .t-row { background: var(--card); padding: 18px; border-radius: 22px; margin: 0 20px 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .t-info b { font-size: 0.95rem; color: var(--text); display: block; }
+        .t-info small { color: var(--subtext); font-size: 0.65rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
         
-        .t-action { display: flex; align-items: center; gap: 12px; }
-        .t-action b { font-size: 0.9rem; white-space: nowrap; }
-        .btn-del { 
-            background: rgba(239, 68, 68, 0.1); 
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: var(--red); 
-            width: 32px; 
-            height: 32px; 
-            border-radius: 10px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            font-size: 1rem;
-            cursor: pointer;
-        }
+        .t-val { display: flex; align-items: center; gap: 12px; }
+        .t-val b { font-size: 0.9rem; }
+        .btn-del { background: #1a1a1a; border: 1px solid var(--border); color: var(--red); width: 35px; height: 35px; border-radius: 12px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-        .chart-box { background: var(--card); border-radius: 25px; border: 1px solid var(--border); margin: 10px 20px; padding: 25px; text-align: center; }
-        .chart-container { width: 150px; height: 150px; margin: 0 auto; }
+        /* IA MODAL E FAB */
+        .ai-fab { position: fixed; bottom: 105px; right: 20px; width: 65px; height: 65px; border-radius: 22px; background: var(--accent); border: none; font-size: 32px; box-shadow: 0 10px 25px rgba(234, 179, 8, 0.4); z-index: 999; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
-        .ai-fab { position: fixed; bottom: 105px; right: 20px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); border: none; font-size: 28px; box-shadow: 0 8px 20px rgba(234, 179, 8, 0.3); z-index: 999; }
         .panel { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 5000; flex-direction: column; }
-        .chat-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-        .msg { max-width: 85%; padding: 12px 16px; border-radius: 15px; font-size: 0.9rem; }
-        .msg-ai { align-self: flex-start; background: var(--card); border: 1px solid var(--border); }
-        .msg-user { align-self: flex-end; background: var(--accent); color: #000; font-weight: 600; }
+        .chat-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .msg { max-width: 85%; padding: 14px 18px; border-radius: 22px; font-size: 0.95rem; line-height: 1.5; }
+        .msg-ai { align-self: flex-start; background: var(--card); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+        .msg-user { align-self: flex-end; background: var(--accent); color: #000; font-weight: 700; border-bottom-right-radius: 4px; }
 
-        .nav-bot { position: fixed; bottom: 0; width: 100%; height: 85px; background: var(--card); border-top: 1px solid var(--border); display: flex; padding-bottom: 20px; z-index: 1000; }
-        .n-btn { flex: 1; border: none; background: none; color: var(--subtext); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; }
+        .nav-bot { position: fixed; bottom: 0; width: 100%; height: 90px; background: var(--card); border-top: 1px solid var(--border); display: flex; padding-bottom: 25px; z-index: 1000; }
+        .n-btn { flex: 1; border: none; background: none; color: var(--subtext); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; letter-spacing: 1px; }
         .n-btn.active { color: var(--accent); }
     </style>
 </head>
 <body>
 
     <div id="ai-modal" class="panel">
-        <div style="padding:20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-            <b style="color:var(--accent)">FINAN PRO AI</b>
-            <button onclick="toggleIA()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
+        <div style="padding:25px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+            <b style="color:var(--accent); font-size:1.1rem;">✨ ASSISTENTE PRO</b>
+            <button onclick="toggleIA()" style="background:none; border:none; color:#fff; font-size:2rem;">&times;</button>
         </div>
         <div id="chat-box" class="chat-area"></div>
-        <div style="padding:20px; display:flex; gap:10px; background:var(--card);">
-            <input type="text" id="ai-input" placeholder="Diga o que gastou ou recebeu..." style="flex:1; padding:15px; border-radius:12px; border:1px solid var(--border); background:#000; color:#fff; outline:none;">
-            <button onclick="processarIA()" style="background:var(--accent); border:none; padding:0 20px; border-radius:12px; font-weight:800;">OK</button>
+        <div style="padding:20px; display:flex; gap:12px; background:var(--card);">
+            <input type="text" id="ai-input" placeholder="Ex: Gastei 15 no Uber..." style="flex:1; padding:18px; border-radius:15px; border:1px solid var(--border); background:#000; color:#fff; outline:none; font-size:1rem;">
+            <button onclick="processarIA()" style="background:var(--accent); border:none; padding:0 25px; border-radius:15px; font-weight:900;">ENVIAR</button>
         </div>
     </div>
 
     <header class="header">
         <div class="nav-top">
-            <b>FINANÇAS<span style="color:var(--accent)">PRO</span></b>
-            <div id="user-display" class="user-badge" onclick="login()">LOGIN</div>
+            <b style="letter-spacing:1px; font-size:1.2rem;">FINANÇAS<span style="color:var(--accent)">PRO</span></b>
+            <div id="user-display" class="user-badge" onclick="login()">Conectar</div>
         </div>
         <div class="month-bar" id="month-list"></div>
     </header>
 
     <div id="v-home">
         <div class="hero">
-            <span style="color:var(--subtext); font-size:0.7rem; font-weight:800; text-transform:uppercase;">Saldo Geral</span>
+            <small style="color:var(--subtext); font-weight:800; text-transform:uppercase; font-size:0.6rem; letter-spacing:2px; opacity:0.7;">Saldo Total</small>
             <h1 id="main-balance">R$ 0,00</h1>
         </div>
         <div class="stat-card">
-            <div><small>Receitas</small><b id="st-rec" style="color:var(--green)">R$ 0,00</b></div>
-            <div><small>Despesas</small><b id="st-gas" style="color:var(--red)">R$ 0,00</b></div>
+            <div><small>📈 Entradas</small><b id="st-rec" style="color:var(--green)">R$ 0,00</b></div>
+            <div style="width:1px; background:var(--border); height:30px; align-self:center;"></div>
+            <div><small>📉 Saídas</small><b id="st-gas" style="color:var(--red)">R$ 0,00</b></div>
         </div>
         <div class="chart-box"><div class="chart-container"><canvas id="myChart"></canvas></div></div>
     </div>
 
-    <div id="v-lista" style="display:none; padding-top:20px;">
-        <div id="cont-lista"></div>
-    </div>
+    <div id="v-lista" style="display:none; padding-top:20px;"><div id="cont-lista"></div></div>
 
     <button class="ai-fab" onclick="toggleIA()">✨</button>
 
     <nav class="nav-bot">
-        <button class="n-btn active" onclick="tab('home', this)">📊 INÍCIO</button>
-        <button class="n-btn" onclick="tab('lista', this)">📜 EXTRATO</button>
+        <button class="n-btn active" onclick="tab('home', this)">DASHBOARD</button>
+        <button class="n-btn" onclick="tab('lista', this)">EXTRATO</button>
     </nav>
 
     <script>
-        // SERVICE WORKER AUTOMÁTICO
+        // PWA SERVICE WORKER
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const sw = `self.addEventListener('fetch', e => e.respondWith(fetch(e.request)));`;
@@ -180,11 +160,8 @@
                     }
                     html += `
                         <div class="t-row">
-                            <div class="t-info">
-                                <b>${t.descricao}</b>
-                                <small>${t.tipo}</small>
-                            </div>
-                            <div class="t-action">
+                            <div class="t-info"><b>${t.descricao}</b><small>${t.tipo}</small></div>
+                            <div class="t-val">
                                 <b style="color:${isEntrada?'var(--green)':'#fff'}">${isEntrada?'+':'-'} R$ ${v.toFixed(2)}</b>
                                 <button class="btn-del" onclick="apagarGasto(${i})">✕</button>
                             </div>
@@ -195,18 +172,18 @@
                 document.getElementById('main-balance').innerText = saldoGlobal.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
                 document.getElementById('st-rec').innerText = `R$ ${r.toFixed(2)}`;
                 document.getElementById('st-gas').innerText = `R$ ${g.toFixed(2)}`;
-                document.getElementById('cont-lista').innerHTML = html || '<p style="text-align:center; opacity:0.2; margin-top:40px;">Sem lançamentos</p>';
+                document.getElementById('cont-lista').innerHTML = html || '<p style="text-align:center; opacity:0.3; margin-top:50px;">Nenhum registro ainda ☕</p>';
                 renderChart(cats, r, g);
             });
         }
 
-        async function apagarGasto(index) {
-            if(!confirm("Apagar este registro?")) return;
+        async function apagarGasto(i) {
+            if(!confirm("Apagar registro?")) return;
             const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo);
             const s = await ref.get();
-            let lista = s.data().transacoes;
-            lista.splice(index, 1);
-            await ref.set({ transacoes: lista });
+            let l = s.data().transacoes;
+            l.splice(i, 1);
+            await ref.set({ transacoes: l });
         }
 
         function renderChart(c, r, g) {
@@ -215,11 +192,12 @@
             chart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Fixo', 'Lazer', 'Invest', 'Outros', 'Saldo'],
+                    labels: ['Fixo', 'Lazer', 'Invest', 'Outros', 'Disponível'],
                     datasets: [{
                         data: [c.Fixo, c.Lazer, c.Invest, c.Outros, (r-g) > 0 ? (r-g) : 0],
                         backgroundColor: ['#3B82F6', '#F59E0B', '#A855F7', '#EF4444', '#EAB308'],
-                        borderWidth: 0
+                        borderWidth: 0,
+                        hoverOffset: 10
                     }]
                 },
                 options: { cutout: '80%', plugins: { legend: { display: false } } }
@@ -229,8 +207,8 @@
         async function processarIA() {
             const inp = document.getElementById('ai-input'), box = document.getElementById('chat-box');
             if(!inp.value || !auth.currentUser) return;
-            const p = inp.value;
-            box.innerHTML += `<div class="msg msg-user">${p}</div>`;
+            const uMsg = inp.value;
+            box.innerHTML += `<div class="msg msg-user">${uMsg}</div>`;
             inp.value = ""; box.scrollTop = box.scrollHeight;
 
             try {
@@ -238,24 +216,31 @@
                     method:'POST', headers:{'Authorization':'Bearer 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','Content-Type':'application/json'},
                     body:JSON.stringify({
                         model:"llama-3.1-8b-instant",
-                        messages:[{role:"system", content: "Você é o FinanPro. REGRAS: 1. Se o usuário quiser lançar algo use JSON: {\"is_launch\":true,\"desc\":\"...\",\"valor\":0.0,\"tipo\":\"entrada/fixo/lazer/invest\"}. 2. 'Gastei/Paguei/Comprei' = Saída. 3. 'Recebi/Ganhei/Entrou' = Entrada. 4. Caso contrário, seja um consultor amigável. Saldo: R$ "+saldoGlobal}, {role:"user", content: p}]
+                        messages:[{
+                            role:"system", 
+                            content: `Você é o FinanPro AI. 
+                            1. Se o usuário quiser lançar dinheiro use JSON: {"is_launch":true,"desc":"...","valor":0.0,"tipo":"entrada/fixo/lazer/invest"}. 
+                            2. Gastei/Paguei/Comprei = Saída. Recebi/Ganhei/Entrou = Entrada. 
+                            3. Se for conversa, use MUITOS emojis e seja amigável. 
+                            Saldo: R$ ${saldoGlobal}`
+                        }, {role:"user", content: uMsg}]
                     })
                 });
                 const d = await res.json();
-                const ai = d.choices[0].message.content;
+                const aiMsg = d.choices[0].message.content;
 
-                if(ai.includes("{")) {
-                    const r = JSON.parse(ai.substring(ai.indexOf("{"), ai.lastIndexOf("}") + 1));
+                if(aiMsg.includes("{")) {
+                    const r = JSON.parse(aiMsg.substring(aiMsg.indexOf("{"), aiMsg.lastIndexOf("}") + 1));
                     const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo);
                     const s = await ref.get();
                     let l = s.exists ? s.data().transacoes || [] : [];
                     l.push({ descricao: r.desc, valor: r.valor, tipo: r.tipo });
                     await ref.set({ transacoes: l });
-                    box.innerHTML += `<div class="msg msg-ai">✅ Registro feito: ${r.desc} (R$ ${r.valor.toFixed(2)})</div>`;
+                    box.innerHTML += `<div class="msg msg-ai">✅ Feito! Lançado ${r.desc} de R$ ${r.valor.toFixed(2)}. O gráfico já atualizou! 🚀</div>`;
                 } else {
-                    box.innerHTML += `<div class="msg msg-ai">${ai}</div>`;
+                    box.innerHTML += `<div class="msg msg-ai">${aiMsg}</div>`;
                 }
-            } catch(e) { box.innerHTML += `<div class="msg msg-ai">Erro na conexão.</div>`; }
+            } catch(e) { box.innerHTML += `<div class="msg msg-ai">Ops, tive um problema. Tenta de novo? 😅</div>`; }
             box.scrollTop = box.scrollHeight;
         }
 
