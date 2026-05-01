@@ -12,296 +12,250 @@
 
     <style>
         :root {
-            --bg: #0A0A0A; --card: #141414; --accent: #EAB308; --text: #FFFFFF;
+            --bg: #050505; --card: #121212; --accent: #EAB308; --text: #FFFFFF;
             --subtext: #A1A1AA; --green: #22C55E; --red: #EF4444; --border: #27272A;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: var(--text); padding-bottom: 100px; overflow-x: hidden; }
 
-        /* Header Premium */
-        .header { padding: 40px 20px 20px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
-        .nav-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .user-badge { background: var(--accent); color: #000; padding: 6px 15px; border-radius: 10px; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; cursor: pointer; }
+        .header { padding: 45px 20px 20px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+        .nav-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .user-badge { background: var(--accent); color: #000; padding: 8px 16px; border-radius: 12px; font-size: 0.7rem; font-weight: 900; text-transform: uppercase; }
 
-        .month-bar { display: flex; overflow-x: auto; gap: 10px; padding-bottom: 10px; scrollbar-width: none; }
-        .month-bar::-webkit-scrollbar { display: none; }
-        .m-item { padding: 8px 16px; border-radius: 12px; background: #1A1A1A; border: 1px solid var(--border); font-size: 0.8rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: 0.3s; }
-        .m-item.active { background: var(--accent); color: #000; border-color: var(--accent); }
+        .month-bar { display: flex; overflow-x: auto; gap: 10px; scrollbar-width: none; padding-bottom: 5px; }
+        .m-item { padding: 10px 18px; border-radius: 14px; background: #1A1A1A; border: 1px solid var(--border); color: var(--subtext); font-size: 0.8rem; font-weight: 700; white-space: nowrap; transition: 0.3s; }
+        .m-item.active { background: var(--accent); color: #000; border-color: var(--accent); transform: scale(1.05); }
 
-        /* Hero & Stats */
-        .hero { text-align: center; padding: 30px 20px; }
-        .hero span { font-size: 0.7rem; text-transform: uppercase; color: var(--subtext); font-weight: 800; letter-spacing: 1px; }
-        .hero h1 { font-size: 2.5rem; font-weight: 900; margin-top: 5px; }
+        .hero { text-align: center; padding: 35px 20px 15px; }
+        .hero span { font-size: 0.7rem; text-transform: uppercase; color: var(--subtext); font-weight: 800; letter-spacing: 1.5px; }
+        .hero h1 { font-size: 2.8rem; font-weight: 900; letter-spacing: -1.5px; margin-top: 5px; }
 
-        .mini-stats { display: flex; gap: 10px; margin: 0 20px 20px; }
-        .stat-card { flex: 1; background: var(--card); padding: 15px; border-radius: 18px; border: 1px solid var(--border); }
-        .stat-card small { font-size: 0.6rem; font-weight: 800; color: var(--subtext); text-transform: uppercase; display: block; margin-bottom: 5px; }
-        .stat-card b { font-size: 1rem; }
+        .mini-stats { display: flex; gap: 12px; margin: 0 20px 25px; }
+        .stat-card { flex: 1; background: var(--card); padding: 18px; border-radius: 22px; border: 1px solid var(--border); }
+        .stat-card small { font-size: 0.6rem; font-weight: 800; color: var(--subtext); text-transform: uppercase; display: block; margin-bottom: 6px; }
+        .stat-card b { font-size: 1.05rem; letter-spacing: -0.5px; }
 
-        /* Gráfico */
-        .chart-box { background: var(--card); border-radius: 24px; border: 1px solid var(--border); margin: 0 20px 20px; padding: 25px; text-align: center; }
-        .chart-container { width: 180px; height: 180px; margin: 0 auto; position: relative; }
+        .chart-box { background: var(--card); border-radius: 28px; border: 1px solid var(--border); margin: 0 20px 25px; padding: 30px; text-align: center; }
+        .chart-container { width: 170px; height: 170px; margin: 0 auto; position: relative; }
 
-        /* Lista de Transações */
-        .t-row { background: var(--card); padding: 16px; border-radius: 20px; margin: 0 20px 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .t-info { display: flex; align-items: center; gap: 12px; }
-        .t-emoji { width: 40px; height: 40px; background: #1A1A1A; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; border: 1px solid var(--border); }
-        .t-details b { display: block; font-size: 0.9rem; }
-        .t-details span { font-size: 0.65rem; color: var(--subtext); font-weight: 700; text-transform: uppercase; }
+        .t-row { background: var(--card); padding: 16px; border-radius: 20px; margin: 0 20px 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .t-info { display: flex; align-items: center; gap: 14px; }
+        .t-emoji { width: 44px; height: 44px; background: #1A1A1A; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 1px solid var(--border); }
+        .t-details b { display: block; font-size: 0.95rem; letter-spacing: -0.3px; }
+        .t-details span { font-size: 0.65rem; color: var(--subtext); font-weight: 800; text-transform: uppercase; }
 
-        .btn-del { background: none; border: none; color: #444; padding: 10px; cursor: pointer; font-size: 1.1rem; }
+        .btn-del { background: rgba(239, 68, 68, 0.1); border: none; color: var(--red); width: 38px; height: 38px; border-radius: 12px; font-size: 1rem; cursor: pointer; }
 
-        /* Botão IA */
-        .ai-fab { position: fixed; bottom: 100px; right: 20px; width: 55px; height: 55px; border-radius: 18px; background: var(--accent); border: none; font-size: 24px; box-shadow: 0 8px 20px rgba(234, 179, 8, 0.4); z-index: 99; cursor: pointer; }
+        .ai-fab { position: fixed; bottom: 105px; right: 20px; width: 60px; height: 60px; border-radius: 20px; background: var(--accent); border: none; font-size: 28px; box-shadow: 0 10px 25px rgba(234, 179, 8, 0.4); z-index: 999; }
 
-        /* Chat Modal */
-        .ai-modal { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 1000; flex-direction: column; }
+        .panel { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 5000; flex-direction: column; }
         .chat-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .msg { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 0.9rem; line-height: 1.4; }
+        .msg { max-width: 85%; padding: 14px 18px; border-radius: 18px; font-size: 0.95rem; line-height: 1.4; }
         .msg-ai { align-self: flex-start; background: var(--card); border: 1px solid var(--border); color: #fff; }
         .msg-user { align-self: flex-end; background: var(--accent); color: #000; font-weight: 700; }
 
-        /* Tab Bar */
-        .nav-bot { position: fixed; bottom: 0; width: 100%; height: 85px; background: var(--card); border-top: 1px solid var(--border); display: flex; padding-bottom: 15px; z-index: 100; }
-        .n-btn { flex: 1; border: none; background: none; color: var(--subtext); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+        .nav-bot { position: fixed; bottom: 0; width: 100%; height: 90px; background: var(--card); border-top: 1px solid var(--border); display: flex; padding-bottom: 20px; z-index: 1000; }
+        .n-btn { flex: 1; border: none; background: none; color: var(--subtext); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 0.65rem; }
         .n-btn.active { color: var(--accent); }
-        .n-btn span { font-size: 1.4rem; margin-bottom: 4px; }
+        .n-btn i { font-size: 1.6rem; margin-bottom: 6px; }
     </style>
 </head>
 <body>
 
-    <div id="ai-modal" class="ai-modal">
-        <div style="padding:20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-            <b style="color:var(--accent)">✨ INTELIGÊNCIA FINANCEIRA</b>
-            <button onclick="toggleIA()" style="background:none; border:none; color:#fff; font-size:1.5rem;">✕</button>
+    <div id="ai-modal" class="panel">
+        <div style="padding:25px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+            <b style="color:var(--accent); letter-spacing:1px;">✨ ASSISTENTE FINANPRO</b>
+            <button onclick="toggleIA()" style="background:none; border:none; color:#fff; font-size:2rem;">&times;</button>
         </div>
         <div id="chat-box" class="chat-area">
-            <div class="msg msg-ai">Olá Henrique! Qual lançamento vamos fazer agora?</div>
+            <div class="msg msg-ai">Olá Henrique! Sou sua IA. Pode falar seus gastos ou ganhos que eu organizo tudo. 😊</div>
         </div>
-        <div style="padding:20px; display:flex; gap:10px; background:var(--card); border-top:1px solid var(--border);">
-            <input type="text" id="ai-input" placeholder="Gastei 50 no mercado..." style="flex:1; padding:15px; border-radius:14px; border:1px solid var(--border); background:#000; color:#fff; outline:none;">
-            <button onclick="processarIA()" style="background:var(--accent); border:none; padding:0 22px; border-radius:14px; font-weight:900;">OK</button>
+        <div style="padding:25px; display:flex; gap:12px; background:var(--card);">
+            <input type="text" id="ai-input" placeholder="Ex: Ganhei 3000 de auxilio" style="flex:1; padding:18px; border-radius:15px; border:1px solid var(--border); background:#000; color:#fff; outline:none;">
+            <button onclick="processarIA()" style="background:var(--accent); border:none; padding:0 25px; border-radius:15px; font-weight:900;">OK</button>
         </div>
     </div>
 
     <header class="header">
         <div class="nav-top">
-            <b style="font-size: 1.2rem; letter-spacing: -1px;">FINANÇAS<span style="color:var(--accent)">PRO</span></b>
-            <div id="user-display" class="user-badge" onclick="login()">Conectar</div>
+            <b style="font-size: 1.3rem; letter-spacing: -1px;">FINANÇAS<span style="color:var(--accent)">PRO</span></b>
+            <div id="user-display" class="user-badge" onclick="login()">LOGIN</div>
         </div>
         <div class="month-bar" id="month-list"></div>
     </header>
 
-    <div id="tab-home">
+    <div id="v-home">
         <div class="hero">
-            <span>Saldo Atual</span>
+            <span>Saldo em Conta</span>
             <h1 id="main-balance">R$ 0,00</h1>
         </div>
 
         <div class="mini-stats">
             <div class="stat-card">
-                <small>Recebido</small>
-                <b id="total-receita" style="color:var(--green)">R$ 0,00</b>
+                <small>Entradas</small>
+                <b id="st-rec" style="color:var(--green)">R$ 0,00</b>
             </div>
             <div class="stat-card">
-                <small>Gasto</small>
-                <b id="total-gasto" style="color:var(--red)">R$ 0,00</b>
+                <small>Saídas</small>
+                <b id="st-gas" style="color:var(--red)">R$ 0,00</b>
             </div>
         </div>
 
         <div class="chart-box">
-            <div class="chart-container"><canvas id="mainChart"></canvas></div>
-            <p style="margin-top:15px; font-size:0.65rem; font-weight:800; color:var(--subtext); letter-spacing:1px;">RESUMO DE DISTRIBUIÇÃO</p>
+            <div class="chart-container"><canvas id="myChart"></canvas></div>
+            <p style="margin-top:18px; font-size:0.7rem; font-weight:800; color:var(--subtext); letter-spacing:1px;">CONSUMO DO ORÇAMENTO</p>
         </div>
     </div>
 
-    <div id="tab-lista" style="display:none; padding-top:10px;">
-        <div id="transacoes-container"></div>
+    <div id="v-lista" style="display:none; padding-top:10px;">
+        <div id="cont-lista"></div>
     </div>
 
     <button class="ai-fab" onclick="toggleIA()">✨</button>
 
     <nav class="nav-bot">
-        <button class="n-btn active" onclick="showTab('home', this)"><span>📊</span>Home</button>
-        <button class="n-btn" onclick="toggleIA()"><span>➕</span>Lançar</button>
-        <button class="n-btn" onclick="showTab('lista', this)"><span>📜</span>Extrato</button>
+        <button class="n-btn active" onclick="tab('home', this)"><i>📊</i>Home</button>
+        <button class="n-btn" onclick="toggleIA()"><i>➕</i>Lançar</button>
+        <button class="n-btn" onclick="tab('lista', this)"><i>📜</i>Extrato</button>
     </nav>
 
     <script>
-        // Configuração Firebase Henrique
-        const firebaseConfig = { apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE", authDomain: "financaspro-1e0e8.firebaseapp.com", projectId: "financaspro-1e0e8", storageBucket: "financaspro-1e0e8.firebasestorage.app", messagingSenderId: "659521706556", appId: "1:659521706556:web:86f2174c4c8a89335ac139" };
-        firebase.initializeApp(firebaseConfig);
+        const cfg = { apiKey: "AIzaSyA6C8n-wiKv6kp2Q7Y99D2GEL2fg_0SPVE", authDomain: "financaspro-1e0e8.firebaseapp.com", projectId: "financaspro-1e0e8", storageBucket: "financaspro-1e0e8.firebasestorage.app", messagingSenderId: "659521706556", appId: "1:659521706556:web:86f2174c4c8a89335ac139" };
+        firebase.initializeApp(cfg);
         const auth = firebase.auth(), db = firebase.firestore();
 
         const MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
         let mesAtivo = MESES[new Date().getMonth()];
-        let chartInstance = null;
+        let chart = null;
 
         function init() {
-            const list = document.getElementById('month-list');
+            const mCont = document.getElementById('month-list');
             MESES.forEach(m => {
-                const div = document.createElement('div');
-                div.className = `m-item ${m === mesAtivo ? 'active' : ''}`;
-                div.innerText = m;
-                div.onclick = () => {
+                const d = document.createElement('div');
+                d.className = `m-item ${m === mesAtivo ? 'active' : ''}`;
+                d.innerText = m;
+                d.onclick = () => {
                     document.querySelectorAll('.m-item').forEach(x => x.classList.remove('active'));
-                    div.classList.add('active');
+                    d.classList.add('active');
                     mesAtivo = m;
-                    syncData();
+                    sync();
                 };
-                list.appendChild(div);
+                mCont.appendChild(d);
             });
-            auth.onAuthStateChanged(user => {
-                if(user) {
-                    document.getElementById('user-display').innerText = user.displayName.split(' ')[0];
-                    syncData();
-                }
-            });
+            auth.onAuthStateChanged(u => { if(u){ document.getElementById('user-display').innerText = u.displayName.split(' ')[0]; sync(); } });
         }
 
         async function login() { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
 
-        function syncData() {
+        function sync() {
             if(!auth.currentUser) return;
-            const path = `usuarios/${auth.currentUser.uid}/meses/${mesAtivo.toLowerCase()}`;
-            
-            db.doc(path).onSnapshot(doc => {
-                let receita = 0, gasto = 0, html = "";
+            db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo.toLowerCase())
+            .onSnapshot(doc => {
+                let rec = 0, gas = 0, html = "";
                 const data = doc.exists ? doc.data().transacoes || [] : [];
+                
+                // Cálculo Matemático Rigoroso
+                data.forEach((t, i) => {
+                    const val = parseFloat(t.valor) || 0;
+                    const type = (t.tipo || '').toLowerCase();
+                    const isEntrada = type.includes('entrada') || type.includes('receita');
 
-                data.forEach((t, idx) => {
-                    const v = parseFloat(t.valor) || 0;
-                    const type = (t.tipo || 'lazer').toLowerCase().trim();
+                    if(isEntrada) rec += val; else gas += val;
 
-                    if(type === 'entrada' || type === 'receita') {
-                        receita += v;
-                    } else {
-                        gasto += v;
-                    }
-
-                    const isPos = type === 'entrada' || type === 'receita';
-                    html += `
-                        <div class="t-row">
-                            <div class="t-info">
-                                <div class="t-emoji">${isPos ? '💵' : (type === 'fixo' ? '🏠' : '🍿')}</div>
-                                <div class="t-details"><b>${t.descricao || 'Sem nome'}</b><span>${type}</span></div>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:10px;">
-                                <b style="color:${isPos ? 'var(--green)' : '#fff'}">R$ ${v.toFixed(2)}</b>
-                                <button class="btn-del" onclick="deleteItem(${idx})">🗑️</button>
-                            </div>
-                        </div>`;
+                    html += `<div class="t-row">
+                        <div class="t-info">
+                            <div class="t-emoji">${isEntrada ? '💵' : (type.includes('fixo') ? '🏠' : '🍿')}</div>
+                            <div class="t-details"><b>${t.descricao}</b><span>${t.tipo}</span></div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <b style="color:${isEntrada ? 'var(--green)' : '#fff'}">R$ ${val.toFixed(2)}</b>
+                            <button class="btn-del" onclick="del(${i})">🗑️</button>
+                        </div>
+                    </div>`;
                 });
 
-                const saldo = receita - gasto;
-                document.getElementById('main-balance').innerText = saldo.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+                const saldo = rec - gas;
+                document.getElementById('main-balance').innerText = saldo.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
                 document.getElementById('main-balance').style.color = saldo < 0 ? 'var(--red)' : '#fff';
-                document.getElementById('total-receita').innerText = `R$ ${receita.toFixed(2)}`;
-                document.getElementById('total-gasto').innerText = `R$ ${gasto.toFixed(2)}`;
+                document.getElementById('st-rec').innerText = `R$ ${rec.toFixed(2)}`;
+                document.getElementById('st-gas').innerText = `R$ ${gas.toFixed(2)}`;
+                document.getElementById('cont-lista').innerHTML = html || "<p style='text-align:center; opacity:0.2; margin-top:50px;'>Sem registros.</p>";
                 
-                document.getElementById('transacoes-container').innerHTML = html || "<p style='text-align:center; opacity:0.2; margin-top:50px;'>Nada por aqui.</p>";
-                updateChart(receita, gasto);
+                render(rec, gas);
             });
         }
 
-        function updateChart(rec, gas) {
-            const ctx = document.getElementById('mainChart').getContext('2d');
-            if(chartInstance) chartInstance.destroy();
-
-            // Lógica Corrigida: Se não houver receita, o gasto ocupa tudo. 
-            // Se houver receita, mostramos o que sobra (Saldo) e o que foi gasto.
-            const saldoParaGrafico = rec > gas ? rec - gas : 0;
-            const gastoParaGrafico = gas;
-
-            chartInstance = new Chart(ctx, {
+        function render(r, g) {
+            const ctx = document.getElementById('myChart').getContext('2d');
+            if(chart) chart.destroy();
+            
+            // Gráfico de Dedução Real
+            // Se o gasto for maior que a receita, o saldo é 0 para o gráfico não quebrar
+            const saldoGrafico = r > g ? r - g : 0;
+            
+            chart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Gasto', 'Saldo Restante'],
                     datasets: [{
-                        data: [gastoParaGrafico, saldoParaGrafico],
-                        backgroundColor: [gas > rec ? '#EF4444' : '#EF4444', '#EAB308'],
-                        borderWidth: 0,
-                        hoverOffset: 4
+                        data: [g || 0.1, saldoGrafico || 0.1],
+                        backgroundColor: ['#EF4444', '#EAB308'], // Vermelho (Gasto) / Amarelo (O que sobrou)
+                        borderWidth: 0
                     }]
                 },
-                options: {
-                    cutout: '82%',
-                    plugins: { legend: { display: false } },
-                    animation: { duration: 1000 }
-                }
+                options: { cutout: '85%', plugins: { legend: { display: false } } }
             });
         }
 
         async function processarIA() {
-            const input = document.getElementById('ai-input');
-            const texto = input.value;
-            if(!texto) return;
-
-            const chat = document.getElementById('chat-box');
-            chat.innerHTML += `<div class="msg msg-user">${texto}</div>`;
-            input.value = "";
+            const inp = document.getElementById('ai-input'), box = document.getElementById('chat-box');
+            const txt = inp.value; if(!txt) return;
+            box.innerHTML += `<div class="msg msg-user">${txt}</div>`;
+            inp.value = "";
 
             try {
-                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer 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', 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        model: "llama-3.1-8b-instant",
-                        messages: [
-                            { role: "system", content: "Você é um cérebro financeiro. Extraia: {\"is_launch\":true, \"desc\":\"\", \"valor\":0.0, \"tipo\":\"entrada/fixo/lazer/investimento\"}. Se o usuário disser 'recebi', 'ganhei' ou 'auxilio', tipo é 'entrada'. Se for gasto comum, 'lazer'. Se for conta, 'fixo'." },
-                            { role: "user", content: texto }
-                        ],
-                        response_format: { type: "json_object" }
+                const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method:'POST', headers:{'Authorization':'Bearer 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','Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        model:"llama-3.1-8b-instant",
+                        messages:[
+                            {role:"system", content:"Você é uma IA financeira. Se o usuário quer lançar, retorne APENAS JSON: {\"is_launch\":true, \"desc\":\"nome\", \"valor\":0.0, \"tipo\":\"entrada/fixo/lazer\"}. Se for conversa, JSON: {\"is_launch\":false, \"msg\":\"resposta\"}. IMPORTANTE: 'recebi', 'ganhei', 'pix' é sempre TIPO ENTRADA."},
+                            {role:"user", content:txt}
+                        ], response_format:{"type":"json_object"}
                     })
                 });
-
-                const result = JSON.parse((await response.json()).choices[0].message.content);
-
-                if(result.is_launch) {
-                    await saveToFirebase(result);
-                    chat.innerHTML += `<div class="msg msg-ai">✅ Entendido! Lançado R$ ${result.valor} em ${result.desc}.</div>`;
+                const r = JSON.parse((await res.json()).choices[0].message.content);
+                if(r.is_launch) {
+                    const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo.toLowerCase());
+                    const snap = await ref.get();
+                    let list = snap.exists ? snap.data().transacoes || [] : [];
+                    list.push({ descricao: r.desc, valor: r.valor, tipo: r.tipo, data: new Date().toISOString() });
+                    await ref.set({ transacoes: list });
+                    box.innerHTML += `<div class="msg msg-ai">✅ Entendido! Salvei ${r.desc} de R$ ${r.valor} como ${r.tipo}.</div>`;
                 } else {
-                    chat.innerHTML += `<div class="msg msg-ai">Não entendi o valor. Pode repetir?</div>`;
+                    box.innerHTML += `<div class="msg msg-ai">${r.msg}</div>`;
                 }
-            } catch (e) {
-                chat.innerHTML += `<div class="msg msg-ai">Erro ao conectar com a inteligência.</div>`;
-            }
-            chat.scrollTop = chat.scrollHeight;
+            } catch(e) { box.innerHTML += `<div class="msg msg-ai">Erro ao processar.</div>`; }
+            box.scrollTop = box.scrollHeight;
         }
 
-        async function saveToFirebase(obj) {
-            const ref = db.doc(`usuarios/${auth.currentUser.uid}/meses/${mesAtivo.toLowerCase()}`);
+        async function del(idx) {
+            if(!confirm("Apagar?")) return;
+            const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo.toLowerCase());
             const snap = await ref.get();
-            let lista = snap.exists ? snap.data().transacoes || [] : [];
-            lista.push({
-                descricao: obj.desc,
-                valor: obj.valor,
-                tipo: obj.tipo,
-                data: new Date().toISOString()
-            });
-            await ref.set({ transacoes: lista });
+            let list = snap.data().transacoes;
+            list.splice(idx, 1);
+            await ref.set({ transacoes: list });
         }
 
-        async function deleteItem(idx) {
-            const ref = db.doc(`usuarios/${auth.currentUser.uid}/meses/${mesAtivo.toLowerCase()}`);
-            const snap = await ref.get();
-            let lista = snap.data().transacoes;
-            lista.splice(idx, 1);
-            await ref.set({ transacoes: lista });
+        function tab(t, b) {
+            document.getElementById('v-home').style.display = t==='home'?'block':'none';
+            document.getElementById('v-lista').style.display = t==='lista'?'block':'none';
+            document.querySelectorAll('.n-btn').forEach(x => x.classList.remove('active'));
+            b.classList.add('active');
         }
 
-        function showTab(t, btn) {
-            document.getElementById('tab-home').style.display = t === 'home' ? 'block' : 'none';
-            document.getElementById('tab-lista').style.display = t === 'lista' ? 'block' : 'none';
-            document.querySelectorAll('.n-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
-
-        function toggleIA() {
-            const m = document.getElementById('ai-modal');
-            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
-        }
+        function toggleIA() { const m = document.getElementById('ai-modal'); m.style.display = m.style.display==='flex'?'none':'flex'; }
 
         init();
     </script>
