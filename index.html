@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#EAB308">
     <link rel="manifest" href="manifest.json">
-    <title>Finan Pro | Final Fix</title>
+    <title>Finan Pro | Master Fix</title>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -30,7 +30,7 @@
         .m-item.active { background: var(--accent); color: #000; font-weight: 800; border-color: var(--accent); }
 
         .hero { text-align: center; padding: 35px 20px; }
-        .hero h1 { font-size: 2.8rem; font-weight: 900; letter-spacing: -1.5px; }
+        .hero h1 { font-size: 2.8rem; font-weight: 900; letter-spacing: -1.5px; transition: 0.3s; }
 
         .stat-card { background: var(--card); padding: 18px; border-radius: 20px; border: 1px solid var(--border); margin: 0 20px 15px; display: flex; justify-content: space-between; text-align: center; }
         .stat-card small { font-size: 0.6rem; color: var(--subtext); text-transform: uppercase; font-weight: 800; display: block; margin-bottom: 5px; }
@@ -81,7 +81,7 @@
 
     <div id="v-home">
         <div class="hero">
-            <small style="letter-spacing:1px; opacity:0.6;">SALDO ATUAL</small>
+            <small style="letter-spacing:1px; opacity:0.6;">SALDO ATUAL ACUMULADO</small>
             <h1 id="main-balance">R$ 0,00</h1>
         </div>
         <div class="stat-card">
@@ -124,45 +124,73 @@
 
         async function login() { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
 
+        // --- LÓGICA DE CÁLCULO MESTRE: CORREÇÃO DE MÊS PARA MÊS ---
         async function sync() {
             if(!auth.currentUser) return;
-            db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo)
+            const uid = auth.currentUser.uid;
+            
+            // 1. Descobrir saldo dos meses anteriores
+            let saldoAnterior = 0;
+            const idxAtual = MESES.indexOf(mesAtivo);
+            
+            for (let i = 0; i < idxAtual; i++) {
+                const mDoc = await db.collection("usuarios").doc(uid).collection("meses").doc(MESES[i]).get();
+                if (mDoc.exists) {
+                    const transacoes = mDoc.data().transacoes || [];
+                    transacoes.forEach(t => {
+                        const v = Number(t.valor) || 0;
+                        if (t.tipo.toLowerCase() === 'entrada') saldoAnterior += v;
+                        else saldoAnterior -= v;
+                    });
+                }
+            }
+
+            // 2. Escutar o mês atual
+            db.collection("usuarios").doc(uid).collection("meses").doc(mesAtivo)
             .onSnapshot(doc => {
-                // Reinicia acumuladores com Zero absoluto para evitar erros de soma
-                let somarRec = 0, somarGas = 0, html = "";
+                let recMes = 0, gasMes = 0, html = "";
                 let cats = { fixo: 0, lazer: 0, invest: 0, outros: 0 };
                 const trans = doc.exists ? doc.data().transacoes || [] : [];
                 
                 trans.forEach((t, i) => {
-                    const valorNum = Number(t.valor) || 0;
-                    const tipoLimpo = t.tipo.toLowerCase().trim();
+                    const v = Number(t.valor) || 0;
+                    const tp = t.tipo.toLowerCase().trim();
                     
-                    if(tipoLimpo === 'entrada') {
-                        somarRec += valorNum;
+                    if(tp === 'entrada') {
+                        recMes += v;
                     } else {
-                        somarGas += valorNum;
-                        if(tipoLimpo.includes('fixo')) cats.fixo += valorNum;
-                        else if(tipoLimpo.includes('lazer')) cats.lazer += valorNum;
-                        else if(tipoLimpo.includes('invest')) cats.invest += valorNum;
-                        else cats.outros += valorNum;
+                        gasMes += v;
+                        if(tp.includes('fixo')) cats.fixo += v;
+                        else if(tp.includes('lazer')) cats.lazer += v;
+                        else if(tp.includes('invest')) cats.invest += v;
+                        else cats.outros += v;
                     }
 
                     html += `
                         <div class="t-row">
                             <div class="t-info"><b>${t.descricao}</b><small>${t.tipo.toUpperCase()}</small></div>
                             <div class="t-actions">
-                                <b style="color:${tipoLimpo === 'entrada'?'var(--green)':'#fff'}">R$ ${valorNum.toFixed(2)}</b>
+                                <b style="color:${tp === 'entrada'?'var(--green)':'#fff'}">R$ ${v.toFixed(2)}</b>
                                 <button class="btn-del" onclick="apagar(${i})">✕</button>
                             </div>
                         </div>`;
                 });
 
-                const saldoFinal = somarRec - somarGas;
-                document.getElementById('main-balance').innerText = saldoFinal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
-                document.getElementById('st-rec').innerText = `R$ ${somarRec.toFixed(2)}`;
-                document.getElementById('st-gas').innerText = `R$ ${somarGas.toFixed(2)}`;
+                // CÁLCULO FINAL: Saldo Anterior + Receitas do Mês - Despesas do Mês
+                const saldoTotalFinal = saldoAnterior + recMes - gasMes;
+                
+                document.getElementById('main-balance').innerText = saldoTotalFinal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+                document.getElementById('st-rec').innerText = `R$ ${recMes.toFixed(2)}`;
+                document.getElementById('st-gas').innerText = `R$ ${gasMes.toFixed(2)}`;
+                
+                if (saldoAnterior !== 0) {
+                    html = `<div style="padding:10px 25px; font-size:0.7rem; color:var(--accent); font-weight:800; opacity:0.8;"> 
+                             Saldo vindo de meses anteriores: R$ ${saldoAnterior.toFixed(2)} 
+                            </div>` + html;
+                }
+
                 document.getElementById('cont-lista').innerHTML = html || '<p style="text-align:center; opacity:0.3; margin-top:50px;">Nenhum registro.</p>';
-                renderChart(cats, saldoFinal);
+                renderChart(cats, saldoTotalFinal);
             });
         }
 
@@ -181,7 +209,7 @@
             chart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Fixo', 'Lazer', 'Invest', 'Outros', 'Saldo'],
+                    labels: ['Fixo', 'Lazer', 'Invest', 'Outros', 'Disponível'],
                     datasets: [{
                         data: [c.fixo, c.lazer, c.invest, c.outros, saldo > 0 ? saldo : 0],
                         backgroundColor: ['#3B82F6', '#F59E0B', '#A855F7', '#EF4444', '#EAB308'],
@@ -206,7 +234,7 @@
                         model:"llama-3.1-8b-instant",
                         messages:[{
                             role:"system", 
-                            content: "Você é o FinanPro AI. Se o usuário quiser lançar algo, responda APENAS o JSON: {\"is_launch\":true,\"desc\":\"...\",\"valor\":0.0,\"tipo\":\"entrada/fixo/lazer/invest/outros\"}. REGRAS: Ganhos/Recebimentos = tipo entrada. Gastos/Pagos = escolha entre fixo, lazer, invest ou outros. Use sempre valores POSITIVOS no JSON. Se for conversa, use emojis 💸🚀."
+                            content: "Você é o FinanPro AI. Se o usuário quiser lançar algo, responda APENAS o JSON: {\"is_launch\":true,\"desc\":\"...\",\"valor\":0.0,\"tipo\":\"entrada/fixo/lazer/invest/outros\"}. Regra: Gastos = fixo, lazer, invest ou outros. Ganhos = entrada. Use sempre valores positivos. Se for conversa, use emojis 💸🚀."
                         }, {role:"user", content: userMsg}]
                     })
                 });
@@ -218,14 +246,13 @@
                     const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo);
                     const s = await ref.get();
                     let list = s.exists ? s.data().transacoes || [] : [];
-                    // Garante que o valor salvo seja um número puro
                     list.push({ descricao: r.desc, valor: Number(r.valor), tipo: r.tipo });
                     await ref.set({ transacoes: list });
-                    box.innerHTML += `<div class="msg msg-ai">✅ Tudo certo! Lançamento de "${r.desc}" registrado. 📈</div>`;
+                    box.innerHTML += `<div class="msg msg-ai">✅ Feito! Lançamento de "${r.desc}" registrado. Seu saldo acumulado foi atualizado! 📈</div>`;
                 } else {
                     box.innerHTML += `<div class="msg msg-ai">${aiMsg}</div>`;
                 }
-            } catch(e) { box.innerHTML += `<div class="msg msg-ai">Tive um pequeno erro técnico. Tenta de novo? 😅</div>`; }
+            } catch(e) { box.innerHTML += `<div class="msg msg-ai">Tive um probleminha. Pode repetir? 😅</div>`; }
             box.scrollTop = box.scrollHeight;
         }
 
