@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#EAB308">
-    <link rel="manifest" href="manifest.json">
-    <title>Finan Pro | Master Final</title>
+    <title>Finan Pro | Saúde Financeira</title>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -23,7 +22,7 @@
 
         .header { padding: 50px 20px 20px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
         .nav-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .user-badge { background: var(--accent); color: #000; padding: 6px 14px; border-radius: 10px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        .user-badge { background: var(--accent); color: #000; padding: 6px 14px; border-radius: 10px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; cursor: pointer; }
 
         .month-bar { display: flex; overflow-x: auto; gap: 8px; scrollbar-width: none; padding-bottom: 5px; }
         .m-item { padding: 10px 16px; border-radius: 12px; background: #1A1A1A; border: 1px solid var(--border); color: var(--subtext); font-size: 0.75rem; white-space: nowrap; cursor: pointer; }
@@ -33,7 +32,12 @@
         .hero h1 { font-size: 2.8rem; font-weight: 900; letter-spacing: -1.5px; }
 
         .stat-card { background: var(--card); padding: 18px; border-radius: 20px; border: 1px solid var(--border); margin: 0 20px 15px; display: flex; justify-content: space-between; text-align: center; }
+        .stat-card.column { flex-direction: column; text-align: left; gap: 15px; }
         .stat-card small { font-size: 0.6rem; color: var(--subtext); text-transform: uppercase; font-weight: 800; display: block; margin-bottom: 5px; }
+
+        .health-box { border-left: 4px solid var(--accent); padding-left: 15px; margin-bottom: 10px; }
+        .progress-bg { width: 100%; height: 8px; background: #27272A; border-radius: 4px; margin-top: 5px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; transition: 1s ease-in-out; }
 
         .chart-box { background: var(--card); border-radius: 25px; border: 1px solid var(--border); margin: 0 20px 25px; padding: 25px; display: flex; justify-content: center; }
         .chart-container { width: 160px; height: 160px; }
@@ -41,7 +45,6 @@
         .t-row { background: var(--card); padding: 16px; border-radius: 18px; margin: 0 20px 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .t-info b { font-size: 0.95rem; display: block; }
         .t-info small { color: var(--subtext); font-size: 0.65rem; text-transform: uppercase; font-weight: 700; }
-        
         .t-actions { display: flex; align-items: center; gap: 15px; }
         .btn-del { background: rgba(239, 68, 68, 0.1); border: none; color: var(--red); padding: 10px; border-radius: 12px; font-size: 1rem; cursor: pointer; }
 
@@ -61,12 +64,12 @@
 
     <div id="ai-modal" class="panel">
         <div style="padding:20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-            <b style="color:var(--accent)">INTELIGÊNCIA FINAN PRO ✨</b>
+            <b style="color:var(--accent)">ASSISTENTE FINAN PRO ✨</b>
             <button onclick="toggleIA()" style="background:none; border:none; color:#fff; font-size:2rem;">✕</button>
         </div>
         <div id="chat-box" class="chat-area"></div>
         <div style="padding:15px; display:flex; gap:10px; background:var(--card);">
-            <input type="text" id="ai-input" placeholder="O que deseja lançar?" style="flex:1; padding:18px; border-radius:15px; border:1px solid var(--border); background:#000; color:#fff; outline:none; font-size:1rem;">
+            <input type="text" id="ai-input" placeholder="Ex: Ganhei 100 reais hoje..." style="flex:1; padding:18px; border-radius:15px; border:1px solid var(--border); background:#000; color:#fff; outline:none; font-size:1rem;">
             <button onclick="processarIA()" style="background:var(--accent); border:none; padding:0 20px; border-radius:15px; font-weight:900;">OK</button>
         </div>
     </div>
@@ -79,9 +82,10 @@
         <div class="month-bar" id="month-list"></div>
     </header>
 
+    <!-- ABA HOME -->
     <div id="v-home">
         <div class="hero">
-            <small style="letter-spacing:1px; opacity:0.6;">SALDO ATUAL ACUMULADO</small>
+            <small style="letter-spacing:1px; opacity:0.6;">SALDO ATUAL</small>
             <h1 id="main-balance">R$ 0,00</h1>
         </div>
         <div class="stat-card">
@@ -92,12 +96,41 @@
         <div class="chart-box"><div class="chart-container"><canvas id="myChart"></canvas></div></div>
     </div>
 
+    <!-- ABA SAÚDE FINANCEIRA -->
+    <div id="v-saude" style="display:none; padding: 20px;">
+        <h2 style="margin-bottom:20px; font-size:1.4rem;">Minha Saúde Financeira</h2>
+        
+        <div class="stat-card column">
+            <div class="health-box">
+                <small>Essencial (50%)</small>
+                <b id="val-fixo">R$ 0,00 / R$ 0,00</b>
+                <div class="progress-bg"><div id="bar-fixo" class="progress-fill" style="background:var(--accent)"></div></div>
+            </div>
+            <div class="health-box" style="border-color: #3B82F6;">
+                <small>Lazer / Desejos (30%)</small>
+                <b id="val-lazer">R$ 0,00 / R$ 0,00</b>
+                <div class="progress-bg"><div id="bar-lazer" class="progress-fill" style="background:#3B82F6"></div></div>
+            </div>
+            <div class="health-box" style="border-color: var(--green);">
+                <small>Investimento / Dívidas (20%)</small>
+                <b id="val-invest">R$ 0,00 / R$ 0,00</b>
+                <div class="progress-bg"><div id="bar-invest" class="progress-fill" style="background:var(--green)"></div></div>
+            </div>
+        </div>
+
+        <div id="status-feedback" style="background:var(--card); padding:20px; border-radius:15px; border:1px solid var(--border); font-size:0.9rem; line-height:1.5;">
+            Aguardando dados para análise...
+        </div>
+    </div>
+
+    <!-- ABA EXTRATO -->
     <div id="v-lista" style="display:none; padding-top:20px;"><div id="cont-lista"></div></div>
 
     <button class="ai-fab" onclick="toggleIA()">✨</button>
 
     <nav class="nav-bot">
         <button class="n-btn active" onclick="tab('home', this)">RESUMO</button>
+        <button class="n-btn" onclick="tab('saude', this)">SAÚDE</button>
         <button class="n-btn" onclick="tab('lista', this)">EXTRATO</button>
     </nav>
 
@@ -109,7 +142,7 @@
         const MESES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
         let mesAtivo = MESES[new Date().getMonth()];
         let chart = null;
-        let unsubscribe = null; // Para gerenciar a escuta do Firebase
+        let unsubscribe = null;
 
         function init() {
             const mCont = document.getElementById('month-list');
@@ -132,13 +165,12 @@
 
         async function sync() {
             if(!auth.currentUser) return;
-            if(unsubscribe) unsubscribe(); // Para a escuta anterior para não duplicar
+            if(unsubscribe) unsubscribe();
 
             const uid = auth.currentUser.uid;
             let saldoAnterior = 0;
             const idxAtual = MESES.indexOf(mesAtivo);
             
-            // Soma saldo acumulado dos meses que ficaram para trás
             for (let i = 0; i < idxAtual; i++) {
                 const mDoc = await db.collection("usuarios").doc(uid).collection("meses").doc(MESES[i]).get();
                 if (mDoc.exists) {
@@ -168,14 +200,13 @@
                         else if(tp.includes('invest')) cats.invest += v;
                         else cats.outros += v;
                     }
-                    html += `
-                        <div class="t-row">
-                            <div class="t-info"><b>${t.descricao}</b><small>${t.tipo.toUpperCase()}</small></div>
-                            <div class="t-actions">
-                                <b style="color:${tp === 'entrada'?'var(--green)':'#fff'}">R$ ${v.toFixed(2)}</b>
-                                <button class="btn-del" onclick="apagar(${i})">✕</button>
-                            </div>
-                        </div>`;
+                    html += `<div class="t-row">
+                        <div class="t-info"><b>${t.descricao}</b><small>${t.tipo.toUpperCase()}</small></div>
+                        <div class="t-actions">
+                            <b style="color:${tp === 'entrada'?'var(--green)':'#fff'}">R$ ${v.toFixed(2)}</b>
+                            <button class="btn-del" onclick="apagar(${i})">✕</button>
+                        </div>
+                    </div>`;
                 });
 
                 const saldoTotalFinal = saldoAnterior + recMes - gasMes;
@@ -183,14 +214,34 @@
                 document.getElementById('st-rec').innerText = `R$ ${recMes.toFixed(2)}`;
                 document.getElementById('st-gas').innerText = `R$ ${gasMes.toFixed(2)}`;
                 
-                let headerLista = saldoAnterior !== 0 ? `<div style="padding:10px 25px; font-size:0.7rem; color:var(--accent); font-weight:800; opacity:0.8;">Saldo acumulado anterior: R$ ${saldoAnterior.toFixed(2)}</div>` : "";
-                document.getElementById('cont-lista').innerHTML = headerLista + (html || '<p style="text-align:center; opacity:0.3; margin-top:50px;">Sem registros neste mês.</p>');
+                let headerLista = saldoAnterior !== 0 ? `<div style="padding:10px 25px; font-size:0.7rem; color:var(--accent); font-weight:800; opacity:0.8;">Saldo anterior: R$ ${saldoAnterior.toFixed(2)}</div>` : "";
+                document.getElementById('cont-lista').innerHTML = headerLista + (html || '<p style="text-align:center; opacity:0.3; margin-top:50px;">Sem registros.</p>');
+                
                 renderChart(cats, saldoTotalFinal);
+                calcSaude(cats, recMes);
             });
         }
 
+        function calcSaude(c, rec) {
+            const mFixo = rec * 0.5, mLazer = rec * 0.3, mInvest = rec * 0.2;
+            
+            document.getElementById('val-fixo').innerText = `R$ ${c.fixo.toFixed(2)} / R$ ${mFixo.toFixed(2)}`;
+            document.getElementById('val-lazer').innerText = `R$ ${c.lazer.toFixed(2)} / R$ ${mLazer.toFixed(2)}`;
+            document.getElementById('val-invest').innerText = `R$ ${c.invest.toFixed(2)} / R$ ${mInvest.toFixed(2)}`;
+
+            document.getElementById('bar-fixo').style.width = Math.min((c.fixo/mFixo)*100 || 0, 100) + '%';
+            document.getElementById('bar-lazer').style.width = Math.min((c.lazer/mLazer)*100 || 0, 100) + '%';
+            document.getElementById('bar-invest').style.width = Math.min((c.invest/mInvest)*100 || 0, 100) + '%';
+
+            let msg = "✅ <b>Tudo sob controle!</b> Suas despesas estão equilibradas.";
+            if(c.fixo > mFixo) msg = "⚠️ <b>Atenção:</b> Seus custos fixos ultrapassaram 50% da receita. Tente reduzir gastos essenciais.";
+            else if(c.lazer > mLazer) msg = "🎢 <b>Cuidado:</b> Você está gastando muito com lazer. Tente segurar um pouco este mês.";
+            
+            document.getElementById('status-feedback').innerHTML = rec > 0 ? msg : "Cadastre suas receitas para ver a análise de saúde financeira.";
+        }
+
         async function apagar(idx) {
-            if(!confirm("Excluir este lançamento?")) return;
+            if(!confirm("Excluir?")) return;
             const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo);
             const s = await ref.get();
             let l = s.data().transacoes;
@@ -207,7 +258,7 @@
                     labels: ['Fixo', 'Lazer', 'Invest', 'Outros', 'Disponível'],
                     datasets: [{
                         data: [c.fixo, c.lazer, c.invest, c.outros, saldo > 0 ? saldo : 0],
-                        backgroundColor: ['#3B82F6', '#F59E0B', '#A855F7', '#EF4444', '#EAB308'],
+                        backgroundColor: ['#EAB308', '#3B82F6', '#22C55E', '#EF4444', '#1A1A1A'],
                         borderWidth: 0
                     }]
                 },
@@ -215,7 +266,6 @@
             });
         }
 
-        // --- AJUSTE NA IA: LANÇAMENTO NO MÊS SELECIONADO ---
         async function processarIA() {
             const inp = document.getElementById('ai-input'), box = document.getElementById('chat-box');
             if(!inp.value || !auth.currentUser) return;
@@ -230,7 +280,7 @@
                         model:"llama-3.1-8b-instant",
                         messages:[{
                             role:"system", 
-                            content: "Você é o FinanPro AI. Se o usuário quiser lançar algo, retorne APENAS o JSON: {\"is_launch\":true,\"desc\":\"...\",\"valor\":0.0,\"tipo\":\"entrada/fixo/lazer/invest/outros\"}. Ganhos = entrada. Gastos = fixo, lazer, invest ou outros. Sempre use valores positivos. Conversas use emojis."
+                            content: "Você é o Finan Pro AI. Ajude o usuário a controlar o dinheiro. Se ele disser algo como 'ganhei', 'perdi', 'recebi' ou 'gastei', extraia os dados e retorne APENAS o JSON: {\"is_launch\":true,\"desc\":\"...\",\"valor\":0.0,\"tipo\":\"entrada/fixo/lazer/invest/outros\"}. Caso contrário, converse amigavelmente dando dicas financeiras curtas."
                         }, {role:"user", content: userMsg}]
                     })
                 });
@@ -239,22 +289,22 @@
 
                 if(aiMsg.includes("{")) {
                     const r = JSON.parse(aiMsg.substring(aiMsg.indexOf("{"), aiMsg.lastIndexOf("}") + 1));
-                    // Aqui forçamos o salvamento no mesAtivo que está na tela
                     const ref = db.collection("usuarios").doc(auth.currentUser.uid).collection("meses").doc(mesAtivo);
                     const s = await ref.get();
                     let list = s.exists ? s.data().transacoes || [] : [];
                     list.push({ descricao: r.desc, valor: Number(r.valor), tipo: r.tipo });
                     await ref.set({ transacoes: list });
-                    box.innerHTML += `<div class="msg msg-ai">✅ Confirmado! Lançamento de "${r.desc}" feito no mês de ${mesAtivo.toUpperCase()}. 🚀</div>`;
+                    box.innerHTML += `<div class="msg msg-ai">✅ Entendido! Anotei aqui: <b>${r.desc}</b> de R$ ${r.valor}. Já atualizei seus gráficos!</div>`;
                 } else {
                     box.innerHTML += `<div class="msg msg-ai">${aiMsg}</div>`;
                 }
-            } catch(e) { box.innerHTML += `<div class="msg msg-ai">Ops, erro técnico. Tente novamente! 😅</div>`; }
+            } catch(e) { box.innerHTML += `<div class="msg msg-ai">Ops, tive um probleminha. Pode repetir?</div>`; }
             box.scrollTop = box.scrollHeight;
         }
 
         function tab(t, b) {
             document.getElementById('v-home').style.display = t==='home'?'block':'none';
+            document.getElementById('v-saude').style.display = t==='saude'?'block':'none';
             document.getElementById('v-lista').style.display = t==='lista'?'block':'none';
             document.querySelectorAll('.n-btn').forEach(x => x.classList.remove('active'));
             b.classList.add('active');
